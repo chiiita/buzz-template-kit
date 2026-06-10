@@ -1,0 +1,890 @@
+// バズ型HTMLテンプレ集ビルダー：1ソースから ①QA画像(satori) ②実HTMLアプリ
+// セーフゾーン準拠(上150/左右100/下160・縦中央)＋アカウントテーマ層(色/フォントをトークン化)
+import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
+import satori from 'satori'; import { html } from 'satori-html';
+import { Resvg } from '@resvg/resvg-js';
+import { PDFDocument } from 'pdf-lib';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// 公開用：アプリ本体はルート index.html（Vercelゼロ設定で静的配信）。QA画像は dist/QA
+const APP = path.join(__dirname, 'index.html');
+const QA  = path.join(__dirname, 'dist', 'QA');
+fs.mkdirSync(path.dirname(QA), { recursive: true });
+
+const KAKU="'Zen Kaku Gothic New'", DELA="'Dela Gothic One'", MIN="'Shippori Mincho'", MARU="'Zen Maru Gothic'", HAND="'Yomogi'";
+
+// 質感ヘルパー（Node/ブラウザ両対応）
+function shade(hex,p){const m=String(hex).replace('#','');const n=m.length===3?m.split('').map(c=>c+c).join(''):m;const r=parseInt(n.slice(0,2),16),g=parseInt(n.slice(2,4),16),b=parseInt(n.slice(4,6),16);const f=x=>Math.max(0,Math.min(255,Math.round(x+255*p)));return '#'+[f(r),f(g),f(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+function b64(s){return typeof Buffer!=='undefined'?Buffer.from(s).toString('base64'):btoa(s);}
+function icon(name,color,px,sw){const inner=ICONS[name];if(!inner)return '';const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="'+(sw||1.6)+'" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>';return '<img src="data:image/svg+xml;base64,'+b64(svg)+'" style="width:'+px+'px;height:'+px+'px;display:flex;"/>';}
+// 紙グレイン(ブラウザCSS用)＋手描きマーカー(画像背景用)
+const NOISE_B64=b64('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/></filter><rect width="160" height="160" filter="url(#n)"/></svg>');
+function markerBg(color){return b64('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M8 22 Q 80 10 150 19 T 292 15" stroke="'+color+'" stroke-width="34" fill="none" stroke-linecap="round" opacity="0.9"/></svg>');}
+// 改行(\n)を入れた位置だけで折る＝勝手な改行は足さない。入れなければ普通に流れる
+function nl(s){return String(s).split('\n').filter(x=>x.length).map(x=>'<div style="display:flex;">'+x+'</div>').join('');}
+// 袋文字(フチ文字)＝多方向textShadowで縁取り＋ドロップシャドウ。美容PR系の金フチ見出し用
+function outline(stroke,drop){const o=5;return [o+'px 0 '+stroke,'-'+o+'px 0 '+stroke,'0 '+o+'px '+stroke,'0 -'+o+'px '+stroke,o+'px '+o+'px '+stroke,'-'+o+'px '+o+'px '+stroke,o+'px -'+o+'px '+stroke,'-'+o+'px -'+o+'px '+stroke,'7px 9px 0 '+(drop||'rgba(0,0,0,0.15)')].join(',');}
+// 顔の図解（resvgはSVG内textを描画しないので顔は図形のみ・%はHTML側でゾーン色対応リストにする）
+function faceSVG(cf,cc,cj,v){const H='#7C6A56';
+const capD='<path d="M78,295 Q66,88 230,88 Q394,88 382,295 Q380,180 230,180 Q80,180 78,295 Z" fill="'+H+'"/>';
+const capR='<path d="M88,300 Q76,100 230,96 Q384,100 372,300 Q368,205 230,200 Q92,205 88,300 Z" fill="'+H+'"/>';
+const capBob='<path d="M72,300 Q60,98 230,90 Q400,98 388,300 Q392,392 366,396 Q384,300 348,212 Q298,165 230,160 Q162,165 112,212 Q76,300 94,396 Q70,392 72,300 Z" fill="'+H+'"/>';
+const longH='<path d="M62,250 Q56,98 230,90 Q404,98 398,250 L394,505 Q372,505 354,502 Q386,320 352,212 Q300,165 230,160 Q160,165 108,212 Q74,320 106,502 Q88,505 66,505 Z" fill="'+H+'"/>';
+const pony='<path d="M346,150 Q438,168 432,332 Q428,424 388,432 Q412,340 388,254 Q366,198 330,176 Z" fill="'+H+'"/>';
+const glass='<rect x="158" y="298" width="60" height="46" rx="14" fill="none" stroke="#3a3a3a" stroke-width="6"/><rect x="242" y="298" width="60" height="46" rx="14" fill="none" stroke="#3a3a3a" stroke-width="6"/><line x1="218" y1="320" x2="242" y2="320" stroke="#3a3a3a" stroke-width="6"/>';
+let back='',cap=capD,glasses='';
+if(v==='女性')back=longH;
+else if(v==='シンプル')cap=capR;
+else if(v==='女性ショート')cap=capBob;
+else if(v==='ポニーテール')back=pony;
+else if(v==='眼鏡'){back=longH;glasses=glass;}
+const s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 560">'
++back
++'<ellipse cx="230" cy="300" rx="150" ry="195" fill="#F3D9C2"/>'
++cap
++'<ellipse cx="230" cy="232" rx="92" ry="44" fill="'+cf+'" opacity="0.5"/>'
++'<ellipse cx="132" cy="336" rx="48" ry="60" fill="'+cc+'" opacity="0.45"/>'
++'<ellipse cx="328" cy="336" rx="48" ry="60" fill="'+cc+'" opacity="0.45"/>'
++'<ellipse cx="230" cy="448" rx="72" ry="44" fill="'+cj+'" opacity="0.5"/>'
++'<path d="M162,292 Q188,283 214,292" stroke="#5a4a3a" stroke-width="6" fill="none" stroke-linecap="round"/>'
++'<path d="M246,292 Q272,283 298,292" stroke="#5a4a3a" stroke-width="6" fill="none" stroke-linecap="round"/>'
++'<ellipse cx="188" cy="320" rx="13" ry="17" fill="#4a3a2e"/>'
++'<ellipse cx="272" cy="320" rx="13" ry="17" fill="#4a3a2e"/>'
++'<path d="M230,332 L221,376 Q230,384 239,376" stroke="#d8b294" stroke-width="5" fill="none" stroke-linecap="round"/>'
++'<path d="M198,416 Q230,436 262,416" stroke="#c5887a" stroke-width="7" fill="none" stroke-linecap="round"/>'
++glasses
++'</svg>';return 'data:image/svg+xml;base64,'+b64(s);}
+
+// lucideアイコン読込（curated）→ ICONS。ブラウザにはJSON埋め込み
+const ICON_NAMES=['check','x','piggy-bank','coins','wallet','banknote','hand-coins','japanese-yen','trending-up','trending-down','sparkles','heart','star','shield','smartphone','zap','tv','house','gift','landmark','sprout','leaf','dumbbell','plane','utensils','coffee','cat','dog','baby','book-open','graduation-cap','briefcase','palette','camera','music','lightbulb','alarm-clock','target','bookmark','flame','droplet','arrow-up','share-2','bell','message-circle','send','map-pin','clock','calendar'];
+function lucideInner(name){try{const s=fs.readFileSync(path.join(__dirname,'node_modules/lucide-static/icons',name+'.svg'),'utf8');return s.replace(/<!--[\s\S]*?-->/,'').replace(/<svg[^>]*>/,'').replace(/<\/svg>/,'').trim();}catch{return null;}}
+const ICONS={}; for(const n of ICON_NAMES){const i=lucideInner(n); if(i)ICONS[n]=i;}
+
+// ===== アカウントテーマ（ターゲット/ニッチ別の最適色・フォント）=====
+const THEMES = {
+  money:   { name:'お金・節約（庶民情報）', bg:'#FBF8F1', panel:'#FFFFFF', panelSoft:'#F6E2D8', ink:'#211C18', sub:'#8C857B', line:'#E7DECB', accent:'#E0352B', accentDeep:'#B5281F', onAccent:'#FBF8F1', darkBg:'#161310', darkInk:'#FFFFFF', darkAccent:'#FF6A5A', darkSub:'#B9B2A8', head:KAKU, body:KAKU, display:DELA },
+  beauty:  { name:'美容・女性', bg:'#FBF1F0', panel:'#FFFFFF', panelSoft:'#F6E2E6', ink:'#5A4F54', sub:'#B59AA0', line:'#ECD4D6', accent:'#D08698', accentDeep:'#AC647A', onAccent:'#FFFFFF', darkBg:'#3A2A2E', darkInk:'#FBF1F0', darkAccent:'#E8A8B6', darkSub:'#C9B2B7', head:MARU, body:MARU, display:MARU },
+  quote:   { name:'名言・メンタル', bg:'#F2ECE3', panel:'#FFFFFF', panelSoft:'#EAE0D0', ink:'#3E3A35', sub:'#A89A88', line:'#CEC2B0', accent:'#A98A6F', accentDeep:'#876B53', onAccent:'#FBF8F1', darkBg:'#2A2620', darkInk:'#F1E9D9', darkAccent:'#C8A45C', darkSub:'#B5AB98', head:MIN, body:MARU, display:MIN },
+  business:{ name:'ビジネス・仕事術', bg:'#F4F6FA', panel:'#FFFFFF', panelSoft:'#E3EAF6', ink:'#1B2A4A', sub:'#8893A8', line:'#C7D3E8', accent:'#2D6CDF', accentDeep:'#1E4FAE', onAccent:'#FFFFFF', darkBg:'#0E1B33', darkInk:'#FFFFFF', darkAccent:'#6FA0FF', darkSub:'#9FB3D8', head:KAKU, body:KAKU, display:DELA },
+  wellness:{ name:'健康・ウェルネス', bg:'#EFF2EA', panel:'#FFFFFF', panelSoft:'#DCE6D0', ink:'#39413A', sub:'#8A9682', line:'#CBD6C2', accent:'#6FA060', accentDeep:'#4E7A42', onAccent:'#FFFFFF', darkBg:'#232A22', darkInk:'#EFF2EA', darkAccent:'#9CCB86', darkSub:'#AAB5A0', head:MIN, body:MARU, display:KAKU },
+  kids:    { name:'子育て・ママ', bg:'#FFF7EE', panel:'#FFFFFF', panelSoft:'#FCE7D5', ink:'#5B4A3C', sub:'#B5A08E', line:'#F0DEC9', accent:'#F2925E', accentDeep:'#D26E3C', onAccent:'#FFFFFF', darkBg:'#3B2E25', darkInk:'#FFF7EE', darkAccent:'#FBB07E', darkSub:'#C9B7A8', head:MARU, body:MARU, display:MARU },
+  english: { name:'英語学習', bg:'#EAF3F2', panel:'#FFFFFF', panelSoft:'#D3E8E4', ink:'#1E3A38', sub:'#7C9794', line:'#C2DBD6', accent:'#1FA39A', accentDeep:'#147F77', onAccent:'#FFFFFF', darkBg:'#10302C', darkInk:'#EAF3F2', darkAccent:'#4FD0C4', darkSub:'#9FB8B4', head:KAKU, body:KAKU, display:DELA },
+  gourmet: { name:'グルメ・食', bg:'#FBF5EC', panel:'#FFFFFF', panelSoft:'#F3E2CE', ink:'#3A2A20', sub:'#A28B76', line:'#E4D2BC', accent:'#C0492C', accentDeep:'#9A3621', onAccent:'#FBF5EC', darkBg:'#241813', darkInk:'#FBF5EC', darkAccent:'#E88A5E', darkSub:'#C2A893', head:MIN, body:MARU, display:MIN },
+  mono:    { name:'モノトーン・モード', bg:'#F4F2EE', panel:'#FFFFFF', panelSoft:'#E6E2DA', ink:'#1A1A1A', sub:'#8A857C', line:'#D8D3C9', accent:'#A8884E', accentDeep:'#86692F', onAccent:'#FFFFFF', darkBg:'#1A1A1A', darkInk:'#F4F2EE', darkAccent:'#C9A24B', darkSub:'#9A958C', head:MIN, body:KAKU, display:DELA },
+  fitness: { name:'フィットネス・筋トレ', bg:'#16191D', panel:'#23272D', panelSoft:'#2C3138', ink:'#FFFFFF', sub:'#9AA2AC', line:'#363B42', accent:'#CDF53C', accentDeep:'#A9CC1F', onAccent:'#16191D', darkBg:'#0C0E10', darkInk:'#FFFFFF', darkAccent:'#CDF53C', darkSub:'#888F98', head:KAKU, body:KAKU, display:DELA },
+  travel:  { name:'旅行・お出かけ', bg:'#EEF6FB', panel:'#FFFFFF', panelSoft:'#D7EAF5', ink:'#1C3D52', sub:'#7B9AAC', line:'#C2DCEC', accent:'#2E9BD6', accentDeep:'#1E7BB0', onAccent:'#FFFFFF', darkBg:'#10293B', darkInk:'#EEF6FB', darkAccent:'#62C2F0', darkSub:'#9FBCCD', head:KAKU, body:KAKU, display:DELA },
+  love:    { name:'恋愛・婚活', bg:'#FBF0F0', panel:'#FFFFFF', panelSoft:'#F3DADF', ink:'#5A3A40', sub:'#B98F97', line:'#EAD0D5', accent:'#C25B72', accentDeep:'#9E3F56', onAccent:'#FFFFFF', darkBg:'#3A222A', darkInk:'#FBF0F0', darkAccent:'#E59AAC', darkSub:'#C9A3AB', head:MIN, body:MARU, display:MIN },
+  pet:     { name:'ペット', bg:'#F5F2E8', panel:'#FFFFFF', panelSoft:'#E9E2CE', ink:'#4F4536', sub:'#A99E86', line:'#DED4BD', accent:'#C58A5A', accentDeep:'#A06A3D', onAccent:'#FFFFFF', darkBg:'#332B20', darkInk:'#F5F2E8', darkAccent:'#E0A877', darkSub:'#BDB29A', head:MARU, body:MARU, display:MARU },
+  career:  { name:'転職・キャリア', bg:'#F1F4F3', panel:'#FFFFFF', panelSoft:'#DCE6E3', ink:'#243B38', sub:'#7E9893', line:'#C6D8D3', accent:'#E07B39', accentDeep:'#B85F23', onAccent:'#FFFFFF', darkBg:'#152826', darkInk:'#F1F4F3', darkAccent:'#F2A268', darkSub:'#9DB3AE', head:KAKU, body:KAKU, display:DELA },
+  invest:  { name:'投資・資産運用', bg:'#F3F2EE', panel:'#FFFFFF', panelSoft:'#E6E2D6', ink:'#23262E', sub:'#8A8B86', line:'#D6D2C6', accent:'#B8923E', accentDeep:'#94722B', onAccent:'#FFFFFF', darkBg:'#15171C', darkInk:'#F3F2EE', darkAccent:'#D8B25A', darkSub:'#9A9B96', head:MIN, body:KAKU, display:DELA },
+  spiritual:{ name:'占い・スピリチュアル', bg:'#F2EEF6', panel:'#FFFFFF', panelSoft:'#E2D8EE', ink:'#3A2F4A', sub:'#9788A8', line:'#D6C9E4', accent:'#7E5AA8', accentDeep:'#5E3F86', onAccent:'#FFFFFF', darkBg:'#241B33', darkInk:'#F2EEF6', darkAccent:'#B79AD8', darkSub:'#A899B8', head:MIN, body:MARU, display:MIN },
+  tech:    { name:'ガジェット・IT', bg:'#EEF1F4', panel:'#FFFFFF', panelSoft:'#DBE2EA', ink:'#1A2330', sub:'#7C8896', line:'#C5D0DB', accent:'#0E7CCB', accentDeep:'#0A5E9B', onAccent:'#FFFFFF', darkBg:'#0D1117', darkInk:'#EEF1F4', darkAccent:'#3BA7F0', darkSub:'#8995A3', head:KAKU, body:KAKU, display:DELA },
+  nightfood:{ name:'グルメ夜・お酒', bg:'#1C1612', panel:'#2A211C', panelSoft:'#33281F', ink:'#F2E8DC', sub:'#A8988A', line:'#3D3128', accent:'#D98A3D', accentDeep:'#B36C28', onAccent:'#1C1612', darkBg:'#120D0A', darkInk:'#F2E8DC', darkAccent:'#E8A85E', darkSub:'#A8988A', head:MIN, body:MARU, display:MIN },
+  cat:     { name:'猫・ねこ', bg:'#F2F0EE', panel:'#FFFFFF', panelSoft:'#E4E0DC', ink:'#3E3A38', sub:'#9C958F', line:'#DAD4CE', accent:'#B98A86', accentDeep:'#97655F', onAccent:'#FFFFFF', darkBg:'#2A2624', darkInk:'#F2F0EE', darkAccent:'#D6A9A4', darkSub:'#ADA39C', head:MARU, body:MARU, display:MARU },
+  kidsedu: { name:'知育・キッズ英語', bg:'#FFF9E8', panel:'#FFFFFF', panelSoft:'#FDE9B8', ink:'#2E4A6B', sub:'#8FA3BC', line:'#F5DC98', accent:'#FF7A45', accentDeep:'#E0561F', onAccent:'#FFFFFF', darkBg:'#21385A', darkInk:'#FFF9E8', darkAccent:'#FFA374', darkSub:'#9FB3CC', head:MARU, body:MARU, display:MARU },
+  korean:  { name:'韓国・オルチャン', bg:'#EFEBE5', panel:'#FFFFFF', panelSoft:'#E2DCD2', ink:'#3A3531', sub:'#9E968B', line:'#D8D0C4', accent:'#A8957F', accentDeep:'#86735E', onAccent:'#FFFFFF', darkBg:'#2A2622', darkInk:'#EFEBE5', darkAccent:'#C7B49C', darkSub:'#A89E92', head:MIN, body:KAKU, display:MIN },
+  handmade:{ name:'ハンドメイド・クラフト', bg:'#F4EFE4', panel:'#FFFFFF', panelSoft:'#E6DCC6', ink:'#4A4334', sub:'#A39A82', line:'#DCD0B8', accent:'#B5703F', accentDeep:'#8E5529', onAccent:'#FFFFFF', darkBg:'#2E2A20', darkInk:'#F4EFE4', darkAccent:'#C99A5E', darkSub:'#B5AC95', head:HAND, body:MARU, display:HAND },
+  outdoor: { name:'アウトドア・キャンプ', bg:'#EEF0E6', panel:'#FFFFFF', panelSoft:'#DDE2CC', ink:'#2C3A28', sub:'#7E8A72', line:'#C8D2B8', accent:'#5E7A3E', accentDeep:'#46602C', onAccent:'#FFFFFF', darkBg:'#1E2A1A', darkInk:'#EEF0E6', darkAccent:'#8FB069', darkSub:'#A0AC92', head:KAKU, body:KAKU, display:DELA },
+  study:   { name:'勉強・受験', bg:'#FBF7EE', panel:'#FFFFFF', panelSoft:'#F3E6CC', ink:'#3A3322', sub:'#A99E82', line:'#E6DABF', accent:'#E0A12E', accentDeep:'#B87E1C', onAccent:'#FFFFFF', darkBg:'#2A2418', darkInk:'#FBF7EE', darkAccent:'#F2C45E', darkSub:'#B8AE92', head:KAKU, body:KAKU, display:DELA },
+  music:   { name:'音楽・エンタメ', bg:'#1A1622', panel:'#272034', panelSoft:'#2F2740', ink:'#F2EEF6', sub:'#A99CB8', line:'#3A3150', accent:'#FF4D8D', accentDeep:'#D62E6E', onAccent:'#FFFFFF', darkBg:'#0F0C17', darkInk:'#F2EEF6', darkAccent:'#FF7AAB', darkSub:'#A99CB8', head:KAKU, body:KAKU, display:DELA },
+  beautypr:{ name:'美容PR(ゴールド袋文字)', bg:'#F4EAD2', panel:'#FFFFFF', panelSoft:'#EDE0BE', ink:'#4E4228', sub:'#A1916B', line:'#DECFA6', accent:'#C7A23E', accentDeep:'#9C7A22', onAccent:'#FFFFFF', darkBg:'#3A3218', darkInk:'#F4EAD2', darkAccent:'#E0BE5A', darkSub:'#B6A678', head:KAKU, body:KAKU, display:DELA },
+  pastel:  { name:'診断・やわらかパステル', bg:'#FBF6F8', panel:'#FFFFFF', panelSoft:'#F3E6EE', ink:'#5A4A52', sub:'#A99AA2', line:'#ECDDE6', accent:'#E089A6', accentDeep:'#C56A88', onAccent:'#FFFFFF', darkBg:'#4A3A42', darkInk:'#FBF6F8', darkAccent:'#F0A6BE', darkSub:'#B6A2AC', head:MARU, body:MARU, display:DELA },
+  recipe:  { name:'レシピ・あたたか暖色', bg:'#FBF3E8', panel:'#FFFFFF', panelSoft:'#F3E2C8', ink:'#5A4630', sub:'#A8916E', line:'#E6D6BC', accent:'#E8893E', accentDeep:'#C2692A', onAccent:'#FFFFFF', darkBg:'#3E2E1C', darkInk:'#FBF3E8', darkAccent:'#F0A862', darkSub:'#B69A78', head:MARU, body:KAKU, display:DELA },
+};
+
+// 共通フレーム（セーフ余白＋縦中央＋奥行きグラデ）
+function wrap(o, inner){
+  const g=`radial-gradient(circle at 50% 32%, ${shade(o.bg,0.035)}, ${o.bg} 58%, ${shade(o.bg,-0.045)})`;
+  return `<div style="width:1080px;height:1350px;box-sizing:border-box;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:${o.align||'stretch'};padding:150px 100px 160px;background:${g};color:${o.color};font-family:${o.font};">${inner}</div>`;
+}
+
+const TEMPLATES = [
+  // ===== 表紙 =====
+  { id:'cover_target', name:'A2 ターゲット名指し（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'誰へ（バッジ）',def:'節約してるのに、貯まらない人へ'},{key:'line1',label:'前置き',def:'がんばってるのに、'},{key:'big',label:'特大ワード',def:'貯まらない。'},{key:'revealA',label:'反転前',def:'犯人は、'},{key:'revealHot',label:'反転（アクセント）',def:'固定費'},{key:'revealB',label:'反転後',def:'。'},{key:'proof',label:'証拠',def:'見直すだけで、年18万円の差。'},{key:'foot',label:'下部誘導',def:'知らないと損する、見直し7つ →'},{key:'icon',label:'意匠アイコン(任意)',type:'icon',def:'piggy-bank'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      ${d.icon?`<div style="position:absolute;bottom:104px;right:64px;display:flex;opacity:0.5;">${icon(d.icon,t.line,290,1.3)}</div>`:''}
+      <div style="display:flex;align-self:flex-start;background:${t.ink};color:${t.bg};font-size:34px;font-weight:700;padding:18px 30px;border-radius:16px;margin-bottom:50px;">${d.badge}</div>
+      <div style="display:flex;font-size:56px;font-weight:700;">${d.line1}</div>
+      <div style="display:flex;font-size:150px;font-family:${t.display};line-height:1.05;background-image:linear-gradient(180deg, transparent 60%, #FCE15A 60%, #FCE15A 88%, transparent 88%);">${d.big}</div>
+      <div style="display:flex;margin-top:30px;font-size:70px;font-weight:900;font-family:${t.head};">${d.revealA}<span style="color:${t.accent};">${d.revealHot}</span>${d.revealB}</div>
+      <div style="display:flex;flex-direction:column;margin-top:38px;font-size:44px;font-weight:700;">${nl(d.proof)}</div>
+      <div style="display:flex;flex-direction:column;margin-top:60px;font-size:34px;font-weight:700;color:${t.sub};">${nl(d.foot)}</div>`) },
+
+  { id:'cover_number', name:'A5 金額・数字インパクト（表紙）', cat:'表紙',
+    fields:[{key:'kicker',label:'キッカー',def:'見直さないだけで'},{key:'pre',label:'数字前',def:'年'},{key:'number',label:'数字',def:'18'},{key:'unit',label:'単位',def:'万円'},{key:'claim',label:'断定',def:'損してる。'},{key:'foot',label:'下部誘導',def:'保存して、週末に見直す →'}],
+    render:(d,t)=>wrap({bg:t.darkBg,color:t.darkInk,font:t.body,align:'center'},`
+      <div style="display:flex;font-size:42px;font-weight:700;color:${t.darkAccent};">${d.kicker}</div>
+      <div style="display:flex;align-items:baseline;margin-top:10px;"><div style="display:flex;font-size:90px;font-weight:700;">${d.pre}</div><div style="display:flex;font-size:300px;font-weight:800;font-family:${t.display};color:${t.darkAccent};line-height:1;">${d.number}</div><div style="display:flex;font-size:96px;font-weight:700;">${d.unit}</div></div>
+      <div style="display:flex;font-size:58px;font-weight:700;margin-top:6px;">${d.claim}</div>
+      <div style="display:flex;font-size:34px;color:${t.darkSub};margin-top:54px;">${d.foot}</div>`) },
+
+  { id:'cover_quote', name:'A7 上品・余白名言（表紙）', cat:'表紙',
+    fields:[{key:'label',label:'ラベル',def:'気にしない練習'},{key:'line1',label:'一言1行目',def:'人といるだけで、'},{key:'line2',label:'一言2行目',def:'なんだか疲れる。'},{key:'support',label:'裏付け',def:'気にしすぎを手放す、8の言葉'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.head,align:'center'},`
+      <div style="display:flex;font-family:${t.body};font-size:30px;letter-spacing:6px;color:${t.accent};">${d.label}</div>
+      <div style="display:flex;width:80px;height:2px;background:${t.accent};margin-top:22px;margin-bottom:40px;"></div>
+      <div style="display:flex;font-size:84px;font-weight:700;line-height:1.5;">${d.line1}</div>
+      <div style="display:flex;font-size:84px;font-weight:700;line-height:1.5;">${d.line2}</div>
+      <div style="display:flex;font-family:${t.body};font-size:34px;color:${t.accent};margin-top:48px;">${d.support}</div>`) },
+
+  { id:'cover_question', name:'A1 図示・問いかけ（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'誰へ',def:'貯金できない人へ'},{key:'q1',label:'問い1',def:'なんで、お金が'},{key:'q2',label:'問い2',def:'残らないんだろう？'},{key:'hint',label:'引き',def:'理由は、たった3つ。'},{key:'foot',label:'下部',def:'保存して読んでね →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;background:${t.ink};color:${t.bg};font-size:32px;font-weight:700;padding:14px 28px;border-radius:14px;margin-bottom:40px;">${d.badge}</div>
+      <div style="display:flex;font-size:150px;font-family:${t.display};color:${t.accent};line-height:1;">?</div>
+      <div style="display:flex;font-size:72px;font-weight:900;font-family:${t.head};margin-top:24px;">${d.q1}</div>
+      <div style="display:flex;font-size:72px;font-weight:900;font-family:${t.head};">${d.q2}</div>
+      <div style="display:flex;font-size:38px;font-weight:700;color:${t.accent};margin-top:34px;">${d.hint}</div>
+      <div style="display:flex;font-size:32px;color:${t.sub};margin-top:50px;">${d.foot}</div>`) },
+
+  { id:'cover_nsen', name:'A3 N選・番号（表紙）', cat:'表紙',
+    fields:[{key:'save',label:'バッジ',def:'保存版'},{key:'topic',label:'テーマ',def:'もう迷わない節約'},{key:'count',label:'数',def:'7'},{key:'unit',label:'単位',def:'選'},{key:'foot',label:'下部',def:'1枚ずつ見ていってね →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;background:${t.ink};color:${t.bg};font-size:30px;font-weight:900;padding:12px 26px;border-radius:10px;">${d.save}</div>
+      <div style="display:flex;font-size:64px;font-weight:900;font-family:${t.head};margin-top:34px;">${d.topic}</div>
+      <div style="display:flex;align-items:center;justify-content:center;width:400px;height:400px;border-radius:50%;background:${t.accent};margin-top:34px;"><div style="display:flex;align-items:baseline;color:${t.onAccent};"><div style="display:flex;font-family:${t.display};font-size:250px;line-height:1;">${d.count}</div><div style="display:flex;font-size:84px;font-weight:900;">${d.unit}</div></div></div>
+      <div style="display:flex;font-size:34px;color:${t.sub};margin-top:40px;">${d.foot}</div>`) },
+
+  { id:'cover_warning', name:'A4 損失回避・警告（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'警告バッジ',def:'知らないと損'},{key:'line1',label:'1行目',def:'貯まらない人が'},{key:'hotword',label:'強調行',def:'必ずやってる'},{key:'line2',label:'3行目',def:'3つの習慣。'},{key:'foot',label:'下部',def:'あなたは大丈夫？ →'}],
+    render:(d,t)=>wrap({bg:t.darkBg,color:t.darkInk,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-self:flex-start;background:${t.accent};color:${t.onAccent};font-size:34px;font-weight:900;padding:14px 28px;border-radius:10px;margin-bottom:50px;">${d.badge}</div>
+      <div style="display:flex;font-size:82px;font-weight:900;font-family:${t.head};line-height:1.3;">${d.line1}</div>
+      <div style="display:flex;font-size:82px;font-weight:900;font-family:${t.head};line-height:1.3;color:${t.darkAccent};">${d.hotword}</div>
+      <div style="display:flex;font-size:82px;font-weight:900;font-family:${t.head};line-height:1.3;">${d.line2}</div>
+      <div style="display:flex;margin-top:56px;font-size:36px;color:${t.darkSub};">${d.foot}</div>`) },
+
+  { id:'cover_paradox', name:'A6 パラドックス（表紙）', cat:'表紙',
+    fields:[{key:'subjectA',label:'主語（〜ほど）',def:'節約を“がんばる”人ほど、'},{key:'result',label:'意外な結果',def:'貯まらない。'},{key:'reason',label:'理由予告',def:'その理由、5つあります。'},{key:'foot',label:'下部',def:'保存して確かめて →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;font-size:64px;font-weight:700;">${d.subjectA}</div>
+      <div style="display:flex;font-size:120px;font-family:${t.display};color:${t.accent};line-height:1.05;margin-top:14px;">${d.result}</div>
+      <div style="display:flex;font-size:44px;font-weight:700;margin-top:40px;">${d.reason}</div>
+      <div style="display:flex;margin-top:60px;font-size:34px;color:${t.sub};">${d.foot}</div>`) },
+
+  { id:'cover_grad', name:'A8 グラデ＋特大＋N選（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'バッジ',def:'保存版'},{key:'head',label:'特大見出し（改行で折る）',def:'知らないだけで\n損してるお金'},{key:'num',label:'数字',def:'18'},{key:'unit',label:'単位',def:'選'},{key:'foot',label:'下部',def:'全部チェックして →'}],
+    render:(d,t)=>`<div style="width:1080px;height:1350px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding:150px 100px 160px;background:linear-gradient(135deg, ${t.accent}, ${t.accentDeep});color:#ffffff;font-family:${t.body};">
+      <div style="display:flex;align-self:flex-start;background:rgba(255,255,255,0.22);color:#ffffff;font-size:32px;font-weight:700;padding:14px 28px;border-radius:10px;margin-bottom:40px;">${d.badge}</div>
+      <div style="display:flex;flex-direction:column;font-size:98px;font-weight:900;font-family:${t.head};line-height:1.2;color:#ffffff;">${nl(d.head)}</div>
+      <div style="display:flex;align-items:baseline;margin-top:30px;"><div style="display:flex;font-family:${t.display};font-size:170px;color:#ffffff;line-height:1;">${d.num}</div><div style="display:flex;font-size:70px;font-weight:900;margin-left:12px;color:#ffffff;">${d.unit}</div></div>
+      <div style="display:flex;margin-top:36px;font-size:34px;color:rgba(255,255,255,0.85);">${d.foot}</div>
+    </div>` },
+
+  { id:'cover_clean', name:'A9 白地2色＋編バッジ（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'バッジ',def:'無料テンプレ付'},{key:'line1',label:'見出し1（アクセント色）',def:'お金が貯まる'},{key:'line2',label:'見出し2',def:'仕組みの作り方'},{key:'sub',label:'サブ（改行で折る）',def:'がんばらずに、自動で。'},{key:'foot',label:'下部',def:'保存して見返す →'}],
+    render:(d,t)=>wrap({bg:'#FFFFFF',color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-self:flex-start;background:${t.ink};color:#ffffff;font-size:32px;font-weight:900;padding:12px 26px;border-radius:8px;margin-bottom:44px;">${d.badge}</div>
+      <div style="display:flex;flex-direction:column;font-size:104px;font-weight:900;font-family:${t.head};line-height:1.18;"><div style="display:flex;color:${t.accent};">${d.line1}</div><div style="display:flex;color:${t.ink};">${d.line2}</div></div>
+      <div style="display:flex;flex-direction:column;margin-top:40px;font-size:40px;font-weight:700;color:${t.sub};">${nl(d.sub)}</div>
+      <div style="display:flex;margin-top:50px;font-size:34px;color:${t.sub};">${d.foot}</div>`) },
+
+  { id:'cover_photo_corner', name:'A15 全面写真＋見出し（表紙）', cat:'表紙',
+    fields:[{key:'photo',label:'写真をアップ',type:'file',def:''},{key:'badge',label:'バッジ',def:'まとめ'},{key:'head',label:'見出し（改行で折る）',def:'貯まる人の\n習慣、全部。'},{key:'foot',label:'下部',def:'保存版 →'}],
+    render:(d,t)=>{const bg=d.photo?`background-image:url(${d.photo});background-size:cover;background-position:center;`:`background-color:${t.panelSoft};`;
+      return `<div style="width:1080px;height:1350px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:120px 90px;font-family:${t.body};${bg}">
+        <div style="display:flex;flex-direction:column;align-self:flex-start;background:rgba(0,0,0,0.55);border-radius:22px;padding:40px;">
+          <div style="display:flex;align-self:flex-start;background:${t.accent};color:${t.onAccent};font-size:28px;font-weight:700;padding:10px 22px;border-radius:8px;margin-bottom:26px;">${d.badge}</div>
+          <div style="display:flex;flex-direction:column;font-size:86px;font-weight:900;font-family:${t.head};color:#ffffff;line-height:1.25;">${nl(d.head)}</div>
+        </div>
+        <div style="display:flex;align-self:flex-start;background:rgba(0,0,0,0.55);border-radius:14px;padding:16px 26px;font-size:32px;color:#ffffff;">${d.foot}</div>
+      </div>`;} },
+
+  { id:'cover_ba', name:'A17 Before→After予告（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'バッジ',def:'1ヶ月で'},{key:'title',label:'見出し（改行で折る）',def:'貯金ゼロから\nこう変わった。'},{key:'before',label:'Before',def:'給料日前はいつも残高ピンチ'},{key:'after',label:'After',def:'毎月3万、自動で貯まる'},{key:'foot',label:'下部',def:'やり方は中で →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-self:flex-start;background:${t.accent};color:${t.onAccent};font-size:30px;font-weight:700;padding:12px 24px;border-radius:8px;margin-bottom:36px;">${d.badge}</div>
+      <div style="display:flex;flex-direction:column;font-size:62px;font-weight:900;font-family:${t.head};margin-bottom:46px;">${nl(d.title)}</div>
+      <div style="display:flex;align-items:stretch;justify-content:space-between;">
+        <div style="display:flex;flex-direction:column;width:390px;background:${t.panel};border:3px solid ${t.line};border-radius:20px;padding:30px;"><div style="display:flex;font-size:30px;font-weight:900;color:${t.sub};margin-bottom:16px;">Before</div><div style="display:flex;font-size:38px;font-weight:700;">${d.before}</div></div>
+        <div style="display:flex;align-items:center;font-size:50px;font-weight:900;color:${t.accent};">→</div>
+        <div style="display:flex;flex-direction:column;width:390px;background:${t.accent};border-radius:20px;padding:30px;color:${t.onAccent};"><div style="display:flex;font-size:30px;font-weight:900;margin-bottom:16px;">After</div><div style="display:flex;font-size:38px;font-weight:700;">${d.after}</div></div>
+      </div>
+      <div style="display:flex;margin-top:46px;font-size:34px;color:${t.sub};">${d.foot}</div>`) },
+
+  { id:'cover_toc', name:'A18 目次・わかること（表紙）', cat:'表紙',
+    fields:[{key:'title',label:'見出し（改行で折る）',def:'お金が貯まる人の\n5つの習慣'},{key:'lead',label:'リード',def:'この投稿でわかること'},{key:'items',label:'項目',type:'rows',cols:['項目'],def:'先取り貯金のやり方\n固定費の見直す順番\nムダ遣いの止め方'},{key:'foot',label:'下部',def:'保存して順にチェック →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:66px;font-weight:900;font-family:${t.head};">${nl(d.title)}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:20px;margin-bottom:16px;border-radius:4px;"></div>
+      <div style="display:flex;font-size:34px;font-weight:700;color:${t.accent};margin-bottom:38px;">${d.lead}</div>
+      <div style="display:flex;flex-direction:column;">${d.items.split('\n').filter(Boolean).map(it=>`<div style="display:flex;align-items:center;margin-bottom:26px;"><div style="display:flex;flex-shrink:0;margin-right:20px;">${icon('check',t.accent,40,3)}</div><div style="display:flex;font-size:42px;font-weight:700;">${it}</div></div>`).join('')}</div>
+      <div style="display:flex;margin-top:28px;font-size:34px;color:${t.sub};">${d.foot}</div>`) },
+
+  { id:'cover_choice', name:'A20 二択フック（表紙）', cat:'表紙',
+    fields:[{key:'q',label:'問い（改行で折る）',def:'貯まる人は\nどっち?'},{key:'a',label:'選択肢A（改行可）',def:'安いものを\n選ぶ'},{key:'b',label:'選択肢B（改行可）',def:'長く使える\nものを選ぶ'},{key:'answer',label:'答え予告',def:'正解は、意外なほうでした。'},{key:'foot',label:'下部',def:'答えは中で →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:60px;font-weight:900;font-family:${t.head};margin-bottom:46px;">${nl(d.q)}</div>
+      <div style="display:flex;align-items:stretch;justify-content:space-between;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:390px;height:320px;background:${t.panel};border:3px solid ${t.line};border-radius:24px;"><div style="display:flex;font-size:40px;font-weight:900;color:${t.sub};margin-bottom:16px;">A</div><div style="display:flex;flex-direction:column;align-items:center;font-size:42px;font-weight:700;">${nl(d.a)}</div></div>
+        <div style="display:flex;align-items:center;font-size:44px;font-weight:900;color:${t.accent};">or</div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:390px;height:320px;background:${t.accent};border-radius:24px;color:${t.onAccent};"><div style="display:flex;font-size:40px;font-weight:900;margin-bottom:16px;">B</div><div style="display:flex;flex-direction:column;align-items:center;font-size:42px;font-weight:700;">${nl(d.b)}</div></div>
+      </div>
+      <div style="display:flex;align-self:center;margin-top:44px;font-size:40px;font-weight:700;">${d.answer}</div>
+      <div style="display:flex;align-self:center;margin-top:12px;font-size:32px;color:${t.sub};">${d.foot}</div>`) },
+
+  { id:'cover_vertical', name:'A10 縦書き（表紙）', cat:'表紙',
+    fields:[{key:'label',label:'小ラベル',def:'プロ直伝'},{key:'text',label:'縦書き本文（改行＝列・右から左）',def:'画像の上の\n文字を読みやすく\nする技術'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>{const cols=String(d.text).split('\n').filter(Boolean).map(col=>`<div style="display:flex;flex-direction:column;align-items:center;font-size:80px;font-weight:900;font-family:${t.head};line-height:1.12;">${[...col].map(c=>`<div style="display:flex;">${c}</div>`).join('')}</div>`).reverse().join('<div style="display:flex;width:26px;"></div>');
+      return `<div style="width:1080px;height:1350px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:140px 100px;background:${t.darkBg};color:${t.darkInk};font-family:${t.body};">
+        <div style="display:flex;align-items:center;margin-bottom:40px;"><div style="display:flex;width:40px;height:2px;background:${t.darkAccent};margin-right:16px;"></div><div style="display:flex;font-size:30px;letter-spacing:4px;color:${t.darkAccent};">${d.label}</div></div>
+        <div style="display:flex;flex-direction:row;align-items:flex-start;">${cols}</div>
+        <div style="display:flex;margin-top:44px;font-size:34px;color:${t.darkSub};">${d.handle}</div>
+      </div>`;} },
+
+  { id:'cover_badges', name:'A11 バッジ散らし（表紙）', cat:'表紙',
+    fields:[{key:'b1',label:'バッジ左上',def:'保存版'},{key:'b2',label:'バッジ右上',def:'期間限定'},{key:'big',label:'特大ワード（改行で折る）',def:'お金の\n裏ワザ'},{key:'b3',label:'バッジ左下',def:'無料'},{key:'b4',label:'バッジ右下',def:'永久保存'},{key:'foot',label:'下部',def:'全部まとめました →'}],
+    render:(d,t)=>{const bd=(x,bg,c)=>`<div style="display:flex;background:${bg};color:${c};font-size:30px;font-weight:900;padding:12px 24px;border-radius:10px;">${x}</div>`;
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+        <div style="display:flex;justify-content:space-between;width:100%;margin-bottom:50px;">${bd(d.b1,t.accent,t.onAccent)}${bd(d.b2,t.ink,t.bg)}</div>
+        <div style="display:flex;flex-direction:column;align-items:center;font-size:130px;font-family:${t.display};line-height:1.05;color:${t.ink};">${nl(d.big)}</div>
+        <div style="display:flex;justify-content:space-between;width:100%;margin-top:50px;">${bd(d.b3,t.ink,t.bg)}${bd(d.b4,t.accent,t.onAccent)}</div>
+        <div style="display:flex;margin-top:46px;font-size:34px;color:${t.sub};">${d.foot}</div>`);} },
+
+  { id:'cover_3d', name:'A12 3D立体文字（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'バッジ',def:'保存版'},{key:'big',label:'特大ワード（改行で折る）',def:'立体で\n目立たせる'},{key:'sub',label:'サブ（改行で折る）',def:'インパクト最大の見出し術。'},{key:'foot',label:'下部',def:'作り方は中で →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;background:${t.ink};color:${t.bg};font-size:32px;font-weight:900;padding:12px 26px;border-radius:8px;margin-bottom:46px;">${d.badge}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:130px;font-weight:900;font-family:${t.display};line-height:1.1;color:${t.ink};text-shadow:9px 9px 0 ${t.accent};">${nl(d.big)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;margin-top:50px;font-size:40px;font-weight:700;color:${t.sub};">${nl(d.sub)}</div>
+      <div style="display:flex;margin-top:40px;font-size:34px;color:${t.sub};">${d.foot}</div>`) },
+
+  { id:'cover_hand', name:'A13 手書き＋下線（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'バッジ',def:'無料'},{key:'big',label:'見出し（改行で折る）',def:'エモい\nフォント'},{key:'num',label:'数字',def:'5選'},{key:'foot',label:'下部',def:'保存して使ってね →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-self:flex-start;background:${t.accent};color:${t.onAccent};font-size:32px;font-weight:900;padding:12px 24px;border-radius:999px;margin-bottom:40px;">${d.badge}</div>
+      <div style="display:flex;flex-direction:column;font-family:'Yomogi';font-size:112px;font-weight:700;line-height:1.25;color:${t.ink};">${nl(d.big)}</div>
+      <div style="display:flex;width:340px;height:14px;background:${t.accent};opacity:0.55;border-radius:7px;margin-top:8px;"></div>
+      <div style="display:flex;align-items:baseline;margin-top:30px;"><div style="display:flex;font-family:'Yomogi';font-size:120px;font-weight:700;color:${t.accent};">${d.num}</div></div>
+      <div style="display:flex;margin-top:34px;font-size:34px;color:${t.sub};">${d.foot}</div>`) },
+
+  { id:'cover_q_photo', name:'A14 問いかけ＋写真（表紙）', cat:'表紙',
+    fields:[{key:'photo',label:'写真をアップ',type:'file',def:''},{key:'badge',label:'バッジ',def:'質問'},{key:'q',label:'問い（改行で折る）',def:'視認性が悪い時、\nどうしてる?'},{key:'foot',label:'下部',def:'解決法は中で →'}],
+    render:(d,t)=>{const bg=d.photo?`background-image:url(${d.photo});background-size:cover;background-position:center;`:`background-color:${t.panelSoft};`;
+      return `<div style="width:1080px;height:1350px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;font-family:${t.body};">
+        <div style="display:flex;flex-direction:column;flex-grow:1;background:${t.bg};padding:130px 90px 60px;">
+          <div style="display:flex;align-self:flex-start;background:${t.accent};color:${t.onAccent};font-size:30px;font-weight:900;padding:12px 24px;border-radius:10px;margin-bottom:36px;">${d.badge}</div>
+          <div style="display:flex;flex-direction:column;font-size:78px;font-weight:900;font-family:${t.head};line-height:1.3;color:${t.ink};">${nl(d.q)}</div>
+          <div style="display:flex;margin-top:30px;font-size:34px;color:${t.sub};">${d.foot}</div>
+        </div>
+        <div style="display:flex;width:1080px;height:520px;${bg}"></div>
+      </div>`;} },
+
+  { id:'cover_sticky', name:'A16 付箋メモ風（表紙）', cat:'表紙',
+    fields:[{key:'title',label:'見出し（改行で折る）',def:'貯金できる人の\nやることリスト'},{key:'notes',label:'付箋',type:'rows',cols:['付箋'],def:'給料日に先取り貯金\n固定費を年1で見直す\nサブスクを棚卸し'},{key:'foot',label:'下部',def:'全部できたら最強 →'}],
+    render:(d,t)=>{const rot=['-2deg','1.5deg','-1deg','2deg'];
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+        <div style="display:flex;flex-direction:column;font-size:60px;font-weight:900;font-family:${t.head};margin-bottom:44px;">${nl(d.title)}</div>
+        <div style="display:flex;flex-direction:column;">${d.notes.split('\n').filter(Boolean).map((n,i)=>`<div style="display:flex;align-items:center;align-self:flex-start;background:#FFF1A8;border-radius:8px;padding:26px 34px;margin-bottom:26px;box-shadow:0 6px 18px rgba(0,0,0,0.12);transform:rotate(${rot[i%4]});"><div style="display:flex;flex-shrink:0;width:22px;height:22px;border-radius:50%;background:${t.accent};margin-right:22px;"></div><div style="display:flex;font-size:42px;font-weight:700;color:#5a4e25;">${n}</div></div>`).join('')}</div>
+        <div style="display:flex;margin-top:24px;font-size:34px;color:${t.sub};">${d.foot}</div>`);} },
+
+  { id:'cover_chat', name:'A19 吹き出し会話（表紙）', cat:'表紙',
+    fields:[{key:'b1',label:'吹き出し左（改行で折る）',def:'え、また\n貯金ゼロ…?'},{key:'b2',label:'吹き出し右（改行で折る）',def:'大丈夫、\n仕組みで貯まるよ'},{key:'big',label:'まとめ（改行で折る）',def:'がんばらない\n貯金術。'},{key:'foot',label:'下部',def:'やり方は中で →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;align-self:flex-start;max-width:680px;background:${t.panel};border:3px solid ${t.line};border-radius:30px;border-bottom-left-radius:6px;padding:30px 36px;font-size:46px;font-weight:700;margin-bottom:26px;">${nl(d.b1)}</div>
+      <div style="display:flex;flex-direction:column;align-self:flex-end;max-width:680px;background:${t.accent};color:${t.onAccent};border-radius:30px;border-bottom-right-radius:6px;padding:30px 36px;font-size:46px;font-weight:700;margin-bottom:50px;">${nl(d.b2)}</div>
+      <div style="display:flex;flex-direction:column;font-size:78px;font-weight:900;font-family:${t.head};line-height:1.25;">${nl(d.big)}</div>
+      <div style="display:flex;margin-top:30px;font-size:34px;color:${t.sub};">${d.foot}</div>`) },
+
+  { id:'cover_outline', name:'A21 袋文字（美容PR）（表紙）', cat:'表紙',
+    fields:[{key:'badge',label:'バッジ',def:'大人ニキビ対策'},{key:'big',label:'袋文字見出し（改行で折る）',def:'予防には\nふきとり！'},{key:'sub',label:'サブ（改行で折る）',def:'毎日のひと手間で、肌が変わる。'},{key:'foot',label:'下部',def:'やり方はこのあと →'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;background:${t.accent};color:${t.onAccent};font-size:32px;font-weight:900;padding:14px 30px;border-radius:999px;margin-bottom:46px;">${d.badge}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:120px;font-weight:900;font-family:${t.head};line-height:1.4;color:#FFFDF5;text-shadow:${outline(t.accentDeep,'rgba(120,90,20,0.25)')};">${nl(d.big)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;margin-top:54px;font-size:42px;font-weight:900;color:${t.accentDeep};">${nl(d.sub)}</div>
+      <div style="display:flex;margin-top:40px;font-size:34px;color:${t.sub};">${d.foot}</div>`) },
+
+  // ===== 中身 =====
+  { id:'content_hero', name:'B2 結果ヒーロー（中身）', cat:'中身',
+    fields:[{key:'no',label:'番号',def:'1'},{key:'category',label:'カテゴリ',def:'通信費'},{key:'icon',label:'アイコン(任意)',type:'icon',def:'smartphone'},{key:'headline',label:'アクション見出し',def:'格安SIMに、乗り換える。'},{key:'amount',label:'結果(特大)',def:'−5,000'},{key:'unit',label:'単位',def:'円／月'},{key:'points',label:'やり方',type:'rows',cols:['やり方'],def:'大手3社→楽天・povo・mineo等へ\n番号そのまま(MNP)・20GBでも月3,000円前後\n手続きはスマホで15分・店舗に行かない'},{key:'use',label:'浮いたお金の使い道',def:'月1の外食ひとつ分'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-items:center;justify-content:space-between;"><div style="display:flex;align-items:center;"><div style="display:flex;align-items:center;justify-content:center;width:92px;height:92px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-size:46px;font-weight:900;">${d.no}</div><div style="display:flex;margin-left:24px;font-size:42px;font-weight:700;letter-spacing:2px;">${d.category}</div></div>${d.icon?`<div style="display:flex;align-items:center;justify-content:center;width:104px;height:104px;border-radius:50%;background:${t.panelSoft};">${icon(d.icon,t.accentDeep,56,1.8)}</div>`:''}</div>
+      <div style="display:flex;flex-direction:column;margin-top:40px;font-size:60px;font-weight:900;font-family:${t.head};">${nl(d.headline)}</div>
+      <div style="display:flex;margin-top:34px;font-size:30px;font-weight:700;color:${t.accent};letter-spacing:2px;">▼ 浮くお金</div>
+      <div style="display:flex;align-items:baseline;margin-top:6px;"><div style="display:flex;font-family:${t.display};font-size:94px;color:${t.accent};line-height:1;">${d.amount}</div><div style="display:flex;font-size:40px;font-weight:700;margin-left:8px;">${d.unit}</div></div>
+      <div style="display:flex;width:100%;height:2px;background:${t.line};margin-top:30px;margin-bottom:30px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.points.split('\n').filter(Boolean).map(p=>`<div style="display:flex;align-items:center;margin-bottom:22px;"><div style="display:flex;width:26px;height:26px;border-radius:50%;background:${t.accent};margin-right:20px;"></div><div style="display:flex;font-size:34px;">${p}</div></div>`).join('')}</div>
+      <div style="display:flex;align-self:flex-start;background:${t.panelSoft};color:${t.accentDeep};font-size:32px;font-weight:700;padding:16px 26px;border-radius:16px;margin-top:24px;">浮いた分は → ${d.use}</div>`) },
+
+  { id:'content_grid', name:'B3 グリッド一覧（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル',def:'見直す固定費リスト'},{key:'cells',label:'マス目',type:'rows',cols:['アイコン名(任意)','ラベル'],def:'smartphone｜通信費\nzap｜電気・ガス\ntv｜サブスク\nshield｜保険\nlandmark｜手数料\nhouse｜家賃\ngift｜ふるさと納税\ncoins｜車の維持費'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:58px;font-weight:900;font-family:${t.head};">${nl(d.title)}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:46px;border-radius:4px;"></div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;">${d.cells.split('\n').filter(Boolean).map((c,i)=>{const pp=c.split('｜');const ic=pp.length>1&&ICONS[pp[0]]?pp[0]:null;const label=pp.length>1?pp.slice(1).join('｜'):pp[0];const badge=ic?`<div style="display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:${t.panelSoft};margin-right:22px;">${icon(ic,t.accentDeep,32,1.9)}</div>`:`<div style="display:flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-size:30px;font-weight:900;margin-right:22px;">${i+1}</div>`;return `<div style="display:flex;align-items:center;width:430px;height:112px;background:${t.panel};border-radius:18px;margin-bottom:22px;padding-left:24px;">${badge}<div style="display:flex;font-size:37px;font-weight:700;">${label}</div></div>`;}).join('')}</div>`) },
+
+  { id:'content_listitem', name:'B1 リスト1項目（中身）', cat:'中身',
+    fields:[{key:'no',label:'番号',def:'1'},{key:'headline',label:'見出し',def:'先取り貯金にする'},{key:'sub',label:'補足',def:'“残ったら貯金”は一生貯まらない。給料日に自動で別口座へ。'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-items:center;justify-content:center;width:130px;height:130px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-family:${t.display};font-size:66px;">${d.no}</div>
+      <div style="display:flex;font-size:76px;font-weight:900;font-family:${t.head};margin-top:44px;">${d.headline}</div>
+      <div style="display:flex;font-size:40px;color:${t.sub};margin-top:30px;line-height:1.5;">${d.sub}</div>`) },
+
+  { id:'content_compare', name:'B5 比較2分割（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル',def:'貯まる人・貯まらない人'},{key:'badLabel',label:'×ラベル',def:'貯まらない'},{key:'bad',label:'×の例',type:'rows',cols:['×の例'],def:'なんとなく払う\n気づいたら残高ゼロ\nセールでまとめ買い'},{key:'goodLabel',label:'◯ラベル',def:'貯まる'},{key:'good',label:'◯の例',type:'rows',cols:['◯の例'],def:'固定費を年1見直し\n先取りで自動貯金\n必要な物だけ買う'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:56px;font-weight:900;font-family:${t.head};margin-bottom:44px;">${nl(d.title)}</div>
+      <div style="display:flex;justify-content:space-between;">
+        <div style="display:flex;flex-direction:column;width:425px;background:#F1E4E2;border-radius:22px;padding:34px;"><div style="display:flex;align-items:center;font-size:40px;font-weight:900;color:#C0392B;margin-bottom:26px;">${icon('x','#C0392B',40,3.6)}<span style="margin-left:10px;">${d.badLabel}</span></div>${d.bad.split('\n').filter(Boolean).map(x=>`<div style="display:flex;font-size:34px;color:#5b4b4b;margin-bottom:22px;">${x}</div>`).join('')}</div>
+        <div style="display:flex;flex-direction:column;width:425px;background:#E2EFE6;border-radius:22px;padding:34px;"><div style="display:flex;align-items:center;font-size:40px;font-weight:900;color:#2E7D4F;margin-bottom:26px;">${icon('check','#2E7D4F',40,3.6)}<span style="margin-left:10px;">${d.goodLabel}</span></div>${d.good.split('\n').filter(Boolean).map(x=>`<div style="display:flex;font-size:34px;color:#3e5246;margin-bottom:22px;">${x}</div>`).join('')}</div>
+      </div>`) },
+
+  { id:'content_quote', name:'B7 引用・一言（中身）', cat:'中身',
+    fields:[{key:'idx',label:'番号',def:'1'},{key:'total',label:'総数',def:'8'},{key:'line1',label:'一言1',def:'全員に好かれようと'},{key:'line2',label:'一言2',def:'しなくていい。'},{key:'support',label:'裏付け',def:'嫌われる勇気が、自分をラクにする'},{key:'handle',label:'アカウント',def:'@気にしない練習'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.head,align:'center'},`
+      <div style="display:flex;font-family:${t.body};font-size:40px;letter-spacing:4px;color:${t.line};">${d.idx} / ${d.total}</div>
+      <div style="display:flex;font-size:64px;font-weight:700;line-height:1.6;margin-top:40px;">${d.line1}</div>
+      <div style="display:flex;font-size:64px;font-weight:700;line-height:1.6;">${d.line2}</div>
+      <div style="display:flex;width:80px;height:2px;background:${t.accent};margin-top:40px;margin-bottom:30px;"></div>
+      <div style="display:flex;font-family:${t.body};font-size:33px;color:${t.accent};">${d.support}</div>
+      <div style="display:flex;font-family:${t.body};font-size:26px;color:${t.line};margin-top:46px;">${d.handle}</div>`) },
+
+  { id:'content_ranking', name:'B ランキング（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル',def:'貯まる人がやめた支出 TOP5'},{key:'items',label:'ランキング項目',type:'rows',cols:['項目','補足(任意)'],def:'コンビニ通い｜月1.2万円\nサブスク放置｜月3千円\nなんとなく外食｜月2万円\nリボ払い｜利息がムダ\n保険の入りすぎ｜月5千円'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:54px;font-weight:900;font-family:${t.head};">${nl(d.title)}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:40px;border-radius:4px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.items.split('\n').filter(Boolean).map((it,i)=>{const p=it.split('｜');const label=p[0];const val=p[1]||'';const meds=['#D9A93B','#AEB3BA','#C2814B'];const rc=i<3?meds[i]:t.accent;return `<div style="display:flex;align-items:center;background:${t.panel};border-radius:18px;padding:20px 26px;margin-bottom:18px;"><div style="display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:${rc};color:#ffffff;font-family:${t.display};font-size:34px;margin-right:24px;">${i+1}</div><div style="display:flex;flex-grow:1;font-size:40px;font-weight:700;">${label}</div>${val?`<div style="display:flex;font-size:32px;font-weight:700;color:${t.accent};margin-left:16px;">${val}</div>`:''}</div>`}).join('')}</div>`) },
+
+  { id:'content_photo', name:'B6 写真アップ型（中身/表紙）', cat:'中身',
+    fields:[{key:'photo',label:'写真をアップ',type:'file',def:''},{key:'label',label:'ラベル(任意)',def:'やってみた'},{key:'title',label:'見出し',def:'1ヶ月、コンビニを\nやめてみた結果。'},{key:'sub',label:'サブ(任意)',def:'浮いたお金、まさかの○円。'}],
+    render:(d,t)=>{const titleLines=String(d.title).split('\n').map(l=>`<div style="display:flex;">${l}</div>`).join('');
+      const bg=d.photo?`background-image:url(${d.photo});background-size:cover;background-position:center;`:`background-color:${t.panelSoft};`;
+      return `<div style="width:1080px;height:1350px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;font-family:${t.body};${bg}">
+        <div style="display:flex;flex-direction:column;width:1080px;box-sizing:border-box;padding:300px 90px 150px 90px;background-image:linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.82));">
+          ${d.label?`<div style="display:flex;align-self:flex-start;background:${t.accent};color:${t.onAccent};font-size:30px;font-weight:700;padding:10px 22px;border-radius:10px;margin-bottom:24px;">${d.label}</div>`:''}
+          <div style="display:flex;flex-direction:column;font-size:84px;font-weight:900;font-family:${t.head};color:#ffffff;line-height:1.25;">${titleLines}</div>
+          ${d.sub?`<div style="display:flex;font-size:36px;color:#eeeeee;margin-top:20px;">${d.sub}</div>`:''}
+        </div>
+      </div>`;} },
+
+  { id:'intro_empathy', name:'導入・共感（2枚目）', cat:'中身',
+    fields:[{key:'label',label:'ラベル',def:'はじめに'},{key:'line1',label:'共感1',def:'わたしも、人の機嫌や視線を'},{key:'line2',label:'共感2',def:'ずっと気にしすぎる側でした。'},{key:'bridge',label:'予告',def:'知ってラクになった言葉を、8つ。'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.head,align:'center'},`
+      <div style="display:flex;font-family:${t.body};font-size:30px;letter-spacing:6px;color:${t.accent};">${d.label}</div>
+      <div style="display:flex;width:60px;height:2px;background:${t.accent};margin-top:20px;margin-bottom:40px;"></div>
+      <div style="display:flex;font-size:56px;font-weight:700;line-height:1.6;">${d.line1}</div>
+      <div style="display:flex;font-size:56px;font-weight:700;line-height:1.6;">${d.line2}</div>
+      <div style="display:flex;width:60px;height:2px;background:${t.accent};margin-top:44px;margin-bottom:30px;"></div>
+      <div style="display:flex;font-family:${t.body};font-size:36px;color:${t.accent};">${d.bridge}</div>`) },
+
+  { id:'content_steps', name:'手順・ステップ（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル',def:'格安SIM乗り換え 3ステップ'},{key:'steps',label:'手順',type:'rows',cols:['手順'],def:'今の契約をスクショで確認\nMNP予約番号を発行（15分）\n新SIMを申込→届いたら差し替え'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:56px;font-weight:900;font-family:${t.head};">${nl(d.title)}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:46px;border-radius:4px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.steps.split('\n').filter(Boolean).map((s,i)=>`<div style="display:flex;align-items:center;margin-bottom:32px;"><div style="display:flex;align-items:center;justify-content:center;width:78px;height:78px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-family:${t.display};font-size:40px;margin-right:28px;">${i+1}</div><div style="display:flex;flex-grow:1;font-size:40px;font-weight:700;">${s}</div></div>`).join('')}</div>`) },
+
+  { id:'content_checklist', name:'チェックリスト（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル',def:'貯まる人の習慣チェック'},{key:'items',label:'項目',type:'rows',cols:['項目'],def:'給料日に先取り貯金してる\n固定費を年1で見直してる\nサブスクを把握してる\nふるさと納税を使ってる\n家計簿アプリで自動記録'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:56px;font-weight:900;font-family:${t.head};">${nl(d.title)}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:46px;border-radius:4px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.items.split('\n').filter(Boolean).map(it=>`<div style="display:flex;align-items:center;margin-bottom:28px;"><div style="display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:12px;background:${t.accent};margin-right:24px;">${icon('check',t.onAccent,30,3.4)}</div><div style="display:flex;font-size:40px;font-weight:500;">${it}</div></div>`).join('')}</div>`) },
+
+  { id:'content_qa', name:'Q&A（中身）', cat:'中身',
+    fields:[{key:'q',label:'質問（改行で折る位置を指定）',def:'格安SIMって、\nつながりにくいの？'},{key:'a',label:'回答（改行で折る位置を指定）',def:'大手の回線を借りてるから、\nエリアは基本同じ。\nお昼の混雑時だけ、\n少し遅く感じる程度です。'}],
+    render:(d,t)=>{const L=s=>String(s).split('\n').filter(x=>x.length).map(x=>`<div style="display:flex;">${x}</div>`).join('');return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-items:flex-start;margin-bottom:44px;"><div style="display:flex;align-items:center;justify-content:center;width:74px;height:74px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-family:${t.head};font-weight:900;font-size:40px;margin-right:26px;flex-shrink:0;">Q</div><div style="display:flex;flex-direction:column;flex-grow:1;font-size:52px;font-weight:900;font-family:${t.head};line-height:1.4;">${L(d.q)}</div></div>
+      <div style="display:flex;align-items:flex-start;"><div style="display:flex;align-items:center;justify-content:center;width:74px;height:74px;border-radius:50%;background:${t.panelSoft};color:${t.accentDeep};font-family:${t.head};font-weight:900;font-size:40px;margin-right:26px;flex-shrink:0;">A</div><div style="display:flex;flex-direction:column;flex-grow:1;font-size:40px;line-height:1.6;color:${t.ink};">${L(d.a)}</div></div>`);} },
+
+  { id:'content_stat', name:'データ強調（中身）', cat:'中身',
+    fields:[{key:'label',label:'前置き',def:'実は'},{key:'stat',label:'数字',def:'72'},{key:'unit',label:'単位',def:'%'},{key:'desc',label:'説明',def:'の人が「使ってないサブスク」に\n気づいていないという結果。'},{key:'source',label:'注記',def:'※イメージ・出典は要確認'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;font-size:40px;font-weight:700;color:${t.accent};">${d.label}</div>
+      <div style="display:flex;align-items:baseline;margin-top:6px;margin-bottom:18px;"><div style="display:flex;font-family:${t.display};font-size:240px;color:${t.accent};line-height:1;">${d.stat}</div><div style="display:flex;font-size:96px;font-weight:900;font-family:${t.display};color:${t.accent};">${d.unit}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:44px;font-weight:700;line-height:1.5;">${String(d.desc).split('\n').map(l=>`<div style="display:flex;">${l}</div>`).join('')}</div>
+      <div style="display:flex;font-size:26px;color:${t.sub};margin-top:40px;">${d.source}</div>`) },
+
+  { id:'content_ba', name:'B4 Before/After（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'やめたら、こう変わった'},{key:'before',label:'Before（改行で折る）',def:'給料日前は、いつも金欠。\n何に使ったか分からない。'},{key:'after',label:'After（改行で折る）',def:'毎月3万、自動で貯まる。\nお金の流れが見える。'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:56px;font-weight:900;font-family:${t.head};margin-bottom:44px;">${nl(d.title)}</div>
+      <div style="display:flex;flex-direction:column;background:${t.panel};border:3px solid ${t.line};border-radius:22px;padding:36px;"><div style="display:flex;font-size:32px;font-weight:900;color:${t.sub};margin-bottom:18px;">Before</div><div style="display:flex;flex-direction:column;font-size:42px;font-weight:700;line-height:1.4;color:${t.sub};">${nl(d.before)}</div></div>
+      <div style="display:flex;align-self:center;font-size:54px;color:${t.accent};margin-top:22px;margin-bottom:22px;">↓</div>
+      <div style="display:flex;flex-direction:column;background:${t.accent};border-radius:22px;padding:36px;color:${t.onAccent};"><div style="display:flex;font-size:32px;font-weight:900;margin-bottom:18px;">After</div><div style="display:flex;flex-direction:column;font-size:42px;font-weight:700;line-height:1.4;">${nl(d.after)}</div></div>`) },
+
+  { id:'content_vs', name:'B6 VS比較カード（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'一括 vs 分割、どっち得?'},{key:'leftLabel',label:'左ラベル',def:'分割払い'},{key:'leftBig',label:'左の数字',def:'+1.5万'},{key:'leftPoints',label:'左の点',type:'rows',cols:['ポイント'],def:'月の負担は軽い\n総額は高くなる'},{key:'rightLabel',label:'右ラベル',def:'一括払い'},{key:'rightBig',label:'右の数字',def:'手数料0円'},{key:'rightPoints',label:'右の点',type:'rows',cols:['ポイント'],def:'総額が一番安い\n管理もシンプル'},{key:'callout',label:'下のまとめ（改行で折る）',def:'差額1.5万円＝月1の外食15回分。'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:52px;font-weight:900;font-family:${t.head};margin-bottom:40px;">${nl(d.title)}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;flex-direction:column;width:390px;background:${t.panel};border:3px solid ${t.line};border-radius:22px;padding:30px;"><div style="display:flex;font-size:34px;font-weight:900;color:${t.sub};margin-bottom:14px;">${d.leftLabel}</div><div style="display:flex;font-size:54px;font-weight:900;font-family:${t.head};color:${t.ink};margin-bottom:20px;">${d.leftBig}</div><div style="display:flex;flex-direction:column;">${d.leftPoints.split('\n').filter(Boolean).map(p=>`<div style="display:flex;font-size:32px;color:${t.sub};margin-bottom:10px;">${p}</div>`).join('')}</div></div>
+        <div style="display:flex;flex-shrink:0;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-family:${t.display};font-size:34px;">VS</div>
+        <div style="display:flex;flex-direction:column;width:390px;background:${t.accent};border-radius:22px;padding:30px;color:${t.onAccent};"><div style="display:flex;font-size:34px;font-weight:900;margin-bottom:14px;">${d.rightLabel}</div><div style="display:flex;font-size:54px;font-weight:900;font-family:${t.head};margin-bottom:20px;">${d.rightBig}</div><div style="display:flex;flex-direction:column;">${d.rightPoints.split('\n').filter(Boolean).map(p=>`<div style="display:flex;font-size:32px;margin-bottom:10px;">${p}</div>`).join('')}</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:40px;background:${t.panelSoft};color:${t.accentDeep};font-size:38px;font-weight:700;padding:28px;border-radius:18px;">${nl(d.callout)}</div>`) },
+
+  { id:'content_editorial', name:'B14 エディトリアル番号（中身）', cat:'中身',
+    fields:[{key:'no',label:'番号',def:'01'},{key:'category',label:'英字ラベル',def:'FIRST STEP'},{key:'headline',label:'見出し（改行で折る）',def:'まず、\n先取りで貯める。'},{key:'body',label:'本文（改行で折る）',def:'給料が入ったら、使う前に\n貯金分を別口座へ。\n「残ったら貯金」は、一生残らない。'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-items:baseline;margin-bottom:10px;"><div style="display:flex;font-family:${t.display};font-size:150px;color:${t.accent};line-height:0.9;opacity:0.9;">${d.no}</div><div style="display:flex;margin-left:28px;font-size:34px;font-weight:700;letter-spacing:4px;color:${t.sub};">${d.category}</div></div>
+      <div style="display:flex;flex-direction:column;font-size:68px;font-weight:900;font-family:${t.head};line-height:1.3;">${nl(d.headline)}</div>
+      <div style="display:flex;width:90px;height:4px;background:${t.line};margin-top:34px;margin-bottom:34px;"></div>
+      <div style="display:flex;flex-direction:column;font-size:38px;line-height:1.7;color:${t.ink};">${nl(d.body)}</div>`) },
+
+  { id:'content_quote_dark', name:'B15 黒地特大引用（中身）', cat:'中身',
+    fields:[{key:'quote',label:'引用（改行で折る）',def:'本当の節約とは、\n我慢ではなく、\n仕組みである。'},{key:'source',label:'出典・補足',def:'お金が貯まる人の共通点'}],
+    render:(d,t)=>`<div style="width:1080px;height:1350px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:150px 110px;background:${t.darkBg};color:${t.darkInk};font-family:${t.body};">
+      <div style="display:flex;font-family:'Shippori Mincho';font-size:130px;color:${t.darkAccent};line-height:0.8;margin-bottom:24px;">“</div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-family:'Shippori Mincho';font-size:62px;font-weight:700;line-height:1.6;">${nl(d.quote)}</div>
+      <div style="display:flex;width:70px;height:2px;background:${t.darkAccent};margin-top:50px;margin-bottom:24px;"></div>
+      <div style="display:flex;font-size:30px;color:${t.darkSub};">${d.source}</div>
+    </div>` },
+
+  { id:'content_photo_band', name:'B16 写真＋帯テキスト（中身）', cat:'中身',
+    fields:[{key:'photo',label:'写真をアップ',type:'file',def:''},{key:'no',label:'番号',def:'1'},{key:'category',label:'ラベル',def:'まずこれ'},{key:'headline',label:'見出し（改行で折る）',def:'給料日に、\n自動で移す。'},{key:'body',label:'本文（改行で折る）',def:'銀行の自動振替を設定するだけ。\n手取りの10%から始めれば十分。'}],
+    render:(d,t)=>{const bg=d.photo?`background-image:url(${d.photo});background-size:cover;background-position:center;`:`background-color:${t.panelSoft};`;
+      return `<div style="width:1080px;height:1350px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;font-family:${t.body};">
+        <div style="display:flex;width:1080px;height:600px;${bg}"></div>
+        <div style="display:flex;flex-direction:column;flex-grow:1;background:${t.bg};padding:56px 90px;">
+          <div style="display:flex;align-items:center;margin-bottom:24px;"><div style="display:flex;flex-shrink:0;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-size:34px;font-weight:900;margin-right:20px;">${d.no}</div><div style="display:flex;font-size:34px;font-weight:700;letter-spacing:2px;color:${t.accent};">${d.category}</div></div>
+          <div style="display:flex;flex-direction:column;font-size:56px;font-weight:900;font-family:${t.head};line-height:1.3;color:${t.ink};">${nl(d.headline)}</div>
+          <div style="display:flex;flex-direction:column;margin-top:22px;font-size:36px;line-height:1.6;color:${t.ink};">${nl(d.body)}</div>
+        </div>
+      </div>`;} },
+
+  { id:'content_diagram', name:'B17 ミニ図解＋キャプション（中身）', cat:'中身',
+    fields:[{key:'lead',label:'前置き',def:'習慣化までの道のり'},{key:'big',label:'特大の数字',def:'66日'},{key:'filled',label:'埋める数（/40）',def:'14'},{key:'caption',label:'キャプション（改行で折る）',def:'14日続けば、もう半分。\n毎日ちょっとずつでいい。'}],
+    render:(d,t)=>{const total=40,fill=Math.max(0,Math.min(total,parseInt(d.filled)||0));const dots=Array.from({length:total}).map((_,i)=>`<div style="display:flex;width:50px;height:50px;border-radius:50%;background:${i<fill?t.accent:t.line};margin:9px;"></div>`).join('');
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+        <div style="display:flex;font-size:40px;font-weight:700;color:${t.sub};margin-bottom:8px;">${d.lead}</div>
+        <div style="display:flex;font-family:${t.display};font-size:130px;color:${t.accent};line-height:1;margin-bottom:44px;">${d.big}</div>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;width:760px;margin-bottom:44px;">${dots}</div>
+        <div style="display:flex;flex-direction:column;align-items:center;font-size:42px;font-weight:700;line-height:1.5;">${nl(d.caption)}</div>`);} },
+
+  { id:'content_lessons', name:'B20 番号レッスン（中身）', cat:'中身',
+    fields:[{key:'title',label:'見出し（改行で折る）',def:'お金が貯まる\n3つの原則'},{key:'lessons',label:'レッスン',type:'rows',cols:['見出し','説明'],def:'先取り｜使う前に、貯金分を分ける\n固定費優先｜一度直せば、毎月効く\n自動化｜意志に頼らない仕組みにする'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:58px;font-weight:900;font-family:${t.head};margin-bottom:46px;">${nl(d.title)}</div>
+      <div style="display:flex;flex-direction:column;">${d.lessons.split('\n').filter(Boolean).map((l,i)=>{const p=l.split('｜');const h=p[0];const desc=p[1]||'';return `<div style="display:flex;align-items:flex-start;margin-bottom:36px;"><div style="display:flex;flex-shrink:0;align-items:center;justify-content:center;width:70px;height:70px;border-radius:16px;background:${t.accent};color:${t.onAccent};font-family:${t.display};font-size:36px;margin-right:26px;">${i+1}</div><div style="display:flex;flex-direction:column;flex-grow:1;"><div style="display:flex;font-size:46px;font-weight:900;color:${t.ink};">${h}</div>${desc?`<div style="display:flex;margin-top:8px;font-size:36px;color:${t.sub};">${desc}</div>`:''}</div></div>`;}).join('')}</div>`) },
+
+  { id:'content_gold_panels', name:'B21 白帯×金文字ポイント（美容PR）（中身）', cat:'中身',
+    fields:[{key:'title',label:'袋文字見出し（改行で折る）',def:'ふきとりが\nいい理由'},{key:'points',label:'ポイント',type:'rows',cols:['見出し','説明'],def:'汚れもしっかりオフ｜洗顔で落ちきらない汚れも、ふきとりでオフ\nうるおいキープ｜さっぱりなのに、しっとり仕上がり\nあとのケアも｜肌を整えて、次のケアがなじみやすく'}],
+    render:(d,t)=>wrap({bg:t.panelSoft,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:64px;font-weight:900;font-family:${t.head};line-height:1.35;color:#FFFDF5;text-shadow:${outline(t.accentDeep,'rgba(120,90,20,0.22)')};margin-bottom:50px;">${nl(d.title)}</div>
+      <div style="display:flex;flex-direction:column;">${d.lessons?'':''}${d.points.split('\n').filter(Boolean).map(p=>{const x=p.split('｜');const h=x[0];const desc=x[1]||'';return `<div style="display:flex;flex-direction:column;margin-bottom:30px;"><div style="display:flex;align-self:stretch;justify-content:center;background:#FFFFFF;border-radius:14px;padding:18px 26px;box-shadow:0 4px 14px rgba(150,120,40,0.15);"><div style="display:flex;font-size:40px;font-weight:900;color:${t.accentDeep};">${h}</div></div>${desc?`<div style="display:flex;font-size:32px;line-height:1.5;color:${t.ink};padding:16px 22px 0;">${desc}</div>`:''}</div>`;}).join('')}</div>`) },
+
+  { id:'content_face', name:'顔ゾーン%図解（イラスト選択）（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'大人ニキビ、\nどこにできやすい?'},{key:'face',label:'顔タイプ',type:'select',options:['女性','男性','女性ショート','ポニーテール','眼鏡','シンプル'],def:'女性'},{key:'z1label',label:'ゾーン1',def:'額（Tゾーン）'},{key:'z1pct',label:'%1',def:'29%'},{key:'z2label',label:'ゾーン2',def:'頬'},{key:'z2pct',label:'%2',def:'35%'},{key:'z3label',label:'ゾーン3',def:'あご・フェイスライン'},{key:'z3pct',label:'%3',def:'55%'},{key:'caption',label:'キャプション（改行で折る）',def:'20代以降は、あご周りが\n増えやすいみたい。'}],
+    render:(d,t)=>{const col=['#7FB1D6','#E59CB0','#92C29A'];const rows=[[d.z1label,d.z1pct,0],[d.z2label,d.z2pct,1],[d.z3label,d.z3pct,2]];
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+        <div style="display:flex;flex-direction:column;font-size:54px;font-weight:900;font-family:${t.head};margin-bottom:24px;">${nl(d.title)}</div>
+        <div style="display:flex;justify-content:center;margin-bottom:30px;"><img src="${faceSVG(col[0],col[1],col[2],d.face)}" style="width:330px;height:402px;"/></div>
+        <div style="display:flex;flex-direction:column;">${rows.map(([lab,pct,i])=>`<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid ${t.line};padding-bottom:18px;margin-bottom:18px;"><div style="display:flex;align-items:center;"><div style="display:flex;flex-shrink:0;width:34px;height:34px;border-radius:50%;background:${col[i]};margin-right:22px;"></div><div style="display:flex;font-size:40px;font-weight:700;">${lab}</div></div><div style="display:flex;flex-shrink:0;font-family:${t.display};font-size:58px;color:${t.accent};line-height:1;">${pct}</div></div>`).join('')}</div>
+        <div style="display:flex;flex-direction:column;margin-top:26px;font-size:36px;line-height:1.5;color:${t.ink};">${nl(d.caption)}</div>`);} },
+
+  { id:'content_face_photo', name:'顔ゾーン%図解（写真差し替え）（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'大人ニキビ、\nどこにできやすい?'},{key:'photo',label:'顔写真/イラストをアップ',type:'file',def:''},{key:'z1label',label:'ゾーン1',def:'額（Tゾーン）'},{key:'z1pct',label:'%1',def:'29%'},{key:'z2label',label:'ゾーン2',def:'頬'},{key:'z2pct',label:'%2',def:'35%'},{key:'z3label',label:'ゾーン3',def:'あご・フェイスライン'},{key:'z3pct',label:'%3',def:'55%'},{key:'caption',label:'キャプション（改行で折る）',def:'20代以降は、あご周りが\n増えやすいみたい。'}],
+    render:(d,t)=>{const col=['#7FB1D6','#E59CB0','#92C29A'];const rows=[[d.z1label,d.z1pct,0],[d.z2label,d.z2pct,1],[d.z3label,d.z3pct,2]];
+      const face=d.photo?`<img src="${d.photo}" style="width:360px;height:360px;border-radius:50%;object-fit:cover;"/>`:`<div style="display:flex;align-items:center;justify-content:center;width:360px;height:360px;border-radius:50%;background:${t.panelSoft};color:${t.sub};font-size:38px;border:4px dashed ${t.line};">＋ 顔写真</div>`;
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+        <div style="display:flex;flex-direction:column;font-size:54px;font-weight:900;font-family:${t.head};margin-bottom:24px;">${nl(d.title)}</div>
+        <div style="display:flex;justify-content:center;margin-bottom:30px;">${face}</div>
+        <div style="display:flex;flex-direction:column;">${rows.map(([lab,pct,i])=>`<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid ${t.line};padding-bottom:18px;margin-bottom:18px;"><div style="display:flex;align-items:center;"><div style="display:flex;flex-shrink:0;width:34px;height:34px;border-radius:50%;background:${col[i]};margin-right:22px;"></div><div style="display:flex;font-size:40px;font-weight:700;">${lab}</div></div><div style="display:flex;flex-shrink:0;font-family:${t.display};font-size:58px;color:${t.accent};line-height:1;">${pct}</div></div>`).join('')}</div>
+        <div style="display:flex;flex-direction:column;margin-top:26px;font-size:36px;line-height:1.5;color:${t.ink};">${nl(d.caption)}</div>`);} },
+
+  { id:'content_diag_grid', name:'診断・タイプ別グリッド（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'あなたはどのタイプ?\nお金の使い方診断'},{key:'types',label:'タイプ',type:'rows',cols:['顔タイプ','名前','ひとこと'],def:'女性｜貯金が生きがい｜コツコツ堅実派\n男性｜稼いで使う｜メリハリ消費派\n女性ショート｜推しに全力｜趣味優先派\nポニーテール｜しっかり管理｜計画的節約派'},{key:'foot',label:'下部',def:'詳しくはこのあと →'}],
+    render:(d,t)=>{const bgs=['#FCE8E6','#E6F0FA','#FBF1DC','#E8F3E9'];const rows=d.types.split('\n').filter(Boolean).slice(0,4);
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+        <div style="display:flex;flex-direction:column;font-size:52px;font-weight:900;font-family:${t.head};line-height:1.3;">${nl(d.title)}</div>
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:30px;">${rows.map((r,i)=>{const p=r.split('｜');const v=p[0],nm=p[1]||'',note=p[2]||'';return `<div style="display:flex;flex-direction:column;align-items:center;width:418px;background:${bgs[i%4]};border-radius:22px;padding:26px 20px;margin-bottom:22px;"><img src="${faceSVG('none','#F2B8C0','none',v)}" style="width:148px;height:180px;"/><div style="display:flex;text-align:center;font-size:36px;font-weight:900;font-family:${t.head};margin-top:8px;">${nm}</div><div style="display:flex;text-align:center;font-size:28px;color:${t.sub};margin-top:6px;">${note}</div></div>`;}).join('')}</div>
+        <div style="display:flex;margin-top:8px;font-size:34px;color:${t.sub};">${d.foot}</div>`);} },
+
+  { id:'content_diag_detail', name:'診断・タイプ詳細（中身）', cat:'中身',
+    fields:[{key:'face',label:'顔タイプ',type:'select',options:['女性','男性','女性ショート','ポニーテール','眼鏡','シンプル'],def:'女性'},{key:'lead',label:'リード',def:'あなたはこのタイプ'},{key:'typeName',label:'タイプ名（改行で折る）',def:'コツコツ堅実タイプ'},{key:'traits',label:'特徴',type:'rows',cols:['特徴'],def:'先取り貯金が得意\n衝動買いは少なめ\nセールに惑わされない\n計画を立てるのが好き'},{key:'advice',label:'ひとこと（改行で折る）',def:'その堅実さが最大の武器。\nたまには自分にご褒美も。'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;font-size:34px;font-weight:700;color:${t.accent};margin-bottom:8px;">${d.lead}</div>
+      <div style="display:flex;flex-direction:column;font-size:62px;font-weight:900;font-family:${t.head};line-height:1.25;margin-bottom:34px;">${nl(d.typeName)}</div>
+      <div style="display:flex;align-items:center;">
+        <div style="display:flex;flex-shrink:0;"><img src="${faceSVG('none','#F2B8C0','none',d.face)}" style="width:300px;height:365px;"/></div>
+        <div style="display:flex;flex-direction:column;flex-grow:1;margin-left:24px;">${d.traits.split('\n').filter(Boolean).map(x=>`<div style="display:flex;align-items:center;margin-bottom:24px;"><div style="display:flex;flex-shrink:0;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:${t.accent};margin-right:18px;">${icon('check',t.onAccent,26,3.4)}</div><div style="display:flex;flex-grow:1;font-size:36px;font-weight:700;">${x}</div></div>`).join('')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-self:stretch;margin-top:30px;background:${t.panelSoft};color:${t.accentDeep};font-size:36px;font-weight:700;line-height:1.5;padding:26px 30px;border-radius:18px;">${nl(d.advice)}</div>`) },
+
+  { id:'content_roadmap', name:'ロードマップ・縦タイムライン（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'お金が貯まるまでの\n3ステップ'},{key:'steps',label:'ステップ',type:'rows',cols:['見出し','説明'],def:'支出を把握する｜まず1ヶ月、何に使ったか書き出す\n固定費を見直す｜通信・保険・サブスクを一度だけ整理\n先取り貯金を自動化｜給料日に、自動で別口座へ'}],
+    render:(d,t)=>{const steps=d.steps.split('\n').filter(Boolean);
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+        <div style="display:flex;flex-direction:column;font-size:56px;font-weight:900;font-family:${t.head};">${nl(d.title)}</div>
+        <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:44px;border-radius:4px;"></div>
+        <div style="display:flex;flex-direction:column;">${steps.map((s,i,a)=>{const p=s.split('｜');const h=p[0];const desc=p[1]||'';return `<div style="display:flex;align-items:stretch;"><div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:80px;margin-right:28px;"><div style="display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-family:${t.display};font-size:40px;flex-shrink:0;">${i+1}</div>${i<a.length-1?`<div style="display:flex;flex-grow:1;width:6px;background:${t.line};margin-top:6px;border-radius:3px;"></div>`:''}</div><div style="display:flex;flex-direction:column;flex-grow:1;padding-bottom:44px;"><div style="display:flex;font-size:46px;font-weight:900;font-family:${t.head};">${h}</div><div style="display:flex;margin-top:10px;font-size:34px;line-height:1.5;color:${t.sub};">${desc}</div></div></div>`}).join('')}</div>`);} },
+
+  { id:'content_ingredients', name:'材料リスト（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル',def:'材料（2人分）'},{key:'items',label:'材料',type:'rows',cols:['材料','分量'],def:'鶏むね肉｜200g\n塩こうじ｜大さじ1\n片栗粉｜適量\nサラダ油｜大さじ2\n黒こしょう｜少々'},{key:'note',label:'ひとこと（改行で折る）',def:'家にあるものでOK。'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;font-size:56px;font-weight:900;font-family:${t.head};">${d.title}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:44px;border-radius:4px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.items.split('\n').filter(Boolean).map(it=>{const p=it.split('｜');const nm=p[0];const amt=p[1]||'';return `<div style="display:flex;align-items:flex-end;margin-bottom:28px;"><div style="display:flex;flex-shrink:0;font-size:42px;font-weight:700;">${nm}</div><div style="display:flex;flex-grow:1;height:0;border-bottom:4px dashed ${t.line};margin:0 16px 12px;"></div><div style="display:flex;flex-shrink:0;font-size:42px;font-weight:900;color:${t.accentDeep};">${amt}</div></div>`;}).join('')}</div>
+      <div style="display:flex;flex-direction:column;align-self:flex-start;margin-top:20px;background:${t.panelSoft};color:${t.accentDeep};font-size:34px;font-weight:700;padding:20px 28px;border-radius:16px;">${nl(d.note)}</div>`) },
+
+  { id:'content_photo_steps', name:'番号付き写真ステップ（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル',def:'作り方'},{key:'photo1',label:'写真1',type:'file',def:''},{key:'cap1',label:'説明1',def:'下味をつけて10分置く'},{key:'photo2',label:'写真2',type:'file',def:''},{key:'cap2',label:'説明2',def:'片栗粉を全体にまぶす'},{key:'photo3',label:'写真3',type:'file',def:''},{key:'cap3',label:'説明3',def:'こんがり焼いたら完成'}],
+    render:(d,t)=>{const cells=[[d.photo1,d.cap1],[d.photo2,d.cap2],[d.photo3,d.cap3]];
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+        <div style="display:flex;font-size:56px;font-weight:900;font-family:${t.head};">${d.title}</div>
+        <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:46px;border-radius:4px;"></div>
+        <div style="display:flex;justify-content:space-between;">${cells.map(([ph,cap],i)=>`<div style="display:flex;flex-direction:column;align-items:center;width:280px;"><div style="display:flex;align-items:center;justify-content:center;width:62px;height:62px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-family:${t.display};font-size:32px;margin-bottom:14px;">${i+1}</div>${ph?`<img src="${ph}" style="width:280px;height:280px;border-radius:18px;object-fit:cover;"/>`:`<div style="display:flex;align-items:center;justify-content:center;width:280px;height:280px;border-radius:18px;background:${t.panelSoft};color:${t.sub};font-size:30px;border:3px dashed ${t.line};">写真${i+1}</div>`}<div style="display:flex;text-align:center;margin-top:16px;font-size:30px;line-height:1.4;color:${t.ink};">${cap}</div></div>`).join('')}</div>`);} },
+
+  { id:'content_biglist', name:'大数字リスト（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'貯まる人の3習慣'},{key:'items',label:'項目',type:'rows',cols:['見出し','説明'],def:'先取り貯金｜使う前に、貯金分を分ける\n固定費見直し｜一度直せば、毎月ずっと効く\n自動化｜意志に頼らない仕組みにする'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:56px;font-weight:900;font-family:${t.head};">${nl(d.title)}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:40px;border-radius:4px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.items.split('\n').filter(Boolean).map((it,i)=>{const p=it.split('｜');const h=p[0];const desc=p[1]||'';return `<div style="display:flex;align-items:flex-start;margin-bottom:34px;"><div style="display:flex;flex-shrink:0;width:128px;font-family:${t.display};font-size:120px;color:${t.accent};line-height:0.85;">${i+1}</div><div style="display:flex;flex-direction:column;flex-grow:1;margin-left:12px;padding-top:12px;"><div style="display:flex;font-size:48px;font-weight:900;font-family:${t.head};">${h}</div><div style="display:flex;margin-top:8px;font-size:34px;line-height:1.5;color:${t.sub};">${desc}</div></div></div>`;}).join('')}</div>`) },
+
+  { id:'content_timetable', name:'時間軸タイムテーブル（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'わたしの朝ルーティン'},{key:'items',label:'予定',type:'rows',cols:['時刻','予定','補足'],def:'6:30｜起きて白湯を飲む｜まず体を起こす\n6:45｜10分だけ散歩｜朝日を浴びる\n7:00｜朝食＋身支度｜スマホは見ない\n7:40｜余裕をもって出発｜駅まで歩く'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:54px;font-weight:900;font-family:${t.head};margin-bottom:40px;">${nl(d.title)}</div>
+      <div style="display:flex;flex-direction:column;">${d.items.split('\n').filter(Boolean).map(it=>{const p=it.split('｜');const time=p[0];const act=p[1]||'';const sub=p[2]||'';return `<div style="display:flex;align-items:stretch;margin-bottom:18px;"><div style="display:flex;flex-shrink:0;width:130px;font-size:36px;font-weight:900;color:${t.accentDeep};padding-top:24px;">${time}</div><div style="display:flex;flex-direction:column;flex-grow:1;background:${t.panel};border-left:8px solid ${t.accent};border-top-right-radius:16px;border-bottom-right-radius:16px;padding:22px 28px;"><div style="display:flex;font-size:40px;font-weight:900;font-family:${t.head};">${act}</div>${sub?`<div style="display:flex;margin-top:6px;font-size:30px;color:${t.sub};">${sub}</div>`:''}</div></div>`;}).join('')}</div>`) },
+
+  { id:'content_calendar', name:'月間カレンダー（中身）', cat:'中身',
+    fields:[{key:'month',label:'月',def:'6'},{key:'title',label:'見出し',def:'今月の予定'},{key:'sub',label:'サブ',def:'〜イベントのお知らせ〜'},{key:'startCol',label:'1日の曜日(0日〜6土)',def:'0'},{key:'days',label:'日数',def:'30'},{key:'marks',label:'印つき日(カンマ区切り)',def:'7,14,21,28'},{key:'legend',label:'凡例',def:'●の日はライブ配信！詳細はキャプション'}],
+    render:(d,t)=>{const start=Math.max(0,Math.min(6,parseInt(d.startCol)||0));const days=parseInt(d.days)||30;const marked=new Set((d.marks||'').split(',').map(x=>x.trim()).filter(Boolean));const wd=['日','月','火','水','木','金','土'];const cells=[];for(let i=0;i<start;i++)cells.push('');for(let n=1;n<=days;n++)cells.push(String(n));while(cells.length%7)cells.push('');
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+        <div style="display:flex;align-items:baseline;"><div style="display:flex;font-family:${t.display};font-size:84px;color:${t.accent};line-height:1;">${d.month}</div><div style="display:flex;margin-left:16px;font-size:42px;font-weight:900;font-family:${t.head};">${d.title}</div></div>
+        <div style="display:flex;font-size:30px;color:${t.sub};margin-top:6px;margin-bottom:20px;">${d.sub}</div>
+        <div style="display:flex;">${wd.map((w,i)=>`<div style="display:flex;align-items:center;justify-content:center;width:125px;height:50px;font-size:28px;font-weight:700;color:${i===0?'#C0392B':i===6?'#2C6FB0':t.sub};">${w}</div>`).join('')}</div>
+        <div style="display:flex;flex-wrap:wrap;">${cells.map(n=>`<div style="display:flex;align-items:center;justify-content:center;width:125px;height:104px;">${n?`<div style="display:flex;align-items:center;justify-content:center;width:68px;height:68px;border-radius:50%;${marked.has(n)?'background:'+t.accent+';':''}"><div style="display:flex;font-size:34px;font-weight:700;color:${marked.has(n)?t.onAccent:t.ink};">${n}</div></div>`:''}</div>`).join('')}</div>
+        <div style="display:flex;margin-top:22px;font-size:30px;color:${t.sub};">${d.legend}</div>`);} },
+
+  { id:'content_spectable', name:'スペック比較表（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル',def:'プラン比較'},{key:'cols',label:'列見出し（｜区切り 2〜3）',def:'無料｜有料'},{key:'rows',label:'行',type:'rows',cols:['項目','値1','値2'],def:'料金｜0円｜月980円\n保存数｜10件まで｜無制限\n広告｜あり｜なし\nサポート｜なし｜優先対応'}],
+    render:(d,t)=>{const cols=d.cols.split('｜').filter(Boolean);const rows=d.rows.split('\n').filter(Boolean).map(r=>r.split('｜'));const n=cols.length;const cw=Math.floor(560/n);
+      return wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+        <div style="display:flex;font-size:54px;font-weight:900;font-family:${t.head};margin-bottom:40px;">${d.title}</div>
+        <div style="display:flex;align-items:stretch;background:${t.accent};border-top-left-radius:16px;border-top-right-radius:16px;"><div style="display:flex;width:320px;"></div>${cols.map(c=>`<div style="display:flex;align-items:center;justify-content:center;width:${cw}px;padding:22px 6px;color:${t.onAccent};font-size:36px;font-weight:900;">${c}</div>`).join('')}</div>
+        ${rows.map((r,ri)=>`<div style="display:flex;align-items:stretch;background:${ri%2?t.panelSoft:t.panel};"><div style="display:flex;align-items:center;width:320px;padding:24px 26px;font-size:36px;font-weight:700;">${r[0]||''}</div>${cols.map((c,ci)=>`<div style="display:flex;align-items:center;justify-content:center;width:${cw}px;padding:24px 6px;font-size:34px;font-weight:700;color:${ci===n-1?t.accentDeep:t.ink};text-align:center;">${r[ci+1]||'-'}</div>`).join('')}</div>`).join('')}</div>`);} },
+
+  { id:'content_spots', name:'スポットリスト（番号ピン）（中身）', cat:'中身',
+    fields:[{key:'title',label:'タイトル（改行で折る）',def:'近所のおすすめカフェ'},{key:'spots',label:'スポット',type:'rows',cols:['名前','ひとこと'],def:'みなと珈琲｜静かで作業がはかどる\nベーカリー麦｜朝7時の焼きたてが神\n喫茶ベル｜昭和レトロな純喫茶\n本と珈琲 栞｜長居できる隠れ家'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:54px;font-weight:900;font-family:${t.head};">${nl(d.title)}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:42px;border-radius:4px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.spots.split('\n').filter(Boolean).map((s,i)=>{const p=s.split('｜');return `<div style="display:flex;align-items:flex-start;margin-bottom:32px;"><div style="display:flex;flex-shrink:0;align-items:center;justify-content:center;width:62px;height:62px;border-radius:50%;background:${t.panelSoft};margin-right:22px;">${icon('map-pin',t.accentDeep,38,2)}</div><div style="display:flex;flex-direction:column;flex-grow:1;"><div style="display:flex;font-size:44px;font-weight:900;font-family:${t.head};">${p[0]}</div><div style="display:flex;margin-top:6px;font-size:34px;color:${t.sub};">${p[1]||''}</div></div></div>`;}).join('')}</div>`) },
+
+  // ===== 締め =====
+  { id:'cta_save', name:'C1 保存版CTA（締め）', cat:'締め',
+    fields:[{key:'recapA',label:'問題再提示前',def:'固定費、ほっとくと'},{key:'recapHot',label:'数字(アクセント)',def:'年18万円'},{key:'recapB',label:'後',def:'の差。'},{key:'head1',label:'価値見出し1',def:'がんばる節約より、'},{key:'head2',label:'価値見出し2',def:'ラクで確実。'},{key:'vals',label:'得られること',type:'rows',cols:['得られること'],def:'今日からできる見直しを、毎日ひとつ\n食費を我慢せず、ムダだけ潰す\n保存して、見返すたびに効く'},{key:'handle',label:'アカウント',def:'@ゆる貯金'},{key:'icon',label:'アイコン(任意)',type:'icon',def:'sparkles'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-items:center;align-self:flex-start;"><div style="display:flex;background:${t.ink};color:${t.bg};font-size:34px;font-weight:900;padding:14px 28px;border-radius:12px;">保存版</div>${d.icon?`<div style="display:flex;margin-left:18px;">${icon(d.icon,t.accent,54,1.9)}</div>`:''}</div>
+      <div style="display:flex;margin-top:38px;font-size:40px;font-weight:700;">${d.recapA}<span style="color:${t.accent};">${d.recapHot}</span>${d.recapB}</div>
+      <div style="display:flex;margin-top:18px;font-size:64px;font-weight:900;font-family:${t.head};">${d.head1}</div>
+      <div style="display:flex;font-size:64px;font-weight:900;font-family:${t.head};">${d.head2}</div>
+      <div style="display:flex;flex-direction:column;margin-top:40px;">${d.vals.split('\n').filter(Boolean).map(v=>`<div style="display:flex;align-items:center;margin-bottom:22px;"><div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:${t.accent};margin-right:20px;">${icon('check',t.onAccent,20,3.4)}</div><div style="display:flex;font-size:36px;">${v}</div></div>`).join('')}</div>
+      <div style="display:flex;flex-direction:column;margin-top:22px;background:${t.accent};border-radius:24px;padding:32px 38px;color:${t.onAccent};"><div style="display:flex;font-size:40px;font-weight:900;">① まず “保存” → 来月の見直しに</div><div style="display:flex;font-size:36px;font-weight:700;margin-top:14px;">② ${d.handle} をフォロー</div></div>`) },
+
+  { id:'cta_next', name:'C2 次の行き先誘導（締め）', cat:'締め',
+    fields:[{key:'head',label:'見出し',def:'次は、ここから。'},{key:'dest1',label:'行き先1',def:'プロフのハイライト「節約まとめ」'},{key:'dest2',label:'行き先2',def:'人気投稿「固定費の全リスト」'},{key:'dest3',label:'行き先3',def:'LINEで家計診断（無料）'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.darkBg,color:t.darkInk,font:t.body,align:'stretch'},`
+      <div style="display:flex;font-size:62px;font-weight:900;font-family:${t.head};">${d.head}</div>
+      <div style="display:flex;flex-direction:column;margin-top:46px;">${[d.dest1,d.dest2,d.dest3].filter(Boolean).map(x=>`<div style="display:flex;align-items:center;background:rgba(255,255,255,0.08);border-radius:18px;padding:26px 30px;margin-bottom:20px;"><div style="display:flex;color:${t.darkAccent};font-size:38px;font-weight:900;margin-right:20px;">→</div><div style="display:flex;font-size:38px;font-weight:700;">${x}</div></div>`).join('')}</div>
+      <div style="display:flex;margin-top:44px;font-size:46px;font-weight:900;color:${t.darkAccent};">${d.handle}</div>`) },
+
+  { id:'cta_recap_save', name:'C3 要約＋保存枠（締め）', cat:'締め',
+    fields:[{key:'title',label:'まとめ見出し',def:'今日のまとめ'},{key:'points',label:'要点',type:'rows',cols:['要点'],def:'先取りで、自動で貯金\n固定費は、年1で見直し\nムダなサブスクは、即解約'},{key:'save',label:'保存メッセージ（改行で折る）',def:'迷ったら、\n保存して見返す。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-items:center;margin-bottom:34px;"><div style="display:flex;flex-shrink:0;">${icon('bookmark',t.accent,52,2)}</div><div style="display:flex;margin-left:18px;font-size:56px;font-weight:900;font-family:${t.head};">${d.title}</div></div>
+      <div style="display:flex;flex-direction:column;border:3px solid ${t.line};border-radius:24px;padding:40px;">${d.points.split('\n').filter(Boolean).map((p,i,a)=>`<div style="display:flex;align-items:center;${i<a.length-1?'margin-bottom:24px;':''}"><div style="display:flex;flex-shrink:0;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:${t.accent};margin-right:22px;">${icon('check',t.onAccent,26,3.4)}</div><div style="display:flex;font-size:40px;font-weight:700;">${p}</div></div>`).join('')}</div>
+      <div style="display:flex;flex-direction:column;align-self:flex-start;margin-top:36px;background:${t.panelSoft};color:${t.accentDeep};font-size:38px;font-weight:700;padding:22px 30px;border-radius:16px;">${nl(d.save)}</div>
+      <div style="display:flex;margin-top:28px;font-size:42px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_share', name:'C4 シェア誘導（締め）', cat:'締め',
+    fields:[{key:'head',label:'見出し（改行で折る）',def:'誰かに教えたく\nなったら。'},{key:'sub',label:'サブ（改行で折る）',def:'シェアで、もう一人の\n「貯まらない」を救えるかも。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:50%;background:${t.accent};margin-bottom:46px;">${icon('share-2',t.onAccent,76,2)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:66px;font-weight:900;font-family:${t.head};line-height:1.3;">${nl(d.head)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;margin-top:30px;font-size:38px;color:${t.sub};line-height:1.5;">${nl(d.sub)}</div>
+      <div style="display:flex;margin-top:46px;font-size:44px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_q_save', name:'C5 問い返し＋保存（締め）', cat:'締め',
+    fields:[{key:'q',label:'問い返し（改行で折る）',def:'刺さるの、\nあった?'},{key:'save',label:'保存促し（改行で折る）',def:'忘れないように、\n保存しておこ。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.head,align:'center'},`
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:90px;font-weight:900;line-height:1.25;">${nl(d.q)}</div>
+      <div style="display:flex;align-items:center;margin-top:50px;border:3px solid ${t.accent};border-radius:40px;padding:24px 40px;"><div style="display:flex;flex-shrink:0;">${icon('bookmark',t.accent,44,2)}</div><div style="display:flex;flex-direction:column;margin-left:18px;font-family:${t.body};font-size:38px;font-weight:700;color:${t.accentDeep};">${nl(d.save)}</div></div>
+      <div style="display:flex;margin-top:46px;font-family:${t.body};font-size:42px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_circle', name:'C6 円形CTAバッジ（締め）', cat:'締め',
+    fields:[{key:'pre',label:'前振り',def:'もっと知りたい人は'},{key:'circle',label:'丸の中（改行）',def:'プロフから\n無料で\n受け取る'},{key:'sub',label:'下サブ（改行で折る）',def:'お金の基本テンプレ、配布中。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;font-size:42px;font-weight:700;color:${t.sub};margin-bottom:34px;">${d.pre}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:560px;height:560px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-family:${t.head};font-size:72px;font-weight:900;line-height:1.3;">${nl(d.circle)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;margin-top:40px;font-size:38px;font-weight:700;">${nl(d.sub)}</div>
+      <div style="display:flex;margin-top:22px;font-size:42px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_recap_follow', name:'C7 3行まとめ＋フォロー（締め）', cat:'締め',
+    fields:[{key:'head',label:'見出し',def:'今日の3行まとめ'},{key:'lines',label:'3行',type:'rows',cols:['行'],def:'我慢の節約より、仕組みで自動。\n固定費は一度直せば、毎月効く。\n浮いたら、先取り貯金に回すだけ。'},{key:'follow',label:'フォロー誘導',def:'お金の話、毎日ひとつ。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;font-size:54px;font-weight:900;font-family:${t.head};">${d.head}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:40px;border-radius:4px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.lines.split('\n').filter(Boolean).map((l,i)=>`<div style="display:flex;align-items:center;margin-bottom:26px;"><div style="display:flex;flex-shrink:0;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:${t.accent};color:${t.onAccent};font-family:${t.display};font-size:30px;margin-right:24px;">${i+1}</div><div style="display:flex;flex-grow:1;font-size:40px;font-weight:700;">${l}</div></div>`).join('')}</div>
+      <div style="display:flex;align-items:center;margin-top:30px;"><div style="display:flex;flex-shrink:0;">${icon('bell',t.accent,44,2)}</div><div style="display:flex;margin-left:16px;font-size:38px;font-weight:700;">${d.follow}</div><div style="display:flex;margin-left:14px;font-size:38px;font-weight:900;color:${t.accent};">${d.handle}</div></div>`) },
+
+  { id:'cta_checklist', name:'C8 チェックリスト締め（締め）', cat:'締め',
+    fields:[{key:'title',label:'見出し',def:'今日からやる3つ'},{key:'items',label:'項目',type:'rows',cols:['項目'],def:'銀行の自動振替を設定する\nサブスクを一覧にして見直す\nふるさと納税の上限を調べる'},{key:'foot',label:'締め（改行で折る）',def:'できたらチェック。\n保存して、見返す。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;font-size:56px;font-weight:900;font-family:${t.head};">${d.title}</div>
+      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin-top:18px;margin-bottom:42px;border-radius:4px;"></div>
+      <div style="display:flex;flex-direction:column;">${d.items.split('\n').filter(Boolean).map(it=>`<div style="display:flex;align-items:center;margin-bottom:28px;"><div style="display:flex;flex-shrink:0;align-items:center;justify-content:center;width:54px;height:54px;border-radius:12px;background:${t.accent};margin-right:24px;">${icon('check',t.onAccent,30,3.4)}</div><div style="display:flex;font-size:40px;font-weight:500;">${it}</div></div>`).join('')}</div>
+      <div style="display:flex;flex-direction:column;align-self:flex-start;margin-top:24px;background:${t.panelSoft};color:${t.accentDeep};font-size:36px;font-weight:700;padding:20px 28px;border-radius:16px;">${nl(d.foot)}</div>`) },
+
+  { id:'cta_profile', name:'C9 プロフ誘導↑（締め）', cat:'締め',
+    fields:[{key:'benefit',label:'価値（改行で折る）',def:'毎日ひとつ、\nお金が貯まるコツ。'},{key:'action',label:'行動',def:'フォローはこちら'},{key:'handle',label:'アカウント',def:'@ゆる貯金'},{key:'sub',label:'下誘導',def:'プロフィールから'}],
+    render:(d,t)=>wrap({bg:t.darkBg,color:t.darkInk,font:t.body,align:'center'},`
+      <div style="display:flex;align-items:center;justify-content:center;width:130px;height:130px;border-radius:50%;background:${t.darkAccent};margin-bottom:40px;">${icon('arrow-up',t.darkBg,72,2.4)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:64px;font-weight:900;font-family:${t.head};line-height:1.3;">${nl(d.benefit)}</div>
+      <div style="display:flex;margin-top:36px;font-size:40px;font-weight:700;color:${t.darkSub};">${d.action}</div>
+      <div style="display:flex;margin-top:14px;font-size:56px;font-weight:900;color:${t.darkAccent};">${d.handle}</div>
+      <div style="display:flex;margin-top:28px;font-size:32px;color:${t.darkSub};">${d.sub}</div>`) },
+
+  { id:'cta_dm', name:'C10 DM誘導（締め）', cat:'締め',
+    fields:[{key:'pre',label:'前振り',def:'受け取りたい人は'},{key:'keyword',label:'合言葉',def:'テンプレ'},{key:'desc',label:'説明（改行で折る）',def:'お金の基本チェックシートを、\nDMで無料プレゼント。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;align-items:center;justify-content:center;width:140px;height:140px;border-radius:50%;background:${t.accent};margin-bottom:40px;">${icon('send',t.onAccent,70,2)}</div>
+      <div style="display:flex;font-size:38px;font-weight:700;color:${t.sub};margin-bottom:18px;">${d.pre}</div>
+      <div style="display:flex;align-items:center;font-size:60px;font-weight:900;font-family:${t.head};"><div style="display:flex;background:${t.panelSoft};color:${t.accentDeep};padding:8px 24px;border-radius:14px;margin-right:14px;">${d.keyword}</div><div style="display:flex;">とDM</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;margin-top:30px;font-size:36px;line-height:1.5;color:${t.ink};">${nl(d.desc)}</div>
+      <div style="display:flex;margin-top:40px;font-size:42px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_comment', name:'C11 コメント誘導（締め）', cat:'締め',
+    fields:[{key:'q',label:'問い（改行で折る）',def:'あなたが最初に\n見直すなら、どれ?'},{key:'guide',label:'誘導',def:'コメントで教えて'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;align-items:center;justify-content:center;width:130px;height:130px;border-radius:50%;background:${t.panelSoft};margin-bottom:40px;">${icon('message-circle',t.accent,68,2)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:62px;font-weight:900;font-family:${t.head};line-height:1.3;">${nl(d.q)}</div>
+      <div style="display:flex;align-items:center;margin-top:34px;background:${t.accent};color:${t.onAccent};font-size:40px;font-weight:700;padding:18px 36px;border-radius:999px;">${d.guide}</div>
+      <div style="display:flex;margin-top:40px;font-size:40px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_next_preview', name:'C12 次回予告（締め）', cat:'締め',
+    fields:[{key:'label',label:'ラベル',def:'NEXT'},{key:'title',label:'次回タイトル（改行で折る）',def:'貯金を“続ける”\n仕組みの作り方'},{key:'note',label:'ひとこと',def:'見逃さないように、フォローしてね。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.darkBg,color:t.darkInk,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-items:center;margin-bottom:30px;"><div style="display:flex;background:${t.darkAccent};color:${t.darkBg};font-size:30px;font-weight:900;letter-spacing:3px;padding:10px 22px;border-radius:8px;">${d.label}</div><div style="display:flex;margin-left:18px;font-size:34px;color:${t.darkSub};">次回予告</div></div>
+      <div style="display:flex;flex-direction:column;font-size:70px;font-weight:900;font-family:${t.head};line-height:1.3;">${nl(d.title)}</div>
+      <div style="display:flex;margin-top:40px;font-size:36px;color:${t.darkSub};">${nl(d.note)}</div>
+      <div style="display:flex;margin-top:30px;font-size:46px;font-weight:900;color:${t.darkAccent};">${d.handle}</div>`) },
+
+  { id:'cta_gift', name:'C13 無料プレゼント（締め）', cat:'締め',
+    fields:[{key:'badge',label:'バッジ',def:'無料プレゼント'},{key:'item',label:'プレゼント内容（改行で折る）',def:'貯まる家計の\nテンプレート'},{key:'how',label:'受け取り方',def:'プロフのリンクから受け取れます'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:30px;background:${t.accent};margin-bottom:36px;">${icon('gift',t.onAccent,80,2)}</div>
+      <div style="display:flex;background:${t.panelSoft};color:${t.accentDeep};font-size:32px;font-weight:900;padding:10px 24px;border-radius:999px;margin-bottom:28px;">${d.badge}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:66px;font-weight:900;font-family:${t.head};line-height:1.3;">${nl(d.item)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;margin-top:30px;font-size:36px;color:${t.sub};">${nl(d.how)}</div>
+      <div style="display:flex;margin-top:24px;font-size:42px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_intro', name:'C14 感謝＋自己紹介（締め）', cat:'締め',
+    fields:[{key:'thanks',label:'感謝',def:'最後まで読んでくれて\nありがとう。'},{key:'about',label:'自己紹介（改行で折る）',def:'がんばらずにお金が貯まる\n仕組みを、毎日ひとつ発信中。'},{key:'follow',label:'フォロー文',def:'よかったらフォローしてね'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:58px;font-weight:900;font-family:${t.head};line-height:1.35;margin-bottom:40px;">${nl(d.thanks)}</div>
+      <div style="display:flex;flex-direction:column;background:${t.panel};border-radius:22px;padding:38px;"><div style="display:flex;flex-direction:column;font-size:40px;font-weight:700;line-height:1.5;color:${t.ink};">${nl(d.about)}</div></div>
+      <div style="display:flex;margin-top:40px;font-size:38px;color:${t.sub};">${d.follow}</div>
+      <div style="display:flex;margin-top:12px;font-size:50px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_quote', name:'C15 引用締め（明朝・締め）', cat:'締め',
+    fields:[{key:'quote',label:'一言（改行で折る）',def:'お金は、追うより\n仕組みで、ついてくる。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;flex-direction:column;align-items:center;font-family:'Shippori Mincho';font-size:64px;font-weight:700;line-height:1.6;">${nl(d.quote)}</div>
+      <div style="display:flex;width:64px;height:2px;background:${t.accent};margin-top:50px;margin-bottom:26px;"></div>
+      <div style="display:flex;font-size:38px;font-weight:700;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_question', name:'C16 質問返し1問（締め）', cat:'締め',
+    fields:[{key:'q',label:'質問（改行で折る）',def:'あなたが今いちばん\n見直したい固定費は?'},{key:'sub',label:'サブ',def:'考えてみるだけで、変わり始める。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.head,align:'center'},`
+      <div style="display:flex;font-size:120px;color:${t.accent};line-height:0.8;margin-bottom:20px;">?</div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:64px;font-weight:900;line-height:1.35;">${nl(d.q)}</div>
+      <div style="display:flex;margin-top:34px;font-family:${t.body};font-size:36px;color:${t.sub};">${d.sub}</div>
+      <div style="display:flex;margin-top:36px;font-family:${t.body};font-size:42px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_savebig', name:'C17 保存版バッジ大（締め）', cat:'締め',
+    fields:[{key:'big',label:'特大ワード',def:'保存版'},{key:'note',label:'一言（改行で折る）',def:'見返すたびに、\nお金が貯まる。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.darkBg,color:t.darkInk,font:t.body,align:'center'},`
+      <div style="display:flex;align-items:center;margin-bottom:40px;"><div style="display:flex;flex-shrink:0;margin-right:24px;">${icon('bookmark',t.darkAccent,80,2)}</div><div style="display:flex;font-family:${t.display};font-size:150px;color:${t.darkAccent};line-height:1;">${d.big}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:50px;font-weight:700;line-height:1.4;">${nl(d.note)}</div>
+      <div style="display:flex;margin-top:44px;font-size:44px;font-weight:900;color:${t.darkAccent};">${d.handle}</div>`) },
+
+  { id:'cta_ba_recap', name:'C18 Before→After総括（締め）', cat:'締め',
+    fields:[{key:'title',label:'見出し（改行で折る）',def:'あなたも、こう変われる。'},{key:'before',label:'Before',def:'毎月カツカツ'},{key:'after',label:'After',def:'自動で貯まる'},{key:'note',label:'ひとこと',def:'まずは1つ、今日から。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;flex-direction:column;font-size:56px;font-weight:900;font-family:${t.head};margin-bottom:44px;">${nl(d.title)}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:380px;height:200px;background:${t.panel};border:3px solid ${t.line};border-radius:20px;"><div style="display:flex;font-size:28px;font-weight:900;color:${t.sub};margin-bottom:10px;">Before</div><div style="display:flex;font-size:44px;font-weight:700;color:${t.sub};">${d.before}</div></div>
+        <div style="display:flex;font-size:50px;font-weight:900;color:${t.accent};">→</div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:380px;height:200px;background:${t.accent};border-radius:20px;color:${t.onAccent};"><div style="display:flex;font-size:28px;font-weight:900;margin-bottom:10px;">After</div><div style="display:flex;font-size:44px;font-weight:700;">${d.after}</div></div>
+      </div>
+      <div style="display:flex;align-self:center;margin-top:40px;font-size:40px;font-weight:700;">${d.note}</div>
+      <div style="display:flex;align-self:center;margin-top:14px;font-size:42px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_total', name:'C19 数字総括CTA（締め）', cat:'締め',
+    fields:[{key:'pre',label:'前振り',def:'全部見直すと'},{key:'total',label:'合計数字',def:'−18万'},{key:'unit',label:'単位',def:'円／年'},{key:'note',label:'ひとこと（改行で折る）',def:'保存して、今日から\n1つずつ実行しよう。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'center'},`
+      <div style="display:flex;font-size:44px;font-weight:700;color:${t.sub};margin-bottom:6px;">${d.pre}</div>
+      <div style="display:flex;align-items:baseline;margin-bottom:30px;"><div style="display:flex;font-family:${t.display};font-size:200px;color:${t.accent};line-height:1;">${d.total}</div><div style="display:flex;font-size:60px;font-weight:900;margin-left:10px;color:${t.accent};">${d.unit}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:42px;font-weight:700;line-height:1.5;">${nl(d.note)}</div>
+      <div style="display:flex;margin-top:36px;font-size:42px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+
+  { id:'cta_highlight', name:'C20 ハイライト保存誘導（締め）', cat:'締め',
+    fields:[{key:'head',label:'見出し（改行で折る）',def:'保存して、\nいつでも見返せるように。'},{key:'sub',label:'サブ',def:'プロフのハイライトにまとめてます。'},{key:'handle',label:'アカウント',def:'@ゆる貯金'}],
+    render:(d,t)=>wrap({bg:t.bg,color:t.ink,font:t.body,align:'stretch'},`
+      <div style="display:flex;align-items:center;margin-bottom:40px;"><div style="display:flex;align-items:center;justify-content:center;width:96px;height:96px;border-radius:24px;background:${t.accent};">${icon('bookmark',t.onAccent,52,2)}</div><div style="display:flex;align-items:center;justify-content:center;width:96px;height:96px;border-radius:24px;background:${t.panelSoft};margin-left:18px;">${icon('star',t.accentDeep,52,2)}</div></div>
+      <div style="display:flex;flex-direction:column;font-size:62px;font-weight:900;font-family:${t.head};line-height:1.3;">${nl(d.head)}</div>
+      <div style="display:flex;flex-direction:column;margin-top:30px;font-size:38px;color:${t.sub};">${nl(d.sub)}</div>
+      <div style="display:flex;margin-top:40px;font-size:46px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
+];
+
+// ---- ① QA画像（satori）----
+const find=(pkg,w)=>{const dir=path.join(__dirname,'node_modules/@expo-google-fonts',pkg,w);const f=fs.readdirSync(dir).find(x=>x.endsWith('.ttf')&&!x.startsWith('._'));return fs.readFileSync(path.join(dir,f));};
+const fonts=[
+  {name:'Zen Kaku Gothic New',data:find('zen-kaku-gothic-new','500Medium'),weight:500,style:'normal'},
+  {name:'Zen Kaku Gothic New',data:find('zen-kaku-gothic-new','700Bold'),weight:700,style:'normal'},
+  {name:'Zen Kaku Gothic New',data:find('zen-kaku-gothic-new','900Black'),weight:900,style:'normal'},
+  {name:'Dela Gothic One',data:find('dela-gothic-one','400Regular'),weight:400,style:'normal'},
+  {name:'Shippori Mincho',data:find('shippori-mincho','700Bold'),weight:700,style:'normal'},
+  {name:'Zen Maru Gothic',data:find('zen-maru-gothic','500Medium'),weight:500,style:'normal'},
+  {name:'Zen Maru Gothic',data:find('zen-maru-gothic','700Bold'),weight:700,style:'normal'},
+  {name:'Zen Maru Gothic',data:find('zen-maru-gothic','900Black'),weight:900,style:'normal'},
+  {name:'Yomogi',data:find('yomogi','400Regular'),weight:400,style:'normal'},
+];
+
+// ---- デッキモード：node build_templates.mjs --deck <deck.json> <out.pdf> → カルーセルPDF一括出力 ----
+const _di=process.argv.indexOf('--deck');
+if(_di>=0){
+  const specPath=process.argv[_di+1], outPath=process.argv[_di+2]||'deck.pdf';
+  const spec=JSON.parse(fs.readFileSync(specPath,'utf8'));
+  const pdf=await PDFDocument.create(); let n=0;
+  for(const s of spec){
+    const t=TEMPLATES.find(x=>x.id===s.tplId); if(!t){console.error('unknown tpl:',s.tplId);continue;}
+    const d=Object.assign(Object.fromEntries(t.fields.map(f=>[f.key,f.def])), s.data||{});
+    const svg=await satori(html(t.render(d,THEMES[s.theme||'money'])),{width:1080,height:1350,fonts});
+    const png=new Resvg(svg,{fitTo:{mode:'original'}}).render().asPng();
+    const img=await pdf.embedPng(png); const pg=pdf.addPage([1080,1350]); pg.drawImage(img,{x:0,y:0,width:1080,height:1350}); n++;
+    if(process.argv.includes('--png')){fs.mkdirSync(path.dirname(outPath),{recursive:true});fs.writeFileSync(path.join(path.dirname(outPath),'slide_'+String(n).padStart(2,'0')+'.png'),png);}
+  }
+  fs.mkdirSync(path.dirname(outPath),{recursive:true});
+  fs.writeFileSync(outPath, await pdf.save());
+  console.log('DECK PDF:',n,'ページ ->',outPath);
+  process.exit(0);
+}
+
+fs.mkdirSync(QA,{recursive:true});
+// 全型を money テーマで
+for(const t of TEMPLATES){
+  const d=Object.fromEntries(t.fields.map(f=>[f.key,f.def]));
+  try{ const svg=await satori(html(t.render(d,THEMES.money)),{width:1080,height:1350,fonts});
+    fs.writeFileSync(path.join(QA,`${t.id}.png`),new Resvg(svg,{fitTo:{mode:'original'}}).render().asPng()); console.log('QA',t.id);
+  }catch(e){ console.error('ERR',t.id,e.message.slice(0,140)); }
+}
+// テーマ違いデモ（cover_target を全テーマ）
+const demo=TEMPLATES[0]; const dd=Object.fromEntries(demo.fields.map(f=>[f.key,f.def]));
+for(const [k,th] of Object.entries(THEMES)){
+  try{ const svg=await satori(html(demo.render(dd,th)),{width:1080,height:1350,fonts});
+    fs.writeFileSync(path.join(QA,`theme_${k}.png`),new Resvg(svg,{fitTo:{mode:'original'}}).render().asPng()); console.log('THEME',k);
+  }catch(e){ console.error('THEME ERR',k,e.message.slice(0,120)); }
+}
+
+// ---- ② 実HTMLアプリ ----
+const tplJs = TEMPLATES.map(t=>`{id:${JSON.stringify(t.id)},name:${JSON.stringify(t.name)},cat:${JSON.stringify(t.cat)},fields:${JSON.stringify(t.fields)},render:${t.render.toString()}}`).join(',\n');
+const page=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>バズ型テンプレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho:wght@600;700;800&family=Yomogi&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+ *{box-sizing:border-box} body{margin:0;font-family:'Zen Kaku Gothic New',sans-serif;background:#2a2a2e;color:#eee;display:flex;height:100vh;overflow:hidden}
+ #side{width:300px;background:#1f1f22;padding:18px;overflow:auto;flex-shrink:0}
+ #side h3{font-size:13px;color:#888;margin:16px 0 6px} .tpl{display:block;width:100%;text-align:left;background:#333;color:#eee;border:0;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;font-size:14px} .tpl.active{background:#E0352B}
+ #mid{flex:1;display:flex;flex-direction:column;overflow:hidden}
+ #preview{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:14px}
+ #stage{transform-origin:center} #card{box-shadow:0 10px 40px rgba(0,0,0,.4);position:relative}
+ #card::after,.pslide::after{content:'';position:absolute;inset:0;pointer-events:none;background-image:url("data:image/svg+xml;base64,${NOISE_B64}");background-size:160px 160px;opacity:.05;mix-blend-mode:multiply}
+ #deckbar{background:#161618;border-top:1px solid #333;padding:10px;display:flex;align-items:flex-start;gap:8px;overflow-x:auto;height:132px;flex-shrink:0}
+ .thumb{position:relative;flex-shrink:0;width:80px;height:100px;border:2px solid transparent;border-radius:6px;overflow:hidden;cursor:pointer;background:#000} .thumb.active{border-color:#E0352B}
+ .thumb .tw{width:1080px;height:1350px;transform:scale(.0735);transform-origin:top left} .thumb .no{position:absolute;top:2px;left:3px;z-index:2;font-size:10px;color:#fff;background:rgba(0,0,0,.55);padding:0 4px;border-radius:3px}
+ #dtools{display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:6px} #dtools button{background:#2c2c30;color:#ccc;border:0;border-radius:6px;padding:6px 9px;font-size:12px;cursor:pointer;white-space:nowrap}
+ #form{width:340px;background:#1f1f22;padding:16px;overflow:auto;flex-shrink:0}
+ #form label{display:block;font-size:12px;color:#9b9;margin:10px 0 4px} #form textarea{width:100%;background:#2c2c30;color:#eee;border:1px solid #444;border-radius:6px;padding:8px;font-size:13px;font-family:inherit;resize:vertical}
+ #theme{width:100%;background:#2c2c30;color:#eee;border:1px solid #555;border-radius:8px;padding:9px;font-size:13px;margin-bottom:10px}
+ #bar{display:flex;gap:6px;margin-bottom:12px} #bar button{flex:1;background:#E0352B;color:#fff;border:0;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer} #bar button.sec{background:#555;flex:0 0 auto;padding:11px 12px}
+ #icongallery{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;align-items:center;justify-content:center} #icongallery.on{display:flex}
+ #icobox{background:#1f1f22;border-radius:12px;padding:24px;width:780px;max-height:80vh;overflow:auto} #icogrid{display:flex;flex-wrap:wrap;gap:10px}
+ #tplgallery,#presetbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;align-items:flex-start;justify-content:center;padding:36px 0} #tplgallery.on,#presetbox.on{display:flex}
+ #galbox{background:#1f1f22;border-radius:12px;padding:20px;width:92vw;max-width:1020px;max-height:88vh;overflow:auto}
+ #galsearch{width:100%;background:#2c2c30;color:#eee;border:1px solid #555;border-radius:8px;padding:11px;font-size:14px;margin-bottom:14px;box-sizing:border-box}
+ #galgrid{display:flex;flex-wrap:wrap;gap:12px}
+ .tcard{width:150px;cursor:pointer} .tcard .tprev{width:150px;height:188px;border-radius:6px;overflow:hidden;background:#000;border:2px solid #333} .tcard:hover .tprev{border-color:#E0352B} .tcard .tw{width:1080px;height:1350px;transform:scale(.139);transform-origin:top left} .tcard .tname{font-size:11px;color:#ccc;margin-top:5px;line-height:1.3}
+ #gbtn{width:100%;background:#E0352B;color:#fff;border:0;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px}
+ #presbox{background:#1f1f22;border-radius:12px;padding:22px;width:90vw;max-width:560px;max-height:84vh;overflow:auto} #preslist .pitem{background:#2c2c30;border-radius:8px;padding:15px;margin-bottom:10px;cursor:pointer} #preslist .pitem:hover{background:#39393f} #preslist .pitem b{color:#fff;font-size:15px} #preslist .pitem span{color:#999;font-size:12px}
+ .ico{display:flex;flex-direction:column;align-items:center;width:118px;padding:12px 6px;background:#2c2c30;border-radius:8px;cursor:pointer;border:2px solid transparent} .ico:hover{border-color:#E0352B;background:#39393f} .ico .nm{font-size:11px;color:#bbb;margin-top:6px;word-break:break-all;text-align:center}
+ .pslide{position:relative} #printarea{position:absolute;left:-99999px;top:0}
+ @media print{ body *{visibility:hidden} #printarea,#printarea *{visibility:visible} #printarea{position:absolute;left:0;top:0} .pslide{page-break-after:always;break-after:page} @page{size:1080px 1350px;margin:0} }
+</style></head><body>
+<div id="side"><h3>アカウントテーマ</h3><select id="theme"></select><h3>型を選ぶ</h3><button id="gbtn" onclick="toggleGallery()">▦ 型ギャラリーで探す</button><div id="list"></div></div>
+<div id="mid"><div id="preview"><div id="stage"><div id="card"></div></div></div><div id="deckbar"></div></div>
+<div id="form"><div id="bar"><button onclick="doPrint()">デッキをPDF保存</button><button class="sec" onclick="togglePresets()">構成</button><button class="sec" onclick="toggleIcons()">アイコン</button><button class="sec" onclick="newDeck()">新規</button><button class="sec" onclick="exportDeck()">書出</button><button class="sec" onclick="document.getElementById('imp').click()">読込</button><input id="imp" type="file" accept="application/json" style="display:none" onchange="importDeck(event)"></div><div id="fields"></div>
+ <p style="font-size:11px;color:#777;margin-top:18px;line-height:1.6">下のデッキ帯で複数スライドを1セットに（＋追加/複製/削除/◀▶並べ替え/全テーマ適用）。<br>「デッキをPDF保存」で全スライドが複数ページPDFに：送信先「PDFに保存」/サイズ1080×1350/余白なし/背景のグラフィックON。<br>テーマ・型の変更は選択中スライドに適用。グリッド型は アイコン名:ラベル。<br><b>文字は改行（Enter）を入れた位置で折れます</b>＝中途半端な折返し防止（入れなければ普通に流れる）。</p></div>
+<div id="printarea"></div>
+<div id="icongallery" onclick="if(event.target.id==='icongallery')toggleIcons()"><div id="icobox"><h3 style="margin-top:0">アイコン一覧（名前を入力欄へ）</h3><div id="icogrid"></div></div></div>
+<div id="tplgallery" onclick="if(event.target.id==='tplgallery')toggleGallery()"><div id="galbox"><input id="galsearch" placeholder="型を検索（例: 診断 / カレンダー / 比較 / 締め）" oninput="filterTpl(this.value)"><div id="galgrid"></div></div></div>
+<div id="presetbox" onclick="if(event.target.id==='presetbox')togglePresets()"><div id="presbox"><h3 style="margin-top:0">構成プリセット（読み込んで中身を差し替え）</h3><div id="preslist"></div></div></div>
+<script>
+const KAKU=${JSON.stringify(KAKU)}, DELA=${JSON.stringify(DELA)}, MIN=${JSON.stringify(MIN)}, MARU=${JSON.stringify(MARU)}, HAND=${JSON.stringify(HAND)};
+const THEMES=${JSON.stringify(THEMES)};
+const ICONS=${JSON.stringify(ICONS)};
+const shade=${shade.toString()};
+const b64=${b64.toString()};
+const icon=${icon.toString()};
+const markerBg=${markerBg.toString()};
+const nl=${nl.toString()};
+const outline=${outline.toString()};
+const faceSVG=${faceSVG.toString()};
+const wrap=${wrap.toString()};
+const TEMPLATES=[${tplJs}];
+const NUMMAP={};(function(){const cnt={},L={'表紙':'A','中身':'B','締め':'C'};TEMPLATES.forEach(t=>{cnt[t.cat]=(cnt[t.cat]||0)+1;const cl=t.name.replace(/^[ABC]\\d+\\s+/,'').replace(/^[ABC]\\s+/,'').replace(/（(表紙|中身|締め)[^）]*）\\s*$/,'');NUMMAP[t.id]=(L[t.cat]||'')+cnt[t.cat]+' '+cl;});})();
+const getTpl=id=>TEMPLATES.find(t=>t.id===id);
+const defaults=t=>Object.fromEntries(t.fields.map(f=>[f.key,f.def]));
+const INITIAL_DECK=[['cover_target','money'],['content_grid','money'],['content_hero','money'],['content_steps','money'],['content_ranking','money'],['content_qa','money'],['cta_save','money']].map(([id,th])=>({tplId:id,theme:th,data:defaults(getTpl(id))}));
+let deck,cur=0,lastField=null,iconTargetKey=null;
+try{const sv=localStorage.getItem('buzzdeck');deck=sv?JSON.parse(sv):null;}catch(e){deck=null;}
+if(!deck||!deck.length)deck=JSON.parse(JSON.stringify(INITIAL_DECK));
+const slide=()=>deck[cur];
+const slideHtml=s=>getTpl(s.tplId).render(s.data,THEMES[s.theme]);
+function fitScale(){const s=Math.min((window.innerWidth-280-340-60)/1080,(window.innerHeight-210)/1350);document.getElementById('stage').style.transform='scale('+Math.max(0.08,s)+')';}
+function renderCard(){document.getElementById('card').innerHTML=slideHtml(slide());}
+function highlightTpl(){document.querySelectorAll('.tpl').forEach(b=>b.classList.toggle('active',b.dataset.id===slide().tplId));}
+function syncTheme(){document.getElementById('theme').value=slide().theme;}
+function renderDeck(){const d=document.getElementById('deckbar');d.innerHTML='';
+ deck.forEach((s,i)=>{const th=document.createElement('div');th.className='thumb'+(i===cur?' active':'');th.onclick=()=>{cur=i;syncTheme();highlightTpl();buildForm();renderCard();renderDeck()};th.innerHTML='<div class="no">'+(i+1)+'</div><div class="tw">'+slideHtml(s)+'</div>';d.appendChild(th)});
+ const tb=document.createElement('div');tb.id='dtools';
+ [['＋追加','add'],['複製','dup'],['削除','del'],['◀','left'],['▶','right'],['全テーマ適用','alltheme']].forEach(([lbl,act])=>{const b=document.createElement('button');b.textContent=lbl;b.onclick=()=>deckAct(act);tb.appendChild(b)});
+ d.appendChild(tb);try{localStorage.setItem('buzzdeck',JSON.stringify(deck))}catch(e){}}
+function refreshAll(){syncTheme();highlightTpl();buildForm();renderCard();renderDeck();}
+function newDeck(){if(!confirm('今のデッキを破棄して新規作成しますか？'))return;deck=JSON.parse(JSON.stringify(INITIAL_DECK));cur=0;refreshAll();}
+function exportDeck(){const b=new Blob([JSON.stringify(deck)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='buzz_deck.json';a.click();}
+function importDeck(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(){try{const d=JSON.parse(r.result);if(Array.isArray(d)&&d.length){deck=d;cur=0;refreshAll();}else alert('形式が違います')}catch(x){alert('読み込めませんでした')}};r.readAsText(f);e.target.value='';}
+function deckAct(a){const s=slide();
+ if(a==='add'){deck.splice(cur+1,0,{tplId:s.tplId,theme:s.theme,data:defaults(getTpl(s.tplId))});cur++;}
+ else if(a==='dup'){deck.splice(cur+1,0,{tplId:s.tplId,theme:s.theme,data:Object.assign({},s.data)});cur++;}
+ else if(a==='del'){if(deck.length>1){deck.splice(cur,1);if(cur>=deck.length)cur=deck.length-1;}}
+ else if(a==='left'){if(cur>0){const t=deck[cur-1];deck[cur-1]=deck[cur];deck[cur]=t;cur--;}}
+ else if(a==='right'){if(cur<deck.length-1){const t=deck[cur+1];deck[cur+1]=deck[cur];deck[cur]=t;cur++;}}
+ else if(a==='alltheme'){const th=s.theme;deck.forEach(x=>x.theme=th);}
+ syncTheme();highlightTpl();buildForm();renderCard();renderDeck();}
+function buildForm(){const t=getTpl(slide().tplId);const f=document.getElementById('fields');f.innerHTML='';t.fields.forEach(fl=>{const lab=document.createElement('label');lab.textContent=fl.label;f.appendChild(lab);if(fl.type==='file'){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.style.cssText='width:100%;color:#eee;font-size:12px';inp.onchange=e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{slide().data[fl.key]=r.result;renderCard();renderDeck()};r.readAsDataURL(file)};f.appendChild(inp);}else if(fl.type==='select'){const sel=document.createElement('select');sel.style.cssText='width:100%;background:#2c2c30;color:#eee;border:1px solid #444;border-radius:6px;padding:8px;font-size:13px';(fl.options||[]).forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;sel.appendChild(op)});sel.value=slide().data[fl.key];sel.onchange=()=>{slide().data[fl.key]=sel.value;renderCard();renderDeck()};f.appendChild(sel);}else if(fl.type==='icon'){const cv=slide().data[fl.key]||'';const w=document.createElement('div');w.style.cssText='display:flex;align-items:center;gap:8px';const pv=document.createElement('div');pv.style.cssText='width:42px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#2c2c30;border-radius:6px';pv.innerHTML=cv&&ICONS[cv]?icon(cv,'#dddddd',26,1.8):'<span style="color:#777;font-size:10px">なし</span>';const bt=document.createElement('button');bt.textContent=cv?('変更（'+cv+'）'):'アイコンを選ぶ';bt.style.cssText='flex:1;background:#2c2c30;color:#ccc;border:1px solid #444;border-radius:6px;padding:9px;font-size:12px;cursor:pointer';bt.onclick=()=>{iconTargetKey=fl.key;toggleIcons();};w.appendChild(pv);w.appendChild(bt);if(cv){const cl=document.createElement('button');cl.textContent='✕';cl.style.cssText='background:#5a3a3a;color:#f0b0b0;border:0;border-radius:6px;padding:0 11px;cursor:pointer;font-size:13px';cl.onclick=()=>{slide().data[fl.key]='';renderCard();renderDeck();buildForm();};w.appendChild(cl);}f.appendChild(w);}else if(fl.type==='rows'){const cols=fl.cols||['値'];const box=document.createElement('div');let arr=(slide().data[fl.key]||'').split('\\n').filter(x=>x.length).map(l=>l.split('｜'));const commit=()=>{slide().data[fl.key]=arr.map(r=>r.join('｜')).join('\\n');renderCard();renderDeck();};function draw(){box.innerHTML='';arr.forEach((r,ri)=>{const row=document.createElement('div');row.style.cssText='display:flex;gap:4px;margin-bottom:6px';cols.forEach((c,ci)=>{const inp=document.createElement('input');inp.type='text';inp.placeholder=c;inp.value=r[ci]||'';inp.style.cssText='flex:1;min-width:0;background:#2c2c30;color:#eee;border:1px solid #444;border-radius:6px;padding:7px;font-size:12px';inp.oninput=()=>{while(arr[ri].length<=ci)arr[ri].push('');arr[ri][ci]=inp.value;commit();};row.appendChild(inp);});const del=document.createElement('button');del.textContent='✕';del.style.cssText='background:#5a3a3a;color:#f0b0b0;border:0;border-radius:6px;padding:0 11px;cursor:pointer;font-size:13px;flex-shrink:0';del.onclick=()=>{arr.splice(ri,1);commit();draw();};row.appendChild(del);box.appendChild(row);});const add=document.createElement('button');add.textContent='＋ 行を追加';add.style.cssText='width:100%;background:#2c2c30;color:#9b9;border:1px dashed #555;border-radius:6px;padding:8px;font-size:12px;cursor:pointer;margin-top:2px';add.onclick=()=>{arr.push(cols.map(()=>''));commit();draw();};box.appendChild(add);}draw();f.appendChild(box);}else{const ta=document.createElement('textarea');ta.value=slide().data[fl.key];ta.rows=(slide().data[fl.key]||'').includes('\\n')?4:1;ta.oninput=()=>{slide().data[fl.key]=ta.value;renderCard();renderDeck()};f.appendChild(ta);}});}
+function selectTpl(t){slide().tplId=t.id;slide().data=defaults(t);highlightTpl();buildForm();renderCard();renderDeck();}
+function buildThemes(){const s=document.getElementById('theme');Object.entries(THEMES).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v.name;s.appendChild(o)});s.value=slide().theme;s.onchange=()=>{slide().theme=s.value;renderCard();renderDeck()};}
+function buildList(){const cats={};TEMPLATES.forEach(t=>{(cats[t.cat]=cats[t.cat]||[]).push(t)});const L={'表紙':'A','中身':'B','締め':'C'};const list=document.getElementById('list');Object.entries(cats).forEach(([c,ts])=>{const h=document.createElement('h3');h.textContent=c;list.appendChild(h);ts.forEach(t=>{const b=document.createElement('button');b.className='tpl';b.dataset.id=t.id;b.textContent=NUMMAP[t.id];b.onclick=()=>selectTpl(t);list.appendChild(b)})})}
+function buildIconGallery(){document.getElementById('icogrid').innerHTML=Object.keys(ICONS).map(n=>'<div class="ico" onclick="insertIcon(\\''+n+'\\')">'+icon(n,'#dddddd',38,1.6)+'<div class="nm">'+n+'</div></div>').join('')}
+function toggleIcons(){const el=document.getElementById('icongallery');if(!el.classList.toggle('on'))iconTargetKey=null;}
+function insertIcon(name){if(iconTargetKey){slide().data[iconTargetKey]=name;iconTargetKey=null;renderCard();renderDeck();buildForm();toggleIcons();return;}if(!lastField){alert('先に入力欄をクリック（カーソルを置く）してから、アイコンを選んでください');return;}const el=lastField;const a=el.selectionStart,b=el.selectionEnd;if(typeof a==='number'){el.value=el.value.slice(0,a)+name+el.value.slice(b);el.selectionStart=el.selectionEnd=a+name.length;}else{el.value+=name;}el.dispatchEvent(new Event('input',{bubbles:true}));toggleIcons();el.focus();}
+document.addEventListener('focusin',e=>{if((e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')&&e.target.closest('#fields'))lastField=e.target;});
+function doPrint(){document.getElementById('printarea').innerHTML=deck.map(s=>'<div class="pslide">'+slideHtml(s)+'</div>').join('');setTimeout(function(){window.print()},60);}
+function buildTplGallery(){const th=slide().theme;document.getElementById('galgrid').innerHTML=TEMPLATES.map(t=>{const h=getTpl(t.id).render(defaults(t),THEMES[th]);return '<div class="tcard" data-n="'+((NUMMAP[t.id]||'')+' '+t.name).toLowerCase()+'" onclick="pickTpl(\\''+t.id+'\\')"><div class="tprev"><div class="tw">'+h+'</div></div><div class="tname">'+NUMMAP[t.id]+'</div></div>';}).join('');}
+function filterTpl(q){q=(q||'').toLowerCase();document.querySelectorAll('#galgrid .tcard').forEach(c=>{c.style.display=c.dataset.n.indexOf(q)>=0?'':'none';});}
+function pickTpl(id){const t=getTpl(id);slide().tplId=id;slide().data=defaults(t);highlightTpl();buildForm();renderCard();renderDeck();toggleGallery();}
+function toggleGallery(){const el=document.getElementById('tplgallery');if(el.classList.toggle('on')){document.getElementById('galsearch').value='';buildTplGallery();}}
+const PRESETS=[{name:'診断カルーセル',desc:'表紙→導入→診断グリッド→タイプ詳細×4→共通アドバイス→ロードマップ→保存',theme:'pastel',ids:['cover_target','intro_empathy','content_diag_grid','content_diag_detail','content_diag_detail','content_diag_detail','content_diag_detail','content_biglist','content_roadmap','cta_save']},{name:'ノウハウ◯選',desc:'表紙→導入→項目×5→まとめ→保存→フォロー',theme:'money',ids:['cover_nsen','intro_empathy','content_listitem','content_listitem','content_listitem','content_listitem','content_listitem','content_biglist','cta_save','cta_profile']},{name:'比較レビュー',desc:'表紙→導入→VS→スペック表→結果→比較→BA→引用→まとめ→保存',theme:'money',ids:['cover_target','intro_empathy','content_vs','content_spectable','content_hero','content_compare','content_ba','content_quote_dark','content_biglist','cta_save']},{name:'レシピ',desc:'写真表紙→導入→材料→手順写真×3→ポイント→引用→保存→要約保存',theme:'recipe',ids:['cover_photo_corner','intro_empathy','content_ingredients','content_photo_steps','content_photo_steps','content_photo_steps','content_biglist','content_quote_dark','cta_save','cta_recap_save']},{name:'美容PR(ゴールド)',desc:'袋文字表紙→導入→白帯→比較→顔図解→顔写真→BA→まとめ→引用→保存',theme:'beautypr',ids:['cover_outline','intro_empathy','content_gold_panels','content_compare','content_face','content_face_photo','content_ba','content_biglist','cta_quote','cta_save']}];
+function buildPresets(){document.getElementById('preslist').innerHTML=PRESETS.map((p,i)=>'<div class="pitem" onclick="loadPreset('+i+')"><b>'+p.name+'</b>（'+p.ids.length+'枚）<br><span>'+p.desc+'</span></div>').join('');}
+function loadPreset(i){const p=PRESETS[i];if(!confirm('「'+p.name+'」を読み込みます（今のデッキは置き換え）。よろしいですか?'))return;deck=p.ids.map(id=>({tplId:id,theme:p.theme,data:defaults(getTpl(id))}));cur=0;refreshAll();togglePresets();}
+function togglePresets(){const el=document.getElementById('presetbox');if(el.classList.toggle('on'))buildPresets();}
+buildThemes();buildList();buildIconGallery();highlightTpl();buildForm();renderCard();renderDeck();fitScale();window.onresize=fitScale;
+</script></body></html>`;
+fs.writeFileSync(APP,page);
+console.log('APP ->',APP);

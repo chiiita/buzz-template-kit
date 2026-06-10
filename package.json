@@ -1,0 +1,24 @@
+{
+  "name": "buzz-template-kit",
+  "version": "1.0.0",
+  "description": "バズIG投稿の型をHTMLテンプレ化し、ブラウザで中身差し替え→PDF出力する型テンプレ集。1ソース→2出力（ブラウザアプリ / satoriバッチ）。",
+  "type": "module",
+  "scripts": {
+    "build": "node build_templates.mjs",
+    "deck": "node build_templates.mjs --deck",
+    "collect": "node pinterest_collect.mjs"
+  },
+  "dependencies": {
+    "satori": "^0.26.0",
+    "satori-html": "^0.3.2",
+    "@resvg/resvg-js": "^2.6.2",
+    "pdf-lib": "^1.17.1",
+    "undici": "^8.3.0",
+    "lucide-static": "^1.17.0",
+    "@expo-google-fonts/zen-kaku-gothic-new": "^0.4.1",
+    "@expo-google-fonts/dela-gothic-one": "^0.4.1",
+    "@expo-google-fonts/shippori-mincho": "^0.4.1",
+    "@expo-google-fonts/zen-maru-gothic": "^0.4.1",
+    "@expo-google-fonts/yomogi": "^0.4.1"
+  }
+}

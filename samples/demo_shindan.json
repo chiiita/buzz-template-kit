@@ -1,0 +1,9 @@
+[
+ {"tplId":"cover_target","theme":"pastel","data":{"badge":"30秒でわかる","line1":"あなたは、どの","big":"タイプ?","revealA":"お金の使い方 ","revealHot":"4タイプ","revealB":" 診断","proof":"当てはまるのは、どれ?","foot":"保存して診断してね →","icon":"piggy-bank"}},
+ {"tplId":"intro_empathy","theme":"pastel","data":{"label":"はじめに","line1":"貯まらないのは、","line2":"性格のせいじゃない。","bridge":"自分のタイプに合うやり方を見つけよう。"}},
+ {"tplId":"content_diag_grid","theme":"pastel","data":{"title":"お金の使い方\n4タイプ","types":"女性｜コツコツ堅実｜計画的に貯める\n男性｜メリハリ消費｜使う時は使う\n女性ショート｜推しに全力｜趣味を優先\nポニーテール｜しっかり管理｜数字で把握","foot":"あなたはどれに近い? →"}},
+ {"tplId":"content_diag_detail","theme":"pastel","data":{"face":"女性","lead":"TYPE A","typeName":"コツコツ堅実タイプ","traits":"先取り貯金が得意\n衝動買いは少なめ\nセールに動じない","advice":"堅実さが最大の武器。\nたまには自分にご褒美も。"}},
+ {"tplId":"content_diag_detail","theme":"pastel","data":{"face":"男性","lead":"TYPE B","typeName":"メリハリ消費タイプ","traits":"使う時は思い切る\n節約はちょっと苦手\n収入アップに前向き","advice":"固定費だけ自動化すれば、\n使う楽しみはそのままでOK。"}},
+ {"tplId":"content_biglist","theme":"pastel","data":{"title":"どのタイプも\nこれだけはやろう","items":"先取り貯金｜使う前に、貯金分を分ける\n固定費見直し｜一度直せば、毎月ラク\n自動化｜意志に頼らない仕組みに"}},
+ {"tplId":"cta_save","theme":"pastel","data":{"recapA":"自分のタイプに、","recapHot":"合うやり方","recapB":"で。","head1":"がんばるより、","head2":"仕組みで自動。","vals":"タイプ別のお金のコツを毎日\n我慢せず、自分に合う方法で\n保存して、診断を見返す","handle":"@ゆる貯金"}}
+]

@@ -1,0 +1,6 @@
+[
+ {"tplId":"cover_target","theme":"money","data":{"badge":"ボーナス、気づいたら消えてる人へ","line1":"入ったはずなのに、","big":"残ってない。","revealA":"原因は、","revealHot":"先取りしてない","revealB":"だけ。","proof":"順番を変えるだけで、貯まる。","foot":"今日からできる3ステップ →","icon":"piggy-bank"}},
+ {"tplId":"content_steps","theme":"money","data":{"title":"ボーナスが残る3ステップ","steps":"先に貯金分を別口座へ（先取り）\n残ったお金で1ヶ月暮らす\n余ったら使う・使わなければ追加貯金"}},
+ {"tplId":"content_hero","theme":"money","data":{"no":"1","category":"先取り貯金","icon":"piggy-bank","headline":"給料日に、自動で移す。","amount":"+10万","unit":"円／年","points":"銀行の自動振替を設定するだけ\n手取りの10%から始める\n“残ったら貯金”は一生貯まらない","use":"年1の旅行ひとつ分"}},
+ {"tplId":"cta_save","theme":"money","data":{"recapA":"順番を変えるだけで、","recapHot":"年10万円","recapB":"の差。","head1":"がんばる節約より、","head2":"仕組みで自動。","vals":"今日からできるお金の仕組みを毎日\n我慢せず、順番だけ変える\n保存して、ボーナス前に見返す","handle":"@ゆる貯金"}}
+]

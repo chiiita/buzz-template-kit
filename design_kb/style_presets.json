@@ -1,0 +1,22 @@
+{
+  "_comment": "検証済みデザインスタイルのプリセット。render系スクリプトが読む。新スタイルはここに追記。",
+  "_font_families": {
+    "mincho": "Shippori Mincho",
+    "maru": "Zen Maru Gothic",
+    "kaku": "Zen Kaku Gothic New",
+    "brush": "Yuji Syuku",
+    "hand": "Yomogi"
+  },
+  "presets": {
+    "calm":   { "mood": "癒し/名言/心理", "bg": "#F2ECE3", "ink": "#3E3A35", "accent": "#A98A6F", "frame": "#CEC2B0", "head": "Shippori Mincho", "headW": 700, "body": "Zen Maru Gothic", "bodyW": 500 },
+    "night":  { "mood": "刺さる/重厚/高級", "bg": "#211F1D", "ink": "#F1E9D9", "accent": "#C8A45C", "frame": "#4A453E", "head": "Shippori Mincho", "headW": 800, "body": "Zen Kaku Gothic New", "bodyW": 500 },
+    "pastel": { "mood": "やさしい/かわいい/女性", "bg": "#FBF1F0", "ink": "#5A4F54", "accent": "#D69AA8", "frame": "#ECD4D6", "head": "Zen Maru Gothic", "headW": 700, "body": "Zen Maru Gothic", "bodyW": 500 },
+    "mono":   { "mood": "モダン/ミニマル/ビジネス/お金", "bg": "#FAFAF8", "ink": "#1F1F1F", "accent": "#C0392B", "frame": "#E3DFD7", "head": "Zen Kaku Gothic New", "headW": 700, "body": "Zen Kaku Gothic New", "bodyW": 500 },
+    "brush":  { "mood": "和/筆/力強い/人生訓", "bg": "#F4F1E9", "ink": "#2C2A28", "accent": "#9B5C42", "frame": "#D8D0BE", "head": "Yuji Syuku", "headW": 400, "body": "Zen Kaku Gothic New", "bodyW": 500 },
+    "fresh":  { "mood": "学習/クリーン/英語", "bg": "#EAF3F2", "ink": "#22433F", "accent": "#3E8E84", "frame": "#C2DBD6", "head": "Zen Kaku Gothic New", "headW": 700, "body": "Zen Kaku Gothic New", "bodyW": 500 },
+    "calm_green": { "mood": "健康/睡眠/ウェルネス", "bg": "#EFF2EA", "ink": "#39413A", "accent": "#7C9A6E", "frame": "#CBD6C2", "head": "Shippori Mincho", "headW": 700, "body": "Zen Maru Gothic", "bodyW": 500 },
+    "money": { "mood": "お金/節約/家計/信頼", "bg": "#F4F8F4", "ink": "#163A2B", "accent": "#2E9E6B", "frame": "#C5E0CF", "head": "Zen Kaku Gothic New", "headW": 700, "body": "Zen Kaku Gothic New", "bodyW": 500 },
+    "navy": { "mood": "ビジネス/仕事術/知的", "bg": "#F4F6FA", "ink": "#1B2A4A", "accent": "#2D6CDF", "frame": "#C7D3E8", "head": "Zen Kaku Gothic New", "headW": 700, "body": "Zen Kaku Gothic New", "bodyW": 500 },
+    "money_pop": { "mood": "お金/節約 庶民・情報系(レーンA)・赤強調", "bg": "#FBF8F1", "ink": "#211C18", "accent": "#E0352B", "frame": "#E7DECB", "head": "Zen Kaku Gothic New", "headW": 900, "body": "Zen Kaku Gothic New", "bodyW": 700 }
+  }
+}
