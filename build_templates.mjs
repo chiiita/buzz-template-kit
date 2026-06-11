@@ -1045,6 +1045,43 @@ const TEMPLATES = [
         +'<div style="position:relative;display:flex;background:'+OR+';color:#fff;padding:10px 28px;font-size:50px;font-weight:900;margin-top:10px;">'+d.line2+'</div>'
       +'</div>';} },
 
+  // Y15 ← #1 Vlog料理・暮らし（写真＋大タイトル＋縦書きサブ＋丸ロゴ） pin/1044975919772833807
+  { id:'yt_vlog_food', name:'Y15 Vlog料理・暮らし', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'title',label:'大タイトル（改行可）',def:'日々の\n食卓'},
+      {key:'vol',label:'VOL表記',def:'VOL.1'},
+      {key:'vsub',label:'左 縦書きサブ',def:'香菜子さんの和食でおうち居酒屋編'},
+      {key:'logo1',label:'丸ロゴ 上段',def:'LINIERE'},
+      {key:'logo2',label:'丸ロゴ 下段',def:'Vlog'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#cfc6ba;');
+      const vchars=String(d.vsub).split('').map(function(c){return '<div style="display:flex;">'+(c===' '?'':c)+'</div>';}).join('');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.08);"></div>':'')
+        +'<div style="position:absolute;top:50px;right:70px;display:flex;flex-direction:column;align-items:flex-end;">'
+          +'<div style="display:flex;flex-direction:column;align-items:flex-end;font-size:128px;font-weight:700;line-height:1.05;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.45);">'+nl(d.title)+'</div>'
+          +'<div style="display:flex;margin-top:12px;font-size:40px;font-weight:700;color:#fff;letter-spacing:4px;text-shadow:0 2px 8px rgba(0,0,0,.4);">'+d.vol+'</div>'
+        +'</div>'
+        +'<div style="position:absolute;left:46px;top:50px;display:flex;align-items:stretch;"><div style="display:flex;width:0;border-left:2px dashed rgba(255,255,255,.75);"></div><div style="display:flex;flex-direction:column;align-items:center;font-size:34px;font-weight:700;color:#fff;letter-spacing:3px;text-shadow:0 2px 8px rgba(0,0,0,.5);margin:0 12px;">'+vchars+'</div><div style="display:flex;width:0;border-left:2px dashed rgba(255,255,255,.75);"></div></div>'
+        +'<div style="position:absolute;right:60px;bottom:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;width:148px;height:148px;border-radius:50%;background:rgba(255,255,255,.92);color:#5a4e42;"><div style="display:flex;font-size:24px;font-weight:900;letter-spacing:2px;">'+d.logo1+'</div><div style="display:flex;font-size:30px;font-style:italic;font-weight:700;">'+d.logo2+'</div></div>'
+      +'</div>';} },
+  // Y16 ← #3 トラベルVlog（白セリフ大＋手書きスクリプト＋タグ） pin/616852480241075142
+  { id:'yt_vlog_travel', name:'Y16 トラベルVlog', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'title',label:'英字大タイトル',def:'A DAY IN MY LIFE'},
+      {key:'sub',label:'サブ（英字）',def:'2days trip to new taipei city'},
+      {key:'script',label:'手書きスクリプト（黄）',def:'Feel the Summer'},
+      {key:'tag',label:'右下タグ',def:'Short stay in BnB'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#9fb0a8;');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:46px 60px;font-family:'+t.head+';'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.12);"></div>':'')
+        +'<div style="position:relative;display:flex;font-size:96px;font-weight:700;letter-spacing:6px;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.5);">'+d.title+'</div>'
+        +'<div style="position:relative;display:flex;margin-top:8px;background:rgba(0,0,0,.45);color:#fff;font-size:34px;font-style:italic;font-weight:700;padding:6px 20px;border-radius:6px;">'+d.sub+'</div>'
+        +'<div style="position:absolute;left:60px;bottom:60px;display:flex;font-family:Yomogi;font-size:64px;font-weight:700;color:#FFE24A;text-shadow:0 2px 10px rgba(0,0,0,.5);">'+d.script+'</div>'
+        +(d.tag?'<div style="position:absolute;right:60px;bottom:64px;display:flex;align-items:center;font-size:34px;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6);"><div style="display:flex;width:16px;height:16px;border-radius:50%;background:#FFE24A;margin-right:10px;"></div>'+d.tag+'</div>':'')
+      +'</div>';} },
+
   // ===== note 見出し画像（1280×670）※参考画像が来たら本実装。現状は仮 =====
   { id:'note_basic', name:'N1 ベーシック', cat:'サムネ', fmt:'note',
     fields:[{key:'title',label:'タイトル（改行で折る）',def:'note運用で\n月10万円までの全記録'},{key:'sub',label:'サブ',def:'ゼロから3ヶ月でやったこと'},{key:'author',label:'著者',def:'@kuro'}],
