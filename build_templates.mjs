@@ -929,11 +929,15 @@ function applyStyleAll(){const s=slide();if(!confirm('このフォント・文�
 async function exportPng(all){let h2c;try{const m=await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm');h2c=m.default||m;}catch(e){alert('画像化ライブラリを読み込めませんでした。ネット接続のある環境でお試しください。');return;}
  const idxs=Array.isArray(all)?all:(all?deck.map(function(_,i){return i;}):[cur]);if(!idxs.length){alert('保存する画像が選ばれていません。');return;}
  try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;}catch(e){}
+ let zip=null;if(idxs.length>1){try{const z=await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');const JSZip=z.default||z;zip=new JSZip();}catch(e){zip=null;}}
  const host=document.createElement('div');host.style.cssText='position:fixed;left:-99999px;top:0;width:1080px;height:1350px;background:#fff';document.body.appendChild(host);
- for(let n=0;n<idxs.length;n++){const i=idxs[n];host.innerHTML='';paint(host,deck[i],false);
-  try{const canvas=await h2c(host,{width:1080,height:1350,scale:2,backgroundColor:null,useCORS:true,logging:false});const url=canvas.toDataURL('image/png');const a=document.createElement('a');a.href=url;a.download='slide_'+String(i+1).padStart(2,'0')+'.png';a.click();}catch(e){alert('スライド'+(i+1)+'の画像化に失敗: '+e.message);}
-  await new Promise(function(r){setTimeout(r,300);});}
- host.remove();}
+ for(let n=0;n<idxs.length;n++){const i=idxs[n];host.innerHTML='';paint(host,deck[i],false);const name='slide_'+String(i+1).padStart(2,'0')+'.png';
+  try{const canvas=await h2c(host,{width:1080,height:1350,scale:2,backgroundColor:null,useCORS:true,logging:false});const url=canvas.toDataURL('image/png');
+   if(zip){zip.file(name,url.split(',')[1],{base64:true});}else{const a=document.createElement('a');a.href=url;a.download=name;a.click();}
+  }catch(e){alert('スライド'+(i+1)+'の画像化に失敗: '+e.message);}
+  await new Promise(function(r){setTimeout(r,zip?40:300);});}
+ host.remove();
+ if(zip){try{const blob=await zip.generateAsync({type:'blob'});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download='slides_'+idxs.length+'.zip';a.click();setTimeout(function(){URL.revokeObjectURL(u);},3000);}catch(e){alert('ZIP作成に失敗: '+e.message);}}}
 function fitScale(){const sc=Math.min((window.innerWidth-280-340-60)/1080,(window.innerHeight-210)/1350);curScale=Math.max(0.08,sc);document.getElementById('stage').style.transform='scale('+curScale+')';positionDelBtn();}
 let logo=null;try{logo=JSON.parse(localStorage.getItem('buzzlogo')||'null')}catch(e){logo=null;}
 function freeHtml(fe,t,idx,live){let inner='',st='position:absolute;left:'+fe.x+'px;top:'+fe.y+'px;';
