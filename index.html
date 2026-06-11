@@ -28,11 +28,31 @@
  #presbox{background:#1f1f22;border-radius:12px;padding:22px;width:90vw;max-width:560px;max-height:84vh;overflow:auto} #preslist .pitem{background:#2c2c30;border-radius:8px;padding:15px;margin-bottom:10px;cursor:pointer} #preslist .pitem:hover{background:#39393f} #preslist .pitem b{color:#fff;font-size:15px} #preslist .pitem span{color:#999;font-size:12px}
  .ico{display:flex;flex-direction:column;align-items:center;width:118px;padding:12px 6px;background:#2c2c30;border-radius:8px;cursor:pointer;border:2px solid transparent} .ico:hover{border-color:#E0352B;background:#39393f} .ico .nm{font-size:11px;color:#bbb;margin-top:6px;word-break:break-all;text-align:center}
  .pslide{position:relative} #printarea{position:absolute;left:-99999px;top:0}
+ #slideopt{margin-bottom:6px}
+ .optsec{background:#26262b;border-radius:8px;padding:10px 11px;margin-bottom:8px}
+ .opth{font-size:12px;color:#d8c8b8;font-weight:700;margin-bottom:7px}
+ .optlab{font-size:11px;color:#8a9a8a;margin:9px 0 4px}
+ .seg{display:flex;gap:5px}
+ .seg button{flex:1;background:#33333a;color:#bbb;border:1px solid #44444c;border-radius:6px;padding:7px 4px;font-size:12px;cursor:pointer}
+ .seg button.on{background:#E0352B;color:#fff;border-color:#E0352B}
+ .optrow{display:flex;align-items:center;gap:8px;margin-top:8px} .optrow input[type=color]{width:46px;height:34px;border:0;background:none;cursor:pointer;flex-shrink:0;padding:0}
+ .swrow{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px} .sw{width:26px;height:26px;border-radius:5px;border:1px solid rgba(255,255,255,.22);cursor:pointer;padding:0} .addsw{background:#3a3a42!important;color:#9b9;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center}
+ .optfile{width:100%;color:#ccc;font-size:11px;margin-top:6px} .optrange{width:100%;margin-top:2px}
+ .optsel{width:100%;background:#33333a;color:#eee;border:1px solid #44444c;border-radius:6px;padding:7px;font-size:13px}
+ .optrow2{display:flex;align-items:center;gap:8px;margin-top:6px} .optrow2 input[type=color]{width:40px;height:30px;border:0;background:none;cursor:pointer;padding:0} .optlab2{font-size:12px;color:#aaa;flex:1}
+ .rs{background:#444;color:#ccc;border:0;border-radius:5px;padding:5px 9px;font-size:10px;cursor:pointer}
+ .elrow{display:flex;gap:5px;flex-wrap:wrap} .elrow button{flex:1;min-width:46px;background:#33333a;color:#ccc;border:1px solid #44444c;border-radius:6px;padding:7px 4px;font-size:12px;cursor:pointer} .elrow button.on{background:#E0352B;color:#fff;border-color:#E0352B}
+ .posgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:96px;margin-top:4px} .posgrid button{aspect-ratio:1;background:#33333a;border:1px solid #44444c;border-radius:4px;cursor:pointer;padding:0} .posgrid button.on{background:#E0352B;border-color:#E0352B}
+ #bar button:disabled{opacity:.35;cursor:default}
+ #movebtn.on{background:#1b9e4b!important;color:#fff}
+ .movemode .draggable{cursor:move} .movemode .draggable:hover{outline:2px dashed rgba(224,53,43,.65);outline-offset:2px} .movemode .selblock{outline:2px solid #E0352B!important;outline-offset:2px}
+ .freeel:hover{outline:2px dashed rgba(43,108,223,.7);outline-offset:2px} .selfree{outline:2px solid #2D6CDF!important;outline-offset:2px}
+ #preview{position:relative} #ovwarn{display:none;position:absolute;top:18px;left:50%;transform:translateX(-50%);background:#B5281F;color:#fff;font-size:12px;padding:6px 14px;border-radius:8px;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.4)}
  @media print{ body *{visibility:hidden} #printarea,#printarea *{visibility:visible} #printarea{position:absolute;left:0;top:0} .pslide{page-break-after:always;break-after:page} @page{size:1080px 1350px;margin:0} }
 </style></head><body>
 <div id="side"><h3>アカウントテーマ</h3><select id="theme"></select><h3>型を選ぶ</h3><button id="gbtn" onclick="toggleGallery()">▦ 型ギャラリーで探す</button><div id="list"></div></div>
-<div id="mid"><div id="preview"><div id="stage"><div id="card"></div></div></div><div id="deckbar"></div></div>
-<div id="form"><div id="bar"><button onclick="doPrint()">デッキをPDF保存</button><button class="sec" onclick="togglePresets()">構成</button><button class="sec" onclick="toggleIcons()">アイコン</button><button class="sec" onclick="newDeck()">新規</button><button class="sec" onclick="exportDeck()">書出</button><button class="sec" onclick="document.getElementById('imp').click()">読込</button><input id="imp" type="file" accept="application/json" style="display:none" onchange="importDeck(event)"></div><div id="fields"></div>
+<div id="mid"><div id="preview"><div id="stage"><div id="card"></div></div><div id="ovwarn">⚠ 文字がはみ出している可能性</div></div><div id="deckbar"></div></div>
+<div id="form"><div id="bar"><button onclick="doPrint()">デッキをPDF保存</button><button class="sec" id="undobtn" onclick="undo()" title="元に戻す (Ctrl+Z)" disabled>↶</button><button class="sec" id="redobtn" onclick="redo()" title="やり直し (Ctrl+Y)" disabled>↷</button><button class="sec" id="movebtn" onclick="toggleMove()">✋移動</button><button class="sec" onclick="togglePresets()">構成</button><button class="sec" onclick="toggleIcons()">アイコン</button><button class="sec" onclick="newDeck()">新規</button><button class="sec" onclick="exportDeck()">書出</button><button class="sec" onclick="document.getElementById('imp').click()">読込</button><input id="imp" type="file" accept="application/json" style="display:none" onchange="importDeck(event)"></div><div id="slideopt"></div><div id="fields"></div>
  <p style="font-size:11px;color:#777;margin-top:18px;line-height:1.6">下のデッキ帯で複数スライドを1セットに（＋追加/複製/削除/◀▶並べ替え/全テーマ適用）。<br>「デッキをPDF保存」で全スライドが複数ページPDFに：送信先「PDFに保存」/サイズ1080×1350/余白なし/背景のグラフィックON。<br>テーマ・型の変更は選択中スライドに適用。グリッド型は アイコン名:ラベル。<br><b>文字は改行（Enter）を入れた位置で折れます</b>＝中途半端な折返し防止（入れなければ普通に流れる）。</p></div>
 <div id="printarea"></div>
 <div id="icongallery" onclick="if(event.target.id==='icongallery')toggleIcons()"><div id="icobox"><h3 style="margin-top:0">アイコン一覧（名前を入力欄へ）</h3><div id="icogrid"></div></div></div>
@@ -499,45 +519,203 @@ const INITIAL_DECK=[['cover_target','money'],['content_grid','money'],['content_
 let deck,cur=0,lastField=null,iconTargetKey=null;
 try{const sv=localStorage.getItem('buzzdeck');deck=sv?JSON.parse(sv):null;}catch(e){deck=null;}
 if(!deck||!deck.length)deck=JSON.parse(JSON.stringify(INITIAL_DECK));
+const FONTS={'標準':'','角ゴシック':KAKU,'丸ゴシック':MARU,'明朝':MIN,'インパクト':DELA,'手書き':HAND};
+function eff(s){const b=THEMES[s.theme];const t=Object.assign({},b);const o=s.over||{};
+ if(o.head&&FONTS[o.head]){t.head=FONTS[o.head];t.display=FONTS[o.head];}
+ if(o.body&&FONTS[o.body]){t.body=FONTS[o.body];}
+ if(o.ink){t.ink=o.ink;}
+ if(o.sub){t.sub=o.sub;}
+ if(o.accent){t.accent=o.accent;t.accentDeep=shade(o.accent,-0.18);}
+ return t;}
 const slide=()=>deck[cur];
-const slideHtml=s=>getTpl(s.tplId).render(s.data,THEMES[s.theme]);
-function fitScale(){const s=Math.min((window.innerWidth-280-340-60)/1080,(window.innerHeight-210)/1350);document.getElementById('stage').style.transform='scale('+Math.max(0.08,s)+')';}
-function renderCard(){document.getElementById('card').innerHTML=slideHtml(slide());}
+const slideHtml=s=>getTpl(s.tplId).render(s.data,eff(s));
+let undoStack=[],redoStack=[],histTimer=null,lastHist=null;
+function scheduleHist(){clearTimeout(histTimer);histTimer=setTimeout(function(){const j=JSON.stringify(deck);if(j!==lastHist){if(lastHist!=null){undoStack.push(lastHist);if(undoStack.length>60)undoStack.shift();}redoStack=[];lastHist=j;updateHistBtns();}},450);}
+function updateHistBtns(){const u=document.getElementById('undobtn'),r=document.getElementById('redobtn');if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;}
+function undo(){clearTimeout(histTimer);const j=JSON.stringify(deck);if(j!==lastHist&&lastHist!=null){redoStack.push(j);deck=JSON.parse(lastHist);lastHist=JSON.stringify(deck);}else if(undoStack.length){redoStack.push(j);const p=undoStack.pop();deck=JSON.parse(p);lastHist=p;}else return;cur=Math.min(cur,deck.length-1);selBlock=-1;refreshAll();updateHistBtns();}
+function redo(){if(!redoStack.length)return;clearTimeout(histTimer);undoStack.push(JSON.stringify(deck));const n=redoStack.pop();deck=JSON.parse(n);lastHist=n;cur=Math.min(cur,deck.length-1);selBlock=-1;refreshAll();updateHistBtns();}
+function save(){try{localStorage.setItem('buzzdeck',JSON.stringify(deck))}catch(e){}scheduleHist();}
+function applyBg(root,s){if(!root)return;const bg=s.bg;if(!bg||!bg.mode||bg.mode==='theme')return;
+ if(bg.mode==='fill'&&bg.fill){root.style.background=bg.fill;}
+ else if(bg.mode==='grad'){const c1=bg.fill||'#ffffff',c2=bg.fill2||'#cccccc',ang=(bg.angle==null?135:bg.angle);root.style.background='linear-gradient('+ang+'deg,'+c1+','+c2+')';}
+ else if(bg.mode==='image'&&bg.image){const op=(bg.opacity==null?35:bg.opacity)/100;let ov='';
+   if(bg.overlay==='white')ov='linear-gradient(rgba(255,255,255,'+op+'),rgba(255,255,255,'+op+')),';
+   else if(bg.overlay==='black')ov='linear-gradient(rgba(0,0,0,'+op+'),rgba(0,0,0,'+op+')),';
+   const fit=bg.fit||'cover',pos=bg.pos||'center';
+   root.style.background=ov+'url('+bg.image+') '+pos+'/'+fit+' no-repeat'+(fit==='contain'?(', '+eff(s).bg):'');}}
+function applyEl(root,s,live){if(!root)return;const ch=root.children,ps=s.pos||{},es=s.el||{},t=eff(s);for(let i=0;i<ch.length;i++){const el=ch[i],p=ps[i],e=es[i]||{};
+ el.style.translate=p?(p[0]+'px '+p[1]+'px'):'';
+ el.style.scale=e.sc?String(e.sc):'';
+ if(e.bold)el.style.setProperty('font-weight','900','important');
+ if(e.al){el.style.alignSelf=e.al;el.style.textAlign=(e.al==='center'?'center':e.al==='flex-end'?'right':'left');}
+ if(e.box){el.style.background=t.panel;el.style.border='3px solid '+t.accent;el.style.borderRadius='18px';el.style.padding='22px 28px';el.style.boxShadow='0 8px 24px rgba(0,0,0,.16)';}
+ if(e.hide){if(live){el.style.opacity='.18';el.style.outline='1px dashed #999';}else{el.style.display='none';}}}}
+function paint(el,s,live){el.innerHTML=slideHtml(s);const r=el.firstElementChild;applyBg(r,s);applyEl(r,s,live);applyOverlay(r,s,live);return r;}
+let moveMode=false,selBlock=-1,selFree=-1,iconForFree=false,curScale=1,brand=[];
+try{brand=JSON.parse(localStorage.getItem('buzzbrand')||'[]')}catch(e){brand=[];}
+function addBrand(h){if(!h)return;h=String(h).toLowerCase();if(brand.indexOf(h)<0){brand.unshift(h);if(brand.length>12)brand.pop();try{localStorage.setItem('buzzbrand',JSON.stringify(brand))}catch(e){}buildSlideOpt();}}
+function clearBrand(){if(!confirm('保存したブランドカラーを全消去しますか？'))return;brand=[];try{localStorage.setItem('buzzbrand','[]')}catch(e){}buildSlideOpt();}
+function applyColor(tg,v){if(tg==='bgfill')setBgFill(v);else if(tg==='gradfill')setGrad('fill',v);else if(tg==='gradfill2')setGrad('fill2',v);else setOver(tg,v);}
+function brandRow(tg,saveHex){let s='<span class="swrow">';brand.forEach(function(c){s+='<button class="sw" title="'+c+'" style="background:'+c+'" onclick="applyColor(\''+tg+'\',\''+c+'\')"></button>';});s+='<button class="sw addsw" title="この色を保存" onclick="addBrand(\''+saveHex+'\')">+</button></span>';return s;}
+function brandRow2(prop,saveHex){let s='<span class="swrow">';brand.forEach(function(c){s+='<button class="sw" title="'+c+'" style="background:'+c+'" onclick="setFree(\''+prop+'\',\''+c+'\')"></button>';});s+='<button class="sw addsw" title="この色を保存" onclick="addBrand(\''+saveHex+'\')">+</button></span>';return s;}
+function applyBgAll(){const s=slide();if(!confirm('この背景を全スライドに適用しますか？'))return;const b=s.bg?JSON.parse(JSON.stringify(s.bg)):null;deck.forEach(function(x){if(x!==s)x.bg=b?JSON.parse(JSON.stringify(b)):undefined;});renderCard();renderDeck();save();}
+function applyStyleAll(){const s=slide();if(!confirm('このフォント・文字色を全スライドに適用しますか？'))return;const o=s.over?JSON.parse(JSON.stringify(s.over)):null;deck.forEach(function(x){if(x!==s)x.over=o?JSON.parse(JSON.stringify(o)):undefined;});renderCard();renderDeck();save();}
+async function exportPng(all){let toPng;try{const m=await import('https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/+esm');toPng=m.toPng;}catch(e){alert('PNG書き出し用ライブラリを読み込めませんでした。オンライン環境でお試しください。');return;}
+ const idxs=all?deck.map(function(_,i){return i;}):[cur];
+ for(let n=0;n<idxs.length;n++){const i=idxs[n];const box=document.createElement('div');box.className='pslide';box.style.cssText='position:fixed;left:-99999px;top:0;width:1080px;height:1350px';document.body.appendChild(box);paint(box,deck[i],false);
+  try{const url=await toPng(box,{width:1080,height:1350,pixelRatio:1,cacheBust:true});const a=document.createElement('a');a.href=url;a.download='slide_'+String(i+1).padStart(2,'0')+'.png';a.click();}catch(e){alert('スライド'+(i+1)+'のPNG化に失敗: '+e.message);}
+  box.remove();await new Promise(function(r){setTimeout(r,250);});}}
+function fitScale(){const sc=Math.min((window.innerWidth-280-340-60)/1080,(window.innerHeight-210)/1350);curScale=Math.max(0.08,sc);document.getElementById('stage').style.transform='scale('+curScale+')';}
+let logo=null;try{logo=JSON.parse(localStorage.getItem('buzzlogo')||'null')}catch(e){logo=null;}
+function freeHtml(fe,t,idx,live){let inner='',st='position:absolute;left:'+fe.x+'px;top:'+fe.y+'px;';
+ if(fe.type==='text'){const ff=(FONTS[fe.font]||t.body);st+='width:'+(fe.w||400)+'px;font-family:'+ff+';font-size:'+(fe.size||60)+'px;font-weight:'+(fe.weight||700)+';color:'+(fe.color||t.ink)+';line-height:1.3;display:flex;flex-direction:column;';inner=nl(fe.text||' ')||(fe.text||'');}
+ else if(fe.type==='image'){st+='width:'+(fe.w||400)+'px;height:'+(fe.h||400)+'px;background:url('+fe.src+') center/cover no-repeat;border-radius:'+(fe.radius||0)+'px;display:flex;';}
+ else if(fe.type==='shape'){const c=fe.color||t.accent;if(fe.shape==='circle')st+='width:'+(fe.w||220)+'px;height:'+(fe.w||220)+'px;border-radius:50%;background:'+c+';display:flex;';else if(fe.shape==='line')st+='width:'+(fe.w||320)+'px;height:'+(fe.h||10)+'px;border-radius:6px;background:'+c+';display:flex;';else st+='width:'+(fe.w||300)+'px;height:'+(fe.h||200)+'px;border-radius:'+(fe.radius||0)+'px;background:'+c+';display:flex;';}
+ else if(fe.type==='icon'){st+='display:flex;';inner=icon(fe.name||'star',fe.color||t.accent,fe.size||120,1.8);}
+ return '<div class="freeel'+(live&&idx===selFree?' selfree':'')+'" data-fi="'+idx+'" style="'+st+'">'+inner+'</div>';}
+function logoHtml(t){const pos=logo.pos||'right bottom',m=58,sz=logo.size||40;let st='position:absolute;display:flex;align-items:center;opacity:'+((logo.opacity==null?90:logo.opacity)/100)+';';
+ st+=(pos.indexOf('top')>=0?'top:'+m+'px;':'bottom:'+m+'px;');st+=(pos.indexOf('left')>=0?'left:'+m+'px;':pos.indexOf('center')>=0?'left:50%;transform:translateX(-50%);':'right:'+m+'px;');
+ let inner='';if(logo.image)inner+='<div style="display:flex;width:'+sz+'px;height:'+sz+'px;background:url('+logo.image+') center/contain no-repeat;margin-right:'+(logo.text?'14px':'0')+';"></div>';
+ if(logo.text)inner+='<div style="display:flex;font-family:'+t.body+';font-size:'+Math.round(sz*0.72)+'px;font-weight:700;color:'+(logo.color||t.ink)+';">'+logo.text+'</div>';
+ return '<div class="logoel" style="'+st+'">'+inner+'</div>';}
+function applyOverlay(root,s,live){if(!root)return;const t=eff(s);
+ if(s.free&&s.free.length){root.style.position='relative';s.free.forEach(function(fe,i){root.insertAdjacentHTML('beforeend',freeHtml(fe,t,i,live));});if(live)enableFreeDrag(root,s);}
+ if(logo&&(logo.text||logo.image)){root.style.position='relative';root.insertAdjacentHTML('beforeend',logoHtml(t));}}
+function enableFreeDrag(root,s){root.querySelectorAll('.freeel').forEach(function(el){const idx=+el.dataset.fi;el.style.cursor='move';el.onmousedown=function(ev){ev.preventDefault();ev.stopPropagation();selFree=idx;selBlock=-1;document.querySelectorAll('#card .selfree').forEach(function(x){x.classList.remove('selfree');});el.classList.add('selfree');buildSlideOpt();const fe=s.free[idx],sx=ev.clientX,sy=ev.clientY,ox=fe.x,oy=fe.y;function mv(e){fe.x=Math.round(ox+(e.clientX-sx)/curScale);fe.y=Math.round(oy+(e.clientY-sy)/curScale);el.style.left=fe.x+'px';el.style.top=fe.y+'px';const sn=computeSnap(cardCoords(el));if(sn.dx!=null){fe.x=Math.round(fe.x+sn.dx);el.style.left=fe.x+'px';}if(sn.dy!=null){fe.y=Math.round(fe.y+sn.dy);el.style.top=fe.y+'px';}showGuide(sn.gx,sn.gy);}function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);clearGuide();save();renderDeck();}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);};});}
+function checkOverflow(){const root=document.querySelector('#card>div');const b=document.getElementById('ovwarn');if(!root||!b)return;b.style.display=(root.scrollHeight>root.clientHeight+2||root.scrollWidth>root.clientWidth+2)?'block':'none';}
+function cardCoords(el){const cr=document.getElementById('card').getBoundingClientRect(),r=el.getBoundingClientRect();return {l:(r.left-cr.left)/curScale,t:(r.top-cr.top)/curScale,w:r.width/curScale,h:r.height/curScale};}
+function computeSnap(c){const thr=12;let dx=null,gx=null,dy=null,gy=null;const cx=c.l+c.w/2;
+ if(Math.abs(cx-540)<thr){dx=540-cx;gx=540;}else if(Math.abs(c.l-100)<thr){dx=100-c.l;gx=100;}else if(Math.abs((c.l+c.w)-980)<thr){dx=980-(c.l+c.w);gx=980;}
+ const cy=c.t+c.h/2;if(Math.abs(cy-675)<thr){dy=675-cy;gy=675;}else if(Math.abs(c.t-150)<thr){dy=150-c.t;gy=150;}else if(Math.abs((c.t+c.h)-1190)<thr){dy=1190-(c.t+c.h);gy=1190;}
+ return {dx:dx,dy:dy,gx:gx,gy:gy};}
+function showGuide(gx,gy){const card=document.getElementById('card');let v=document.getElementById('gv'),z=document.getElementById('gh');
+ if(gx==null){if(v)v.remove();}else{if(!v){v=document.createElement('div');v.id='gv';v.style.cssText='position:absolute;top:0;bottom:0;width:2px;background:#2D6CDF;z-index:9;pointer-events:none';card.appendChild(v);}v.style.left=gx+'px';}
+ if(gy==null){if(z)z.remove();}else{if(!z){z=document.createElement('div');z.id='gh';z.style.cssText='position:absolute;left:0;right:0;height:2px;background:#2D6CDF;z-index:9;pointer-events:none';card.appendChild(z);}z.style.top=gy+'px';}}
+function clearGuide(){const v=document.getElementById('gv'),z=document.getElementById('gh');if(v)v.remove();if(z)z.remove();}
+function renderCard(){const c=document.getElementById('card');const root=paint(c,slide(),moveMode);if(moveMode)enableDrag(root);checkOverflow();}
+function enableDrag(root){if(!root)return;root.classList.add('movemode');const ch=root.children;for(let i=0;i<ch.length;i++){(function(el,idx){if(el.classList.contains('freeel')||el.classList.contains('logoel'))return;el.classList.add('draggable');if(idx===selBlock)el.classList.add('selblock');el.onmousedown=function(ev){ev.preventDefault();ev.stopPropagation();selBlock=idx;document.querySelectorAll('#card .selblock').forEach(x=>x.classList.remove('selblock'));el.classList.add('selblock');buildSlideOpt();const s=slide();const base=(s.pos&&s.pos[idx])?s.pos[idx]:[0,0];const sx=ev.clientX,sy=ev.clientY;let tmp=base.slice();function mv(e){const dx=(e.clientX-sx)/curScale,dy=(e.clientY-sy)/curScale;tmp=[Math.round(base[0]+dx),Math.round(base[1]+dy)];el.style.translate=tmp[0]+'px '+tmp[1]+'px';const sn=computeSnap(cardCoords(el));if(sn.dx!=null)tmp[0]=Math.round(tmp[0]+sn.dx);if(sn.dy!=null)tmp[1]=Math.round(tmp[1]+sn.dy);if(sn.dx!=null||sn.dy!=null)el.style.translate=tmp[0]+'px '+tmp[1]+'px';showGuide(sn.gx,sn.gy);}function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);clearGuide();if(!s.pos)s.pos={};s.pos[idx]=tmp;save();renderDeck();}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);};})(ch[i],i);}}
+function toggleMove(){moveMode=!moveMode;selBlock=-1;selFree=-1;document.getElementById('movebtn').classList.toggle('on',moveMode);buildSlideOpt();renderCard();}
+function resetPos(){slide().pos={};slide().el={};selBlock=-1;renderCard();renderDeck();buildSlideOpt();save();}
+function nudge(e){if(!moveMode||selBlock<0)return;const k=e.key;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(k)<0)return;if(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))return;e.preventDefault();const s=slide();if(!s.pos)s.pos={};const o=(s.pos[selBlock]||[0,0]).slice();const step=e.shiftKey?20:4;if(k==='ArrowUp')o[1]-=step;if(k==='ArrowDown')o[1]+=step;if(k==='ArrowLeft')o[0]-=step;if(k==='ArrowRight')o[0]+=step;s.pos[selBlock]=o;renderCard();renderDeck();save();}
+function goSlide(i){cur=i;selBlock=-1;selFree=-1;syncTheme();highlightTpl();buildSlideOpt();buildForm();renderCard();renderDeck();}
+function setBgMode(m){const s=slide();if(!s.bg)s.bg={};s.bg.mode=m;if(m==='fill'&&!s.bg.fill)s.bg.fill=eff(s).bg;if(m==='grad'){if(!s.bg.fill)s.bg.fill=eff(s).accent;if(!s.bg.fill2)s.bg.fill2=eff(s).accentDeep;if(s.bg.angle==null)s.bg.angle=135;}if(m==='image'&&s.bg.overlay==null){s.bg.overlay='black';s.bg.opacity=35;}renderCard();renderDeck();buildSlideOpt();save();}
+function setBgFill(v){const s=slide();if(!s.bg)s.bg={};s.bg.mode='fill';s.bg.fill=v;renderCard();renderDeck();save();}
+function setBgImage(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(){const s=slide();if(!s.bg)s.bg={};s.bg.mode='image';s.bg.image=r.result;if(s.bg.overlay==null){s.bg.overlay='black';s.bg.opacity=35;}renderCard();renderDeck();buildSlideOpt();save();};r.readAsDataURL(f);}
+function setOverlay(v){const s=slide();if(!s.bg)s.bg={};s.bg.overlay=v;renderCard();renderDeck();save();}
+function setOpacity(v){const s=slide();if(!s.bg)s.bg={};s.bg.opacity=+v;renderCard();renderDeck();}
+function setGrad(k,v){const s=slide();if(!s.bg)s.bg={};s.bg.mode='grad';if(k==='angle')s.bg.angle=+v;else s.bg[k]=v;if(!s.bg.fill)s.bg.fill=eff(s).accent;if(!s.bg.fill2)s.bg.fill2=eff(s).accentDeep;renderCard();renderDeck();save();}
+function setFit(v){const s=slide();if(!s.bg)s.bg={};s.bg.fit=v;renderCard();renderDeck();buildSlideOpt();save();}
+function setImgPos(v){const s=slide();if(!s.bg)s.bg={};s.bg.pos=v;renderCard();renderDeck();buildSlideOpt();save();}
+function setOver(key,v){const s=slide();if(!s.over)s.over={};if(v===''||v==='標準')delete s.over[key];else s.over[key]=v;renderCard();renderDeck();buildSlideOpt();save();}
+function freeArr(){const s=slide();if(!s.free)s.free=[];return s.free;}
+function addFree(type){const a=freeArr(),t=eff(slide());const o={type:type,x:430,y:600};
+ if(type==='text'){o.text='テキスト';o.size=60;o.color=t.ink;o.font='標準';o.weight=700;o.w=420;}
+ else if(type==='shape'){o.shape='rect';o.w=320;o.h=200;o.color=t.accent;o.radius=16;}
+ else if(type==='icon'){o.name='star';o.size=130;o.color=t.accent;}
+ a.push(o);selFree=a.length-1;selBlock=-1;if(!moveMode){moveMode=true;document.getElementById('movebtn').classList.add('on');}renderCard();renderDeck();buildSlideOpt();save();}
+function addFreeImage(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(){const a=freeArr();a.push({type:'image',src:r.result,x:320,y:480,w:440,h:440,radius:0});selFree=a.length-1;selBlock=-1;if(!moveMode){moveMode=true;document.getElementById('movebtn').classList.add('on');}renderCard();renderDeck();buildSlideOpt();save();};r.readAsDataURL(f);}
+function setFree(p,v){if(selFree<0)return;const a=freeArr();if(!a[selFree])return;a[selFree][p]=v;renderCard();renderDeck();save();}
+function setFreeUI(p,v){setFree(p,v);buildSlideOpt();}
+function toggleFreeBold(){if(selFree<0)return;const a=freeArr();a[selFree].weight=(a[selFree].weight==900?400:900);renderCard();renderDeck();buildSlideOpt();save();}
+function freeBump(p,d,mn,mx){if(selFree<0)return;const a=freeArr(),o=a[selFree];o[p]=Math.max(mn,Math.min(mx,(o[p]||0)+d));renderCard();renderDeck();buildSlideOpt();save();}
+function delFree(){if(selFree<0)return;freeArr().splice(selFree,1);selFree=-1;renderCard();renderDeck();buildSlideOpt();save();}
+function setLogo(k,v){if(!logo)logo={};logo[k]=v;try{localStorage.setItem('buzzlogo',JSON.stringify(logo))}catch(e){}renderCard();renderDeck();}
+function setLogoImage(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(){if(!logo)logo={};logo.image=r.result;try{localStorage.setItem('buzzlogo',JSON.stringify(logo))}catch(e){}renderCard();renderDeck();buildSlideOpt();};r.readAsDataURL(f);}
+function clearLogo(){logo=null;try{localStorage.removeItem('buzzlogo')}catch(e){}renderCard();renderDeck();buildSlideOpt();}
+function elObj(){const s=slide();if(!s.el)s.el={};if(!s.el[selBlock])s.el[selBlock]={};return s.el[selBlock];}
+function elBump(d){if(selBlock<0)return;const e=elObj();e.sc=Math.round(Math.max(0.4,Math.min(3,(e.sc||1)+d))*100)/100;renderCard();renderDeck();buildSlideOpt();save();}
+function elToggle(p){if(selBlock<0)return;const e=elObj();e[p]=!e[p];renderCard();renderDeck();buildSlideOpt();save();}
+function elAlign(v){if(selBlock<0)return;const e=elObj();e.al=(e.al===v?'':v);renderCard();renderDeck();buildSlideOpt();save();}
+function elReset(){const s=slide();if(selBlock<0)return;if(s.el)delete s.el[selBlock];if(s.pos)delete s.pos[selBlock];renderCard();renderDeck();buildSlideOpt();save();}
+function buildSlideOpt(){const s=slide();const bg=s.bg||{};const o=s.over||{};const et=eff(s);
+ const fontOpts=function(sel){return Object.keys(FONTS).map(function(k){return '<option value="'+k+'"'+(sel===k?' selected':'')+'>'+k+'</option>';}).join('');};
+ const sw=['bg','panelSoft','accent','accentDeep','ink','sub'].map(function(k){return '<button class="sw" title="'+et[k]+'" style="background:'+et[k]+'" onclick="setBgFill(\''+et[k]+'\')"></button>';}).join('');
+ let h='<div class="optsec"><div class="opth">背景</div><div class="seg">'
+   +'<button class="'+(!bg.mode||bg.mode==='theme'?'on':'')+'" onclick="setBgMode(\'theme\')">標準</button>'
+   +'<button class="'+(bg.mode==='fill'?'on':'')+'" onclick="setBgMode(\'fill\')">塗り</button>'
+   +'<button class="'+(bg.mode==='grad'?'on':'')+'" onclick="setBgMode(\'grad\')">グラデ</button>'
+   +'<button class="'+(bg.mode==='image'?'on':'')+'" onclick="setBgMode(\'image\')">画像</button></div>';
+ if(bg.mode==='fill'){h+='<div class="optrow"><input type="color" value="'+(bg.fill||et.bg)+'" oninput="setBgFill(this.value)"><span class="swrow">'+sw+'</span></div>'+brandRow('bgfill',bg.fill||et.bg);}
+ if(bg.mode==='grad'){h+='<div class="optrow2"><span class="optlab2">色1</span><input type="color" value="'+(bg.fill||et.accent)+'" oninput="setGrad(\'fill\',this.value)"><span class="optlab2">色2</span><input type="color" value="'+(bg.fill2||et.accentDeep)+'" oninput="setGrad(\'fill2\',this.value)"></div>'+brandRow('gradfill',bg.fill||et.accent)
+   +'<div class="optlab">角度 '+(bg.angle==null?135:bg.angle)+'°</div><input type="range" class="optrange" min="0" max="360" value="'+(bg.angle==null?135:bg.angle)+'" oninput="setGrad(\'angle\',this.value);this.previousElementSibling.textContent=\'角度 \'+this.value+\'°\'">';}
+ if(bg.mode==='image'){h+='<input type="file" accept="image/*" class="optfile" onchange="setBgImage(event)">'+(bg.image?'<div class="optlab" style="color:#7a7">画像セット済（再アップで差し替え）</div>':'<div class="optlab" style="color:#977">画像をアップしてください</div>')
+   +'<div class="optlab">表示方法</div><div class="seg"><button class="'+(!bg.fit||bg.fit==='cover'?'on':'')+'" onclick="setFit(\'cover\')">全体に敷く</button><button class="'+(bg.fit==='contain'?'on':'')+'" onclick="setFit(\'contain\')">全部見せる</button></div>'
+   +'<div class="optlab">位置</div><div class="posgrid">'+['left top','center top','right top','left center','center','right center','left bottom','center bottom','right bottom'].map(function(pp){return '<button class="'+((bg.pos||'center')===pp?'on':'')+'" onclick="setImgPos(\''+pp+'\')"></button>';}).join('')+'</div>'
+   +'<div class="optlab">上に重ねるレイヤー</div><div class="seg"><button class="'+(!bg.overlay||bg.overlay==='none'?'on':'')+'" onclick="setOverlay(\'none\')">なし</button><button class="'+(bg.overlay==='white'?'on':'')+'" onclick="setOverlay(\'white\')">白</button><button class="'+(bg.overlay==='black'?'on':'')+'" onclick="setOverlay(\'black\')">黒</button></div>'
+   +'<div class="optlab">レイヤーの濃さ '+(bg.opacity==null?35:bg.opacity)+'%</div><input type="range" class="optrange" min="0" max="90" value="'+(bg.opacity==null?35:bg.opacity)+'" oninput="setOpacity(this.value);this.previousElementSibling.textContent=\'レイヤーの濃さ \'+this.value+\'%\'">';}
+ if(bg.mode&&bg.mode!=='theme')h+='<button class="rs" style="margin-top:9px" onclick="applyBgAll()">この背景を全スライドへ</button>';
+ h+='</div>';
+ h+='<div class="optsec"><div class="opth">フォント</div><div class="optlab" style="margin-top:0">見出し</div><select class="optsel" onchange="setOver(\'head\',this.value)">'+fontOpts(o.head||'標準')+'</select><div class="optlab">本文</div><select class="optsel" onchange="setOver(\'body\',this.value)">'+fontOpts(o.body||'標準')+'</select></div>';
+ h+='<div class="optsec"><div class="opth">文字カラー</div>';
+ [['ink','文字色'],['accent','アクセント'],['sub','サブ文字']].forEach(function(kv){const k=kv[0],lab=kv[1];h+='<div class="optrow2"><span class="optlab2">'+lab+'</span><input type="color" value="'+(o[k]||et[k])+'" oninput="setOver(\''+k+'\',this.value)">'+(o[k]?'<button class="rs" onclick="setOver(\''+k+'\',\'\')">標準</button>':'')+'</div>'+brandRow(k,o[k]||et[k]);});
+ h+='<button class="rs" style="margin-top:9px" onclick="applyStyleAll()">フォント・色を全スライドへ</button>';
+ if(brand.length)h+='<div class="optlab">保存色（＋で追加）<button class="rs" style="margin-left:6px" onclick="clearBrand()">全消去</button></div>';
+ h+='</div>';
+ h+='<div class="optsec"><div class="opth">配置・要素編集</div>';
+ if(!moveMode){h+='<div class="optlab" style="margin-top:0">上の「✋移動」をONにすると、文字・表をドラッグ移動＆選択して個別編集できます。</div>';}
+ else if(selBlock<0){h+='<div class="optlab" style="margin-top:0">プレビュー上の文字・表を<b>クリックで選択</b>→ここに編集メニューが出ます。ドラッグで移動／矢印キーで微調整。</div>';}
+ else{const e=(s.el&&s.el[selBlock])||{};
+   h+='<div class="optlab" style="margin-top:0">選択中の要素 #'+(selBlock+1)+'</div>';
+   h+='<div class="optlab">文字サイズ '+Math.round((e.sc||1)*100)+'%</div><div class="elrow"><button onclick="elBump(-0.1)">－</button><button onclick="elBump(0.1)">＋</button><button class="'+(e.bold?'on':'')+'" onclick="elToggle(\'bold\')">太字</button></div>';
+   h+='<div class="optlab">整列</div><div class="elrow"><button class="'+(e.al==='flex-start'?'on':'')+'" onclick="elAlign(\'flex-start\')">左</button><button class="'+(e.al==='center'?'on':'')+'" onclick="elAlign(\'center\')">中央</button><button class="'+(e.al==='flex-end'?'on':'')+'" onclick="elAlign(\'flex-end\')">右</button></div>';
+   h+='<div class="elrow" style="margin-top:8px"><button class="'+(e.box?'on':'')+'" onclick="elToggle(\'box\')">枠・影</button><button class="'+(e.hide?'on':'')+'" onclick="elToggle(\'hide\')">'+(e.hide?'再表示':'非表示')+'</button><button onclick="elReset()">要素リセット</button></div>';}
+ if(s.pos&&Object.keys(s.pos).length||s.el&&Object.keys(s.el).length){h+='<button class="rs" style="margin-top:10px" onclick="resetPos()">スライド全体の配置をリセット</button>';}
+ h+='</div>';
+ h+='<div class="optsec"><div class="opth">追加レイヤー（自由配置）</div><div class="elrow"><button onclick="addFree(\'text\')">＋文字</button><button onclick="document.getElementById(\'fimgin\').click()">＋画像</button><button onclick="addFree(\'shape\')">＋図形</button><button onclick="addFree(\'icon\')">＋アイコン</button></div><input id="fimgin" type="file" accept="image/*" style="display:none" onchange="addFreeImage(event)">';
+ const fe=(s.free&&selFree>=0)?s.free[selFree]:null;
+ if(fe){h+='<div class="optlab">選択中の'+({text:'文字',image:'画像',shape:'図形',icon:'アイコン'}[fe.type]||'要素')+'（ドラッグで移動）</div>';
+   if(fe.type==='text'){h+='<textarea class="optsel" style="resize:vertical" oninput="setFree(\'text\',this.value)">'+(fe.text||'').replace(/</g,'&lt;')+'</textarea>'
+     +'<div class="optlab">文字サイズ '+(fe.size||60)+'</div><div class="elrow"><button onclick="freeBump(\'size\',-6,12,400)">－</button><button onclick="freeBump(\'size\',6,12,400)">＋</button><button onclick="toggleFreeBold()">太字</button></div>'
+     +'<div class="optlab">フォント</div><select class="optsel" onchange="setFree(\'font\',this.value)">'+Object.keys(FONTS).map(function(k){return '<option'+((fe.font||'標準')===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
+     +'<div class="optrow2"><span class="optlab2">文字色</span><input type="color" value="'+(fe.color||et.ink)+'" oninput="setFree(\'color\',this.value)"></div>'+brandRow2('color',fe.color||et.ink);}
+   else if(fe.type==='image'){h+='<div class="optlab">大きさ '+(fe.w||440)+'</div><div class="elrow"><button onclick="freeBump(\'w\',-30,80,1080);freeBump(\'h\',-30,80,1350)">－</button><button onclick="freeBump(\'w\',30,80,1080);freeBump(\'h\',30,80,1350)">＋</button></div><div class="optlab">角丸 '+(fe.radius||0)+'</div><div class="elrow"><button onclick="freeBump(\'radius\',-10,0,400)">－</button><button onclick="freeBump(\'radius\',10,0,400)">＋</button></div>';}
+   else if(fe.type==='shape'){h+='<div class="optlab">形</div><div class="seg"><button class="'+(fe.shape==='rect'?'on':'')+'" onclick="setFreeUI(\'shape\',\'rect\')">四角</button><button class="'+(fe.shape==='circle'?'on':'')+'" onclick="setFreeUI(\'shape\',\'circle\')">丸</button><button class="'+(fe.shape==='line'?'on':'')+'" onclick="setFreeUI(\'shape\',\'line\')">線</button></div><div class="optlab">大きさ</div><div class="elrow"><button onclick="freeBump(\'w\',-30,20,1080)">幅－</button><button onclick="freeBump(\'w\',30,20,1080)">幅＋</button><button onclick="freeBump(\'h\',-20,6,1350)">高－</button><button onclick="freeBump(\'h\',20,6,1350)">高＋</button></div><div class="optrow2"><span class="optlab2">色</span><input type="color" value="'+(fe.color||et.accent)+'" oninput="setFree(\'color\',this.value)"></div>'+brandRow2('color',fe.color||et.accent);}
+   else if(fe.type==='icon'){h+='<div class="elrow"><button onclick="iconForFree=true;toggleIcons()">アイコンを選ぶ（現在: '+(fe.name||'star')+'）</button></div><div class="optlab">大きさ '+(fe.size||130)+'</div><div class="elrow"><button onclick="freeBump(\'size\',-14,24,600)">－</button><button onclick="freeBump(\'size\',14,24,600)">＋</button></div><div class="optrow2"><span class="optlab2">色</span><input type="color" value="'+(fe.color||et.accent)+'" oninput="setFree(\'color\',this.value)"></div>'+brandRow2('color',fe.color||et.accent);}
+   h+='<button class="rs" style="margin-top:9px" onclick="delFree()">この要素を削除</button>';}
+ else{h+='<div class="optlab">＋で文字/画像/図形/アイコンを追加→プレビュー上をドラッグで移動。クリックで選択。絵文字は＋文字に直接入力。</div>';}
+ h+='</div>';
+ const lg=logo||{};h+='<div class="optsec"><div class="opth">ロゴ・透かし（全スライド共通）</div><div class="optrow2"><span class="optlab2">テキスト</span><input class="optsel" style="flex:2" value="'+(lg.text||'').replace(/"/g,'&quot;')+'" oninput="setLogo(\'text\',this.value)"></div><div class="elrow"><button onclick="document.getElementById(\'logoin\').click()">画像ロゴ'+(lg.image?'（変更）':'')+'</button>'+(lg.image||lg.text?'<button onclick="clearLogo()">消す</button>':'')+'</div><input id="logoin" type="file" accept="image/*" style="display:none" onchange="setLogoImage(event)">';
+ if(lg.text||lg.image){h+='<div class="optlab">位置</div><select class="optsel" onchange="setLogo(\'pos\',this.value)">'+['right bottom','left bottom','center bottom','right top','left top','center top'].map(function(p){return '<option value="'+p+'"'+((lg.pos||'right bottom')===p?' selected':'')+'>'+({'right bottom':'右下','left bottom':'左下','center bottom':'中央下','right top':'右上','left top':'左上','center top':'中央上'}[p])+'</option>';}).join('')+'</select><div class="optrow2"><span class="optlab2">文字色</span><input type="color" value="'+(lg.color||et.ink)+'" oninput="setLogo(\'color\',this.value)"></div><div class="optlab">大きさ '+(lg.size||40)+'</div><input type="range" class="optrange" min="24" max="90" value="'+(lg.size||40)+'" oninput="setLogo(\'size\',+this.value)"><div class="optlab">濃さ '+(lg.opacity==null?90:lg.opacity)+'%</div><input type="range" class="optrange" min="15" max="100" value="'+(lg.opacity==null?90:lg.opacity)+'" oninput="setLogo(\'opacity\',+this.value)">';}
+ h+='</div>';
+ h+='<div class="optsec"><div class="opth">画像で書き出し（PNG）</div><div class="elrow"><button onclick="exportPng(false)">このスライド</button><button onclick="exportPng(true)">全スライド</button></div><div class="optlab">PDFと別に1枚ずつPNG保存（1080×1350）。オンライン環境で動作。</div></div>';
+ document.getElementById('slideopt').innerHTML=h;}
 function highlightTpl(){document.querySelectorAll('.tpl').forEach(b=>b.classList.toggle('active',b.dataset.id===slide().tplId));}
 function syncTheme(){document.getElementById('theme').value=slide().theme;}
 function renderDeck(){const d=document.getElementById('deckbar');d.innerHTML='';
- deck.forEach((s,i)=>{const th=document.createElement('div');th.className='thumb'+(i===cur?' active':'');th.onclick=()=>{cur=i;syncTheme();highlightTpl();buildForm();renderCard();renderDeck()};th.innerHTML='<div class="no">'+(i+1)+'</div><div class="tw">'+slideHtml(s)+'</div>';d.appendChild(th)});
+ deck.forEach((s,i)=>{const th=document.createElement('div');th.className='thumb'+(i===cur?' active':'');th.onclick=()=>goSlide(i);th.innerHTML='<div class="no">'+(i+1)+'</div><div class="tw"></div>';paint(th.querySelector('.tw'),s);d.appendChild(th)});
  const tb=document.createElement('div');tb.id='dtools';
  [['＋追加','add'],['複製','dup'],['削除','del'],['◀','left'],['▶','right'],['全テーマ適用','alltheme']].forEach(([lbl,act])=>{const b=document.createElement('button');b.textContent=lbl;b.onclick=()=>deckAct(act);tb.appendChild(b)});
- d.appendChild(tb);try{localStorage.setItem('buzzdeck',JSON.stringify(deck))}catch(e){}}
-function refreshAll(){syncTheme();highlightTpl();buildForm();renderCard();renderDeck();}
+ d.appendChild(tb);save();}
+function refreshAll(){syncTheme();highlightTpl();buildSlideOpt();buildForm();renderCard();renderDeck();}
 function newDeck(){if(!confirm('今のデッキを破棄して新規作成しますか？'))return;deck=JSON.parse(JSON.stringify(INITIAL_DECK));cur=0;refreshAll();}
 function exportDeck(){const b=new Blob([JSON.stringify(deck)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='buzz_deck.json';a.click();}
 function importDeck(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(){try{const d=JSON.parse(r.result);if(Array.isArray(d)&&d.length){deck=d;cur=0;refreshAll();}else alert('形式が違います')}catch(x){alert('読み込めませんでした')}};r.readAsText(f);e.target.value='';}
 function deckAct(a){const s=slide();
  if(a==='add'){deck.splice(cur+1,0,{tplId:s.tplId,theme:s.theme,data:defaults(getTpl(s.tplId))});cur++;}
- else if(a==='dup'){deck.splice(cur+1,0,{tplId:s.tplId,theme:s.theme,data:Object.assign({},s.data)});cur++;}
+ else if(a==='dup'){const c=JSON.parse(JSON.stringify(s));deck.splice(cur+1,0,c);cur++;}
  else if(a==='del'){if(deck.length>1){deck.splice(cur,1);if(cur>=deck.length)cur=deck.length-1;}}
  else if(a==='left'){if(cur>0){const t=deck[cur-1];deck[cur-1]=deck[cur];deck[cur]=t;cur--;}}
  else if(a==='right'){if(cur<deck.length-1){const t=deck[cur+1];deck[cur+1]=deck[cur];deck[cur]=t;cur++;}}
  else if(a==='alltheme'){const th=s.theme;deck.forEach(x=>x.theme=th);}
- syncTheme();highlightTpl();buildForm();renderCard();renderDeck();}
+ syncTheme();highlightTpl();buildSlideOpt();buildForm();renderCard();renderDeck();}
 function buildForm(){const t=getTpl(slide().tplId);const f=document.getElementById('fields');f.innerHTML='';t.fields.forEach(fl=>{const lab=document.createElement('label');lab.textContent=fl.label;f.appendChild(lab);if(fl.type==='file'){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.style.cssText='width:100%;color:#eee;font-size:12px';inp.onchange=e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{slide().data[fl.key]=r.result;renderCard();renderDeck()};r.readAsDataURL(file)};f.appendChild(inp);}else if(fl.type==='select'){const sel=document.createElement('select');sel.style.cssText='width:100%;background:#2c2c30;color:#eee;border:1px solid #444;border-radius:6px;padding:8px;font-size:13px';(fl.options||[]).forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;sel.appendChild(op)});sel.value=slide().data[fl.key];sel.onchange=()=>{slide().data[fl.key]=sel.value;renderCard();renderDeck()};f.appendChild(sel);}else if(fl.type==='icon'){const cv=slide().data[fl.key]||'';const w=document.createElement('div');w.style.cssText='display:flex;align-items:center;gap:8px';const pv=document.createElement('div');pv.style.cssText='width:42px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#2c2c30;border-radius:6px';pv.innerHTML=cv&&ICONS[cv]?icon(cv,'#dddddd',26,1.8):'<span style="color:#777;font-size:10px">なし</span>';const bt=document.createElement('button');bt.textContent=cv?('変更（'+cv+'）'):'アイコンを選ぶ';bt.style.cssText='flex:1;background:#2c2c30;color:#ccc;border:1px solid #444;border-radius:6px;padding:9px;font-size:12px;cursor:pointer';bt.onclick=()=>{iconTargetKey=fl.key;toggleIcons();};w.appendChild(pv);w.appendChild(bt);if(cv){const cl=document.createElement('button');cl.textContent='✕';cl.style.cssText='background:#5a3a3a;color:#f0b0b0;border:0;border-radius:6px;padding:0 11px;cursor:pointer;font-size:13px';cl.onclick=()=>{slide().data[fl.key]='';renderCard();renderDeck();buildForm();};w.appendChild(cl);}f.appendChild(w);}else if(fl.type==='rows'){const cols=fl.cols||['値'];const box=document.createElement('div');let arr=(slide().data[fl.key]||'').split('\n').filter(x=>x.length).map(l=>l.split('｜'));const commit=()=>{slide().data[fl.key]=arr.map(r=>r.join('｜')).join('\n');renderCard();renderDeck();};function draw(){box.innerHTML='';arr.forEach((r,ri)=>{const row=document.createElement('div');row.style.cssText='display:flex;gap:4px;margin-bottom:6px';cols.forEach((c,ci)=>{const inp=document.createElement('input');inp.type='text';inp.placeholder=c;inp.value=r[ci]||'';inp.style.cssText='flex:1;min-width:0;background:#2c2c30;color:#eee;border:1px solid #444;border-radius:6px;padding:7px;font-size:12px';inp.oninput=()=>{while(arr[ri].length<=ci)arr[ri].push('');arr[ri][ci]=inp.value;commit();};row.appendChild(inp);});const del=document.createElement('button');del.textContent='✕';del.style.cssText='background:#5a3a3a;color:#f0b0b0;border:0;border-radius:6px;padding:0 11px;cursor:pointer;font-size:13px;flex-shrink:0';del.onclick=()=>{arr.splice(ri,1);commit();draw();};row.appendChild(del);box.appendChild(row);});const add=document.createElement('button');add.textContent='＋ 行を追加';add.style.cssText='width:100%;background:#2c2c30;color:#9b9;border:1px dashed #555;border-radius:6px;padding:8px;font-size:12px;cursor:pointer;margin-top:2px';add.onclick=()=>{arr.push(cols.map(()=>''));commit();draw();};box.appendChild(add);}draw();f.appendChild(box);}else{const ta=document.createElement('textarea');ta.value=slide().data[fl.key];ta.rows=(slide().data[fl.key]||'').includes('\n')?4:1;ta.oninput=()=>{slide().data[fl.key]=ta.value;renderCard();renderDeck()};f.appendChild(ta);}});}
-function selectTpl(t){slide().tplId=t.id;slide().data=defaults(t);highlightTpl();buildForm();renderCard();renderDeck();}
+function selectTpl(t){slide().tplId=t.id;slide().data=defaults(t);slide().pos={};slide().el={};selBlock=-1;highlightTpl();buildSlideOpt();buildForm();renderCard();renderDeck();}
 function buildThemes(){const s=document.getElementById('theme');Object.entries(THEMES).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v.name;s.appendChild(o)});s.value=slide().theme;s.onchange=()=>{slide().theme=s.value;renderCard();renderDeck()};}
 function buildList(){const cats={};TEMPLATES.forEach(t=>{(cats[t.cat]=cats[t.cat]||[]).push(t)});const L={'表紙':'A','中身':'B','締め':'C'};const list=document.getElementById('list');Object.entries(cats).forEach(([c,ts])=>{const h=document.createElement('h3');h.textContent=c;list.appendChild(h);ts.forEach(t=>{const b=document.createElement('button');b.className='tpl';b.dataset.id=t.id;b.textContent=NUMMAP[t.id];b.onclick=()=>selectTpl(t);list.appendChild(b)})})}
 function buildIconGallery(){document.getElementById('icogrid').innerHTML=Object.keys(ICONS).map(n=>'<div class="ico" onclick="insertIcon(\''+n+'\')">'+icon(n,'#dddddd',38,1.6)+'<div class="nm">'+n+'</div></div>').join('')}
 function toggleIcons(){const el=document.getElementById('icongallery');if(!el.classList.toggle('on'))iconTargetKey=null;}
-function insertIcon(name){if(iconTargetKey){slide().data[iconTargetKey]=name;iconTargetKey=null;renderCard();renderDeck();buildForm();toggleIcons();return;}if(!lastField){alert('先に入力欄をクリック（カーソルを置く）してから、アイコンを選んでください');return;}const el=lastField;const a=el.selectionStart,b=el.selectionEnd;if(typeof a==='number'){el.value=el.value.slice(0,a)+name+el.value.slice(b);el.selectionStart=el.selectionEnd=a+name.length;}else{el.value+=name;}el.dispatchEvent(new Event('input',{bubbles:true}));toggleIcons();el.focus();}
+function insertIcon(name){if(iconForFree){iconForFree=false;setFree('name',name);toggleIcons();return;}if(iconTargetKey){slide().data[iconTargetKey]=name;iconTargetKey=null;renderCard();renderDeck();buildForm();toggleIcons();return;}if(!lastField){alert('先に入力欄をクリック（カーソルを置く）してから、アイコンを選んでください');return;}const el=lastField;const a=el.selectionStart,b=el.selectionEnd;if(typeof a==='number'){el.value=el.value.slice(0,a)+name+el.value.slice(b);el.selectionStart=el.selectionEnd=a+name.length;}else{el.value+=name;}el.dispatchEvent(new Event('input',{bubbles:true}));toggleIcons();el.focus();}
 document.addEventListener('focusin',e=>{if((e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')&&e.target.closest('#fields'))lastField=e.target;});
-function doPrint(){document.getElementById('printarea').innerHTML=deck.map(s=>'<div class="pslide">'+slideHtml(s)+'</div>').join('');setTimeout(function(){window.print()},60);}
+function doPrint(){const pa=document.getElementById('printarea');pa.innerHTML=deck.map(()=>'<div class="pslide"></div>').join('');const ps=pa.querySelectorAll('.pslide');deck.forEach((s,i)=>paint(ps[i],s));setTimeout(function(){window.print()},80);}
 function buildTplGallery(){const th=slide().theme;document.getElementById('galgrid').innerHTML=TEMPLATES.map(t=>{const h=getTpl(t.id).render(defaults(t),THEMES[th]);return '<div class="tcard" data-n="'+((NUMMAP[t.id]||'')+' '+t.name).toLowerCase()+'" onclick="pickTpl(\''+t.id+'\')"><div class="tprev"><div class="tw">'+h+'</div></div><div class="tname">'+NUMMAP[t.id]+'</div></div>';}).join('');}
 function filterTpl(q){q=(q||'').toLowerCase();document.querySelectorAll('#galgrid .tcard').forEach(c=>{c.style.display=c.dataset.n.indexOf(q)>=0?'':'none';});}
-function pickTpl(id){const t=getTpl(id);slide().tplId=id;slide().data=defaults(t);highlightTpl();buildForm();renderCard();renderDeck();toggleGallery();}
+function pickTpl(id){const t=getTpl(id);slide().tplId=id;slide().data=defaults(t);slide().pos={};slide().el={};selBlock=-1;highlightTpl();buildSlideOpt();buildForm();renderCard();renderDeck();toggleGallery();}
 function toggleGallery(){const el=document.getElementById('tplgallery');if(el.classList.toggle('on')){document.getElementById('galsearch').value='';buildTplGallery();}}
 const PRESETS=[{name:'診断カルーセル',desc:'表紙→導入→診断グリッド→タイプ詳細×4→共通アドバイス→ロードマップ→保存',theme:'pastel',ids:['cover_target','intro_empathy','content_diag_grid','content_diag_detail','content_diag_detail','content_diag_detail','content_diag_detail','content_biglist','content_roadmap','cta_save']},{name:'ノウハウ◯選',desc:'表紙→導入→項目×5→まとめ→保存→フォロー',theme:'money',ids:['cover_nsen','intro_empathy','content_listitem','content_listitem','content_listitem','content_listitem','content_listitem','content_biglist','cta_save','cta_profile']},{name:'比較レビュー',desc:'表紙→導入→VS→スペック表→結果→比較→BA→引用→まとめ→保存',theme:'money',ids:['cover_target','intro_empathy','content_vs','content_spectable','content_hero','content_compare','content_ba','content_quote_dark','content_biglist','cta_save']},{name:'レシピ',desc:'写真表紙→導入→材料→手順写真×3→ポイント→引用→保存→要約保存',theme:'recipe',ids:['cover_photo_corner','intro_empathy','content_ingredients','content_photo_steps','content_photo_steps','content_photo_steps','content_biglist','content_quote_dark','cta_save','cta_recap_save']},{name:'美容PR(ゴールド)',desc:'袋文字表紙→導入→白帯→比較→顔図解→顔写真→BA→まとめ→引用→保存',theme:'beautypr',ids:['cover_outline','intro_empathy','content_gold_panels','content_compare','content_face','content_face_photo','content_ba','content_biglist','cta_quote','cta_save']}];
 function buildPresets(){document.getElementById('preslist').innerHTML=PRESETS.map((p,i)=>'<div class="pitem" onclick="loadPreset('+i+')"><b>'+p.name+'</b>（'+p.ids.length+'枚）<br><span>'+p.desc+'</span></div>').join('');}
 function loadPreset(i){const p=PRESETS[i];if(!confirm('「'+p.name+'」を読み込みます（今のデッキは置き換え）。よろしいですか?'))return;deck=p.ids.map(id=>({tplId:id,theme:p.theme,data:defaults(getTpl(id))}));cur=0;refreshAll();togglePresets();}
 function togglePresets(){const el=document.getElementById('presetbox');if(el.classList.toggle('on'))buildPresets();}
-buildThemes();buildList();buildIconGallery();highlightTpl();buildForm();renderCard();renderDeck();fitScale();window.onresize=fitScale;
+buildThemes();buildList();buildIconGallery();highlightTpl();buildSlideOpt();buildForm();renderCard();renderDeck();fitScale();window.onresize=fitScale;document.addEventListener('keydown',nudge);
+lastHist=JSON.stringify(deck);
+document.addEventListener('keydown',function(e){const z=(e.ctrlKey||e.metaKey)&&(e.key==='z'||e.key==='Z');const y=(e.ctrlKey||e.metaKey)&&(e.key==='y'||e.key==='Y');if(z&&e.shiftKey){e.preventDefault();redo();}else if(z){e.preventDefault();undo();}else if(y){e.preventDefault();redo();}});
 </script></body></html>
