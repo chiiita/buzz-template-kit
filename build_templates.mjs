@@ -979,6 +979,52 @@ const TEMPLATES = [
         +'<div style="position:absolute;right:80px;bottom:34px;display:flex;align-items:center;"><div style="display:flex;font-size:42px;font-weight:900;margin-right:16px;">'+d.date+'</div><div style="display:flex;background:'+NV+';color:#fff;font-size:30px;font-weight:900;padding:8px 18px;border-radius:8px;">'+d.online+'</div></div>'
       +'</div>';} },
 
+  // Y12 ← #11 SNS講座 実績3箱（人物右・色箱見出し・実績3つ） pin/937945059871774271
+  { id:'yt_sns_proof', name:'Y12 SNS講座＋実績3箱', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真(任意)',type:'file',def:''},
+      {key:'top',label:'上 帯テキスト',def:'未経験から月収7桁'},
+      {key:'title1',label:'見出し（【】色箱・交互ピンク青）',def:'【SNS】×【公式LINE】'},
+      {key:'title2',label:'見出し2',def:'スモールビジネス講座'},
+      {key:'b1',label:'実績1',def:'図解90枚'},
+      {key:'b2',label:'実績2',def:'動画25本'},
+      {key:'b3',label:'実績3',def:'フォロワー3.4万'},
+      {key:'person',label:'人物 切り抜き 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const bgc=d.photo?('url('+d.photo+') center/cover no-repeat'):'linear-gradient(135deg,#fdeef4,#e7eefb)';let i=0;
+      const mk=String(d.title1).replace(/【([^】]*)】/g,function(m,p){const c=(i++%2)?'#2f7fe0':'#E0518A';return '<span style="display:flex;background:'+c+';color:#fff;border-radius:14px;padding:0 16px;margin:0 6px;">'+p+'</span>';});
+      const bx=function(s){return '<div style="display:flex;align-items:center;background:#fff;border:3px solid #16335c;border-radius:12px;padding:8px 18px;margin-right:14px;font-size:32px;font-weight:900;color:#16335c;">'+s+'</div>';};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:80px 80px 120px;font-family:'+t.head+';color:#16335c;background:'+bgc+';">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:420px;height:auto;"/>':'')
+        +'<div style="position:relative;display:flex;align-self:flex-start;background:#16335c;color:#fff;font-size:36px;font-weight:900;padding:8px 22px;border-radius:10px;margin-bottom:20px;">'+d.top+'</div>'
+        +'<div style="position:relative;display:flex;align-items:center;font-size:120px;font-weight:900;line-height:1.05;">'+mk+'</div>'
+        +'<div style="position:relative;display:flex;font-size:78px;font-weight:900;line-height:1.1;margin-top:4px;">'+d.title2+'</div>'
+        +'<div style="position:absolute;left:80px;bottom:40px;display:flex;">'+bx(d.b1)+bx(d.b2)+bx(d.b3)+'</div>'
+      +'</div>';} },
+  // Y13 ← #7 2人対談告知（左右人物・中央ポップ帯・日時） pin/23995810511269147
+  { id:'yt_talk2', name:'Y13 2人対談告知', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'leftImg',label:'左 人物(任意)',type:'file',def:''},
+      {key:'rightImg',label:'右 人物(任意)',type:'file',def:''},
+      {key:'label',label:'上 ラベル',def:'online'},
+      {key:'title',label:'特大タイトル（改行可）',def:'CREATORS\nTALK'},
+      {key:'theme',label:'テーマ',def:'"伝わるデザイン"って何だろう?'},
+      {key:'sub',label:'サブ',def:'クリエイター2人の本音対談'},
+      {key:'date',label:'日時',def:'6.21 19:30 START!'},
+      {key:'leftName',label:'左 名前',def:'RYUHEI ASADA'},
+      {key:'rightName',label:'右 名前',def:'KAZUMI TERAI'}],
+    render:(d,t)=>{const BL='#3b5bff',YL='#FFE24A';const li=d.leftImg?('background:url('+d.leftImg+') center/cover;'):'background:#3a3a3a;';const ri=d.rightImg?('background:url('+d.rightImg+') center/cover;'):'background:#3a3a3a;';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:row;font-family:'+t.head+';">'
+        +'<div style="display:flex;flex-direction:column;justify-content:flex-end;width:360px;height:720px;'+li+'"><div style="display:flex;background:rgba(0,0,0,.55);color:#fff;font-size:26px;font-weight:900;padding:8px 14px;">'+d.leftName+'</div></div>'
+        +'<div style="display:flex;flex-direction:column;justify-content:center;align-items:center;width:560px;height:720px;background:'+BL+';color:#fff;padding:36px 30px;text-align:center;">'
+          +'<div style="display:flex;font-size:40px;font-weight:700;font-style:italic;color:'+YL+';margin-bottom:10px;">'+d.label+'</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-size:100px;font-weight:900;line-height:1.0;color:'+YL+';">'+nl(d.title)+'</div>'
+          +'<div style="display:flex;margin-top:26px;background:rgba(0,0,0,.18);border-radius:8px;padding:8px 16px;font-size:30px;font-weight:900;">'+d.theme+'</div>'
+          +'<div style="display:flex;margin-top:10px;font-size:26px;">'+d.sub+'</div>'
+          +'<div style="display:flex;margin-top:18px;font-size:44px;font-weight:900;color:'+YL+';">'+d.date+'</div>'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;width:360px;height:720px;'+ri+'"><div style="display:flex;background:rgba(0,0,0,.55);color:#fff;font-size:26px;font-weight:900;padding:8px 14px;">'+d.rightName+'</div></div>'
+      +'</div>';} },
+
   // ===== note 見出し画像（1280×670）※参考画像が来たら本実装。現状は仮 =====
   { id:'note_basic', name:'N1 ベーシック', cat:'サムネ', fmt:'note',
     fields:[{key:'title',label:'タイトル（改行で折る）',def:'note運用で\n月10万円までの全記録'},{key:'sub',label:'サブ',def:'ゼロから3ヶ月でやったこと'},{key:'author',label:'著者',def:'@kuro'}],
