@@ -674,6 +674,16 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +'</div>'
         +'<div style="display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;width:360px;height:720px;'+ri+'"><div style="display:flex;background:rgba(0,0,0,.55);color:#fff;font-size:26px;font-weight:900;padding:8px 14px;">'+d.rightName+'</div></div>'
       +'</div>';}},
+{id:"yt_recruit",name:"Y14 採用・英字コーポレート",cat:"サムネ",fmt:"youtube",fields:[{"key":"person","label":"人物 左(任意)","type":"file","def":""},{"key":"script","label":"英字 ラベル(斜体)","def":"Engineer first"},{"key":"eng","label":"英字 大見出し（改行可）","def":"WORK AS\nYOURSELF"},{"key":"line1","label":"和文1（白・橙枠）","def":"ここで働いていることに"},{"key":"line2","label":"和文2（橙ベタ）","def":"満足できる会社へ"},{"key":"quote","label":"左 縦書き引用(任意)","def":"「自分らしさを忘れない」そんな環境を整えています"}],render:(d,t)=>{const OR='#ED8A3A';
+      const vq=d.quote?('<div style="position:absolute;left:20px;top:54px;display:flex;flex-direction:column;align-items:center;font-size:25px;font-weight:700;color:#555;letter-spacing:2px;">'+[].concat.apply([],String(d.quote).split('')).map(function(c){return '<div style="display:flex;">'+(c===' '?'・':c)+'</div>';}).join('')+'</div>'):'';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:60px 70px;font-family:'+t.head+';color:#2a2a2a;background:linear-gradient(212deg, '+OR+' 20%, #ffffff 20%);">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;left:120px;bottom:0;width:430px;height:auto;"/>':'')
+        +vq
+        +'<div style="position:relative;display:flex;font-size:36px;font-style:italic;font-weight:700;color:'+OR+';margin-bottom:6px;">'+d.script+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-end;font-size:104px;font-weight:900;line-height:1.0;letter-spacing:2px;color:#2a2a2a;">'+nl(d.eng)+'</div>'
+        +'<div style="position:relative;display:flex;background:#fff;border-left:10px solid '+OR+';padding:10px 24px;font-size:50px;font-weight:900;box-shadow:0 3px 10px rgba(0,0,0,.12);margin-top:30px;">'+d.line1+'</div>'
+        +'<div style="position:relative;display:flex;background:'+OR+';color:#fff;padding:10px 28px;font-size:50px;font-weight:900;margin-top:10px;">'+d.line2+'</div>'
+      +'</div>';}},
 {id:"note_basic",name:"N1 ベーシック",cat:"サムネ",fmt:"note",fields:[{"key":"title","label":"タイトル（改行で折る）","def":"note運用で\n月10万円までの全記録"},{"key":"sub","label":"サブ","def":"ゼロから3ヶ月でやったこと"},{"key":"author","label":"著者","def":"@kuro"}],render:(d,t)=>wrapAt(1920,1006,{bg:t.bg,color:t.ink,font:t.head,align:'stretch',pad:'110px 150px'},`
       <div style="display:flex;flex-direction:column;font-size:132px;font-weight:900;line-height:1.3;">${nl(d.title)}</div>
       <div style="display:flex;width:180px;height:12px;background:${t.accent};margin:36px 0;border-radius:6px;"></div>
