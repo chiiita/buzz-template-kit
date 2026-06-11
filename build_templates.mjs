@@ -834,100 +834,25 @@ const TEMPLATES = [
         +'<img src="'+mas+'" style="position:absolute;right:18px;bottom:6px;width:200px;"/>'
       +'</div>';} },
 
-  // ===== YouTube 定番バズ型 第1波（フォント=t.head＝ゴシック既定・編集で変更可） =====
-  { id:'yt_photo_big', name:'Y5 全面写真＋下部特大', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'photo',label:'背景写真をアップ',type:'file',def:''},{key:'kicker',label:'上の手書き帯',def:'知らないと一生損する'},{key:'sub',label:'サブ（上）',def:'貯まらない人の口グセ'},{key:'big',label:'特大ワード（黄色・改行可）',def:'今すぐやめて'},{key:'mascot',label:'マスコット(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:56px 80px;font-family:'+t.head+';'+photo+'">'
-        +'<div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,.05) 55%, rgba(0,0,0,0) 75%);"></div>'
-        +'<div style="position:absolute;top:26px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:42px;font-weight:700;color:#fff;text-shadow:'+outline('#1f1f1f')+';">＼ '+d.kicker+' ／</div></div>'
-        +'<div style="position:relative;display:flex;font-size:46px;font-weight:700;color:#fff;margin-bottom:8px;text-shadow:2px 2px 8px rgba(0,0,0,.7);">'+d.sub+'</div>'
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-weight:900;font-size:158px;line-height:1.0;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.big)+'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:18px;bottom:6px;width:188px;"/>'
-      +'</div>';} },
-  { id:'yt_split', name:'Y6 左カラー帯＋右写真', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'photo',label:'右側の写真をアップ',type:'file',def:''},{key:'pre',label:'小見出し',def:'元手0円'},{key:'big',label:'特大ワード（改行可）',def:'スマホ副業\n7選'},{key:'foot',label:'下部',def:'初心者OK'}],
-    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';'+photo+'">'
-        +'<div style="display:flex;flex-direction:column;justify-content:center;width:760px;height:720px;padding:60px 64px;background:linear-gradient(135deg,'+t.accent+','+t.accentDeep+');color:#fff;">'
-          +'<div style="display:flex;align-self:flex-start;background:rgba(255,255,255,.22);font-size:38px;font-weight:700;padding:8px 22px;border-radius:10px;margin-bottom:24px;">'+d.pre+'</div>'
-          +'<div style="display:flex;flex-direction:column;font-size:128px;font-weight:900;line-height:1.1;">'+nl(d.big)+'</div>'
-          +'<div style="display:flex;margin-top:26px;font-size:40px;font-weight:700;color:#FFE24A;">'+d.foot+'</div>'
-        +'</div></div>';} },
-  { id:'yt_number', name:'Y7 数字インパクト', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'photo',label:'背景写真をアップ',type:'file',def:''},{key:'kicker',label:'上の手書き帯',def:'会社員でも余裕でした'},{key:'pre',label:'数字の前',def:'たった3ヶ月で'},{key:'num',label:'数字',def:'127'},{key:'unit',label:'単位',def:'万円'},{key:'after',label:'締め',def:'稼げた方法'},{key:'mascot',label:'マスコット(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 80px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.16);"></div>':'')
-        +'<div style="position:absolute;top:28px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
-        +'<div style="position:relative;display:flex;font-size:62px;font-weight:900;">'+d.pre+'</div>'
-        +'<div style="position:relative;display:flex;align-items:baseline;margin:4px 0;"><div style="display:flex;font-weight:900;font-size:280px;line-height:.95;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';">'+d.num+'</div><div style="display:flex;font-size:96px;font-weight:900;margin-left:8px;">'+d.unit+'</div></div>'
-        +'<div style="position:relative;display:flex;font-size:72px;font-weight:900;">'+d.after+'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:18px;bottom:6px;width:180px;"/>'
-      +'</div>';} },
-  { id:'yt_ba', name:'Y8 Before→After 二分割', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'title',label:'上部タイトル（改行可）',def:'人生変わった'},{key:'bl',label:'Before 文',def:'毎月赤字'},{key:'al',label:'After 文',def:'月20万貯金'},{key:'bimg',label:'Before写真(任意)',type:'file',def:''},{key:'aimg',label:'After写真(任意)',type:'file',def:''}],
-    render:(d,t)=>{const bi=d.bimg?('background:url('+d.bimg+') center/cover;'):'background:#6b6b6b;';const ai=d.aimg?('background:url('+d.aimg+') center/cover;'):('background:'+t.accent+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';">'
-        +'<div style="display:flex;flex-direction:column;justify-content:flex-end;width:640px;height:720px;padding:40px;'+bi+'"><div style="display:flex;align-self:flex-start;background:#333;color:#fff;font-size:38px;font-weight:900;padding:8px 22px;border-radius:8px;margin-bottom:14px;">Before</div><div style="display:flex;font-size:56px;font-weight:900;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+d.bl+'</div></div>'
-        +'<div style="display:flex;flex-direction:column;justify-content:flex-end;width:640px;height:720px;padding:40px;'+ai+'"><div style="display:flex;align-self:flex-start;background:#fff;color:'+t.accentDeep+';font-size:38px;font-weight:900;padding:8px 22px;border-radius:8px;margin-bottom:14px;">After</div><div style="display:flex;font-size:56px;font-weight:900;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+d.al+'</div></div>'
-        +'<div style="position:absolute;top:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-size:64px;font-weight:900;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.title)+'</div>'
-        +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;width:130px;height:130px;border-radius:50%;background:#FFE24A;border:6px solid #1f1f1f;font-size:54px;font-weight:900;color:#1f1f1f;">→</div>'
-      +'</div>';} },
-  { id:'yt_vs', name:'Y9 VS 対決', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'title',label:'上部タイトル',def:'どっちが正解？'},{key:'left',label:'左（赤）',def:'貯金'},{key:'right',label:'右（青）',def:'投資'}],
-    render:(d,t)=>{return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';">'
-        +'<div style="display:flex;align-items:center;justify-content:center;width:640px;height:720px;background:linear-gradient(135deg,#E0352B,#9e251d);"><div style="display:flex;flex-direction:column;align-items:center;font-size:140px;font-weight:900;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.left)+'</div></div>'
-        +'<div style="display:flex;align-items:center;justify-content:center;width:640px;height:720px;background:linear-gradient(135deg,#2D6CDF,#1c4aa0);"><div style="display:flex;flex-direction:column;align-items:center;font-size:140px;font-weight:900;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.right)+'</div></div>'
-        +'<div style="position:absolute;top:30px;left:50%;transform:translateX(-50%);display:flex;background:#1f1f1f;color:#fff;font-size:46px;font-weight:900;padding:10px 30px;border-radius:12px;">'+d.title+'</div>'
-        +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:50%;background:#FFE24A;border:7px solid #1f1f1f;font-family:'+t.head+';font-size:64px;font-weight:900;color:#1f1f1f;">VS</div>'
-      +'</div>';} },
-  { id:'yt_question', name:'Y10 疑問フック', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'photo',label:'背景写真をアップ',type:'file',def:''},{key:'kicker',label:'上の手書き帯',def:'9割が間違えてる'},{key:'q',label:'問い（改行可）',def:'なぜお金が\n残らない？'},{key:'hint',label:'引き',def:'答えはたった1つ'},{key:'mascot',label:'マスコット(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 80px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.16);"></div>':'')
-        +'<div style="position:absolute;top:28px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
-        +'<div style="position:absolute;right:40px;top:34px;display:flex;font-weight:900;font-size:340px;line-height:.9;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';">?</div>'
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-size:104px;font-weight:900;line-height:1.18;text-shadow:'+outline('#ffffff','rgba(0,0,0,.1)')+';">'+nl(d.q)+'</div>'
-        +'<div style="position:relative;display:flex;margin-top:18px;background:#E0352B;color:#fff;font-size:46px;font-weight:900;padding:8px 22px;border-radius:10px;">'+d.hint+'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:18px;bottom:6px;width:180px;"/>'
-      +'</div>';} },
-  { id:'yt_shock', name:'Y11 衝撃・赤背景', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'top',label:'上段（白）',def:'まだやってるの？'},{key:'big',label:'特大ワード（白・改行可）',def:'その節約\n逆効果'},{key:'foot',label:'下段',def:'今すぐ見直して'}],
-    render:(d,t)=>{return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px;font-family:'+t.head+';background:radial-gradient(circle at 50% 40%, #E0352B, #8e1f18);color:#fff;">'
-        +'<div style="display:flex;font-size:58px;font-weight:900;margin-bottom:14px;">'+d.top+'</div>'
-        +'<div style="display:flex;flex-direction:column;align-items:center;font-size:170px;font-weight:900;line-height:1.02;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.big)+'</div>'
-        +'<div style="display:flex;margin-top:18px;background:#FFE24A;color:#1f1f1f;font-size:48px;font-weight:900;padding:8px 26px;border-radius:10px;">'+d.foot+'</div>'
-      +'</div>';} },
-  { id:'yt_rank', name:'Y12 ランキング1位', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'photo',label:'背景写真をアップ',type:'file',def:''},{key:'kicker',label:'上の手書き帯',def:'プロが本気で選んだ'},{key:'rank',label:'順位の数字',def:'1'},{key:'title',label:'タイトル（改行可）',def:'稼げる副業\nランキング'},{key:'mascot',label:'マスコット(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:row;justify-content:flex-start;align-items:center;padding:60px 70px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.18);"></div>':'')
-        +'<div style="position:absolute;top:26px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
-        +'<div style="position:relative;display:flex;align-items:baseline;margin-right:30px;"><div style="display:flex;font-size:70px;font-weight:900;color:#C9A227;">第</div><div style="display:flex;font-weight:900;font-size:300px;line-height:.9;color:#FFD23C;text-shadow:'+outline('#9c7a14')+';">'+d.rank+'</div><div style="display:flex;font-size:70px;font-weight:900;color:#C9A227;">位</div></div>'
-        +'<div style="position:relative;display:flex;flex-direction:column;font-size:104px;font-weight:900;line-height:1.18;">'+nl(d.title)+'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:16px;bottom:6px;width:170px;"/>'
-      +'</div>';} },
-  { id:'yt_nsen', name:'Y13 ◯選・番号', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'photo',label:'背景写真をアップ',type:'file',def:''},{key:'kicker',label:'上の手書き帯',def:'保存しないと損'},{key:'topic',label:'テーマ（改行可）',def:'神アプリ'},{key:'count',label:'数',def:'7'},{key:'unit',label:'単位',def:'選'},{key:'mascot',label:'マスコット(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:50px 80px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.18);"></div>':'')
-        +'<div style="position:absolute;top:26px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:118px;font-weight:900;line-height:1.1;">'+nl(d.topic)+'</div>'
-        +'<div style="position:relative;display:flex;align-items:center;justify-content:center;width:300px;height:300px;border-radius:50%;background:#E0352B;margin-top:14px;"><div style="display:flex;align-items:baseline;color:#fff;"><div style="display:flex;font-weight:900;font-size:200px;line-height:1;">'+d.count+'</div><div style="display:flex;font-size:72px;font-weight:900;">'+d.unit+'</div></div></div>'
-        +'<img src="'+mas+'" style="position:absolute;right:16px;bottom:6px;width:170px;"/>'
-      +'</div>';} },
-  { id:'yt_bubble', name:'Y14 吹き出しフック', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'photo',label:'背景写真をアップ',type:'file',def:''},{key:'bubble',label:'吹き出しのセリフ（改行可）',def:'え、それ\n損してます'},{key:'big',label:'特大ワード（黄色・改行可）',def:'正しい使い方'},{key:'mascot',label:'マスコット(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:56px 80px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.14);"></div>':'')
-        +'<div style="position:relative;display:flex;flex-direction:column;align-self:flex-start;background:#fff;border:5px solid #1f1f1f;border-radius:28px;padding:22px 34px;font-size:60px;font-weight:900;line-height:1.2;margin-bottom:26px;">'+nl(d.bubble)+'</div>'
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-weight:900;font-size:150px;line-height:1.0;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.big)+'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:16px;bottom:6px;width:185px;"/>'
+  // ===== YouTube Pinterest参考由来（出典は design_kb/youtube_templates_roadmap.md） =====
+  // Y5 ← #3 ビジネス解説（赤黒・人物右・吹き出し・下帯） pin/26599454046060050
+  { id:'yt_biz_explain', name:'Y5 ビジネス解説（人物右）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真(任意・無は暗赤)',type:'file',def:''},
+      {key:'tag',label:'左上 角リボン',def:'競合に差をつける'},
+      {key:'bubble',label:'右上 吹き出し(任意)',def:'具体的な事例を多数紹介！'},
+      {key:'title',label:'白見出し（改行可）',def:'次世代マーケティング'},
+      {key:'big',label:'特大ワード（アクセント縁・改行可）',def:'究極ガイド'},
+      {key:'foot',label:'下帯テキスト',def:'最先端の手法を徹底解説！'},
+      {key:'person',label:'人物 切り抜き 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const bgc=d.photo?('url('+d.photo+') center/cover no-repeat'):('radial-gradient(circle at 72% 48%, '+shade(t.accentDeep,-0.15)+', #131318 64%)');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:90px 80px 120px;font-family:'+t.head+';color:#fff;background:'+bgc+';">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;height:690px;"/>':'')
+        +'<div style="position:absolute;top:0;left:0;display:flex;background:'+t.accent+';color:#fff;font-size:34px;font-weight:900;padding:14px 30px;border-bottom-right-radius:18px;">'+d.tag+'</div>'
+        +(d.bubble?'<div style="position:absolute;top:30px;right:40px;display:flex;background:#fff;color:#1a1a1a;font-size:28px;font-weight:700;padding:12px 22px;border-radius:14px;">'+d.bubble+'</div>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:78px;font-weight:900;line-height:1.15;text-shadow:2px 3px 6px rgba(0,0,0,.5);">'+nl(d.title)+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:150px;font-weight:900;line-height:1.05;color:#fff;text-shadow:'+outline(t.accentDeep)+';margin-top:6px;">'+nl(d.big)+'</div>'
+        +'<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;justify-content:center;align-items:center;background:'+t.accent+';color:#fff;font-size:44px;font-weight:900;padding:14px 0;">'+d.foot+'</div>'
       +'</div>';} },
 
   // ===== note 見出し画像（1280×670）※参考画像が来たら本実装。現状は仮 =====

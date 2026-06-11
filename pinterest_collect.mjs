@@ -43,9 +43,11 @@ async function dl(url,dest){
 }
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const [,,query,outDir,countArg]=process.argv;
+const [,,query,outDir,countArg,ratioMode]=process.argv;
 const count=parseInt(countArg||'12',10);
-if(!query||!outDir){console.error('usage: node pinterest_collect.mjs "<q>" <dir> [n]');process.exit(1);}
+// ratioMode: 'yt'=横長16:9寄り / 'note'=横長やや緩め / 既定=縦長〜正方(IG)
+const RR=ratioMode==='yt'?[1.45,2.1]:ratioMode==='note'?[1.5,2.2]:[0.6,1.25];
+if(!query||!outDir){console.error('usage: node pinterest_collect.mjs "<q>" <dir> [n] [ig|yt|note]');process.exit(1);}
 fs.mkdirSync(outDir,{recursive:true});
 
 const {csrf,cookie}=await warmup();
@@ -54,11 +56,13 @@ await sleep(1500);
 let pins=await search(query,csrf,cookie,Math.max(25,count*2));
 console.log('検索ヒット:',pins.length,'件');
 // 縦長〜正方(カルーセル単スライド)に寄せる: 0.6<=w/h<=1.2
-pins=pins.filter(p=>p.w&&p.h&&(p.w/p.h)>=0.6&&(p.w/p.h)<=1.25);
-let n=0;
+pins=pins.filter(p=>p.w&&p.h&&(p.w/p.h)>=RR[0]&&(p.w/p.h)<=RR[1]);
+let n=0; const manifest=[];
 for(const p of pins.slice(0,count)){
-  try{ const sz=await dl(p.url,path.join(outDir,`p_${String(++n).padStart(2,'0')}.jpg`)); console.log(`  DL ${n}: ${sz}B ${p.w}x${p.h}`); }
-  catch(e){ console.log('  skip:',e.message); n--; }
+  const file=`p_${String(n+1).padStart(2,'0')}.jpg`;
+  try{ const sz=await dl(p.url,path.join(outDir,file)); n++; manifest.push({file:file,pinId:p.id,pinUrl:'https://www.pinterest.com/pin/'+p.id+'/',imgUrl:p.url,w:p.w,h:p.h}); console.log(`  DL ${n}: ${sz}B ${p.w}x${p.h} pin/${p.id}`); }
+  catch(e){ console.log('  skip:',e.message); }
   await sleep(1200);
 }
-console.log('保存:',n,'枚 ->',outDir);
+fs.writeFileSync(path.join(outDir,'sources.json'),JSON.stringify(manifest,null,2));
+console.log('保存:',n,'枚 + sources.json ->',outDir);
