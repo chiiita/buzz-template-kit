@@ -847,12 +847,55 @@ const TEMPLATES = [
       {key:'person',label:'人物 切り抜き 右(任意)',type:'file',def:''}],
     render:(d,t)=>{const bgc=d.photo?('url('+d.photo+') center/cover no-repeat'):('radial-gradient(circle at 72% 48%, '+shade(t.accentDeep,-0.15)+', #131318 64%)');
       return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:90px 80px 120px;font-family:'+t.head+';color:#fff;background:'+bgc+';">'
-        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;height:690px;"/>':'')
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:500px;height:auto;"/>':'')
         +'<div style="position:absolute;top:0;left:0;display:flex;background:'+t.accent+';color:#fff;font-size:34px;font-weight:900;padding:14px 30px;border-bottom-right-radius:18px;">'+d.tag+'</div>'
         +(d.bubble?'<div style="position:absolute;top:30px;right:40px;display:flex;background:#fff;color:#1a1a1a;font-size:28px;font-weight:700;padding:12px 22px;border-radius:14px;">'+d.bubble+'</div>':'')
         +'<div style="position:relative;display:flex;flex-direction:column;font-size:78px;font-weight:900;line-height:1.15;text-shadow:2px 3px 6px rgba(0,0,0,.5);">'+nl(d.title)+'</div>'
         +'<div style="position:relative;display:flex;flex-direction:column;font-size:150px;font-weight:900;line-height:1.05;color:#fff;text-shadow:'+outline(t.accentDeep)+';margin-top:6px;">'+nl(d.big)+'</div>'
         +'<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;justify-content:center;align-items:center;background:'+t.accent+';color:#fff;font-size:44px;font-weight:900;padding:14px 0;">'+d.foot+'</div>'
+      +'</div>';} },
+
+  // Y6 ← #5 AI/ノウハウ解説＋数字（紫・人物右・200選） pin/23995810511269145
+  { id:'yt_ai_explain', name:'Y6 AI解説＋数字（人物右）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真(任意・無は紫)',type:'file',def:''},
+      {key:'tag',label:'左上タグ',def:'生成AI活用術'},
+      {key:'bubble',label:'右上 吹き出し(任意)',def:'超実践的プロンプト集'},
+      {key:'title',label:'白見出し（改行可）',def:'プロンプトの書き方'},
+      {key:'big',label:'特大ワード（白袋文字・改行可）',def:'徹底解説'},
+      {key:'foot',label:'下帯テキスト',def:'ビジネスで今すぐ使えるテンプレート'},
+      {key:'num',label:'下帯の数字',def:'200'},
+      {key:'unit',label:'数字の単位',def:'選'},
+      {key:'person',label:'人物 切り抜き 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const bgc=d.photo?('url('+d.photo+') center/cover no-repeat'):'linear-gradient(125deg, #6a2da8, #381860)';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:120px 80px 130px;font-family:'+t.head+';color:#fff;background:'+bgc+';">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:480px;height:auto;"/>':'')
+        +'<div style="position:absolute;top:0;left:0;display:flex;background:rgba(0,0,0,.42);color:#fff;font-size:34px;font-weight:900;padding:14px 30px;border-bottom-right-radius:16px;">'+d.tag+'</div>'
+        +(d.bubble?'<div style="position:absolute;top:28px;right:40px;display:flex;background:#fff;color:#3a1a66;font-size:28px;font-weight:900;padding:12px 22px;border-radius:14px;">'+d.bubble+'</div>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:80px;font-weight:900;line-height:1.15;">'+nl(d.title)+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:168px;font-weight:900;line-height:1.0;color:#fff;text-shadow:'+outline('#1f1240')+';margin-top:4px;">'+nl(d.big)+'</div>'
+        +'<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;align-items:center;background:rgba(0,0,0,.4);padding:0 36px;height:96px;"><div style="display:flex;flex:1;font-size:42px;font-weight:900;color:#fff;">'+d.foot+'</div>'+(d.num?'<div style="display:flex;align-items:baseline;justify-content:center;background:#FFE24A;color:#1f1240;border-radius:999px;padding:6px 24px;margin-left:18px;text-shadow:none;"><div style="display:flex;font-size:62px;font-weight:900;">'+d.num+'</div><div style="display:flex;font-size:40px;font-weight:900;">'+d.unit+'</div></div>':'')+'</div>'
+      +'</div>';} },
+
+  // Y7 ← #4 専門家ボックス煽り（紺金・単語囲み・3ベネ・縦書き肩書） pin/195202965095460416
+  { id:'yt_expert_box', name:'Y7 専門家ボックス煽り', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真(任意・無は紺)',type:'file',def:''},
+      {key:'line1',label:'1行目（【】で金枠・改行可）',def:'【若】【い】【人】ほど'},
+      {key:'big',label:'特大ワード（改行可）',def:'家を買え'},
+      {key:'benefits',label:'下の3ベネ（｜区切り）',def:'無料で住める｜お金が貰える｜余裕ができる'},
+      {key:'role',label:'縦書き肩書 右(任意)',def:'不動産アナリスト 二乃宮風太郎'},
+      {key:'person',label:'人物 切り抜き 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const G='#E8C24A';const bgc=d.photo?('url('+d.photo+') center/cover no-repeat'):'radial-gradient(circle at 58% 40%, #26406f, #0d1626 72%)';
+      const boxed=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;align-items:center;">'+line.replace(/【([^】]*)】/g,'<span style="display:flex;border:5px solid '+G+';color:'+G+';border-radius:10px;padding:0 10px;margin:0 6px;">$1</span>')+'</div>';}).join('');};
+      const bens=String(d.benefits).split('｜').filter(function(x){return x.length;}).map(function(b){return '<div style="display:flex;align-items:center;background:'+G+';color:#0d1626;border-radius:8px;padding:6px 18px;margin-right:16px;font-size:30px;font-weight:900;">'+b+'</div>';}).join('');
+      const role=d.role?('<div style="position:absolute;right:494px;top:70px;display:flex;flex-direction:column;align-items:center;font-size:26px;font-weight:700;color:#fff;letter-spacing:2px;">'+[].concat.apply([],String(d.role).split('')).map(function(c){return '<div style="display:flex;">'+(c===' '?'・':c)+'</div>';}).join('')+'</div>'):'';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:80px 80px 120px;font-family:'+t.head+';color:#fff;background:'+bgc+';">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:470px;height:auto;"/>':'')
+        +role
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:90px;font-weight:900;line-height:1.25;text-shadow:2px 2px 6px rgba(0,0,0,.5);">'+boxed(d.line1)+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:160px;font-weight:900;line-height:1.0;color:#fff;text-shadow:'+outline('#0d1626')+';margin-top:8px;">'+nl(d.big)+'</div>'
+        +'<div style="position:absolute;left:80px;bottom:34px;display:flex;">'+bens+'</div>'
       +'</div>';} },
 
   // ===== note 見出し画像（1280×670）※参考画像が来たら本実装。現状は仮 =====
