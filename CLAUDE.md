@@ -1,7 +1,11 @@
 # バズ型テンプレ集 — プロジェクト指示書（Claude用）
 
-このフォルダ単体で完結する **「実在バズIG投稿の型をHTMLテンプレ化 → ブラウザで中身差し替え → PDF出力」** する型テンプレ集。
+このフォルダ単体で完結する **「実在バズIG投稿の型をHTMLテンプレ化 → ブラウザで中身差し替え → 画像/PDF出力」** する型テンプレ集＋簡易デザインエディタ。
 別チャットでもこのCLAUDE.mdを読めば続きを作れる。
+
+> 📌 **2026-06-11にブラウザ・エディタを大改修（移動/サイズ/削除/背景/フォント色/自由レイヤー/ロゴ/Undo/画像ZIP保存/UI刷新）。
+> エディタ系の続きをやるなら必ず `EDITOR_HANDOVER_2026-06-11.md` を先に読む**（データモデル・全関数マップ・ハマりどころ・検証手順を網羅）。
+> 編集対象は `build_templates.mjs` のみ（`index.html`は生成物）。アプリJSはテンプレートリテラル内なので `\n`→`\\n`・`'`→`\\'` のエスケープ必須。ブラウザ書き出しは html2canvas（html-to-imageは真っ黒になるので使わない）。
 
 ## 🌐 公開状況（2026-06-10〜）
 - **公開URL（誰でも利用可）**：https://buzz-template-kit.vercel.app
@@ -10,23 +14,17 @@
 - **更新フロー**：型追加→`node build_templates.mjs`で`index.html`再生成→ユーザーが `git add -A && git commit -m "add template" && git push`→**Vercel自動デプロイ**
 - **現在の規模**：73型（表紙21／中身32／締め20）× 28テーマ
 
-## スライド個別カスタム機能（2026-06-11 追加）
-各スライドは `{tplId, theme, data}` に加え、任意で以下を持てる（後方互換・無ければテーマ標準）：
-- `bg` … 背景上書き `{mode:'theme'|'fill'|'image', fill:'#hex', image:dataURL, overlay:'none'|'white'|'black', opacity:0-90, fit:'cover'}`。**テンプレ無改修で実現**＝レンダ後に `applyBg(root,s)` がルートdivの背景だけ差し替え（塗りつぶし色／画像＋白黒レイヤー）。カード・サムネ・PDFすべて同じ後処理で一貫
-- `over` … フォント/カラー上書き `{head, body, ink, accent, sub}`。`eff(s)` が `render(data, eff(s))` の theme を差し替え（見出し/本文フォントを個別・文字色/アクセント/サブ色を個別）。フォント名は `FONTS`（標準/角ゴ/丸ゴ/明朝/インパクト/手書き）
-- `pos` … 要素ドラッグの位置オフセット `{ブロックindex:[dx,dy]}`。**ドラッグ単位＝ルート直下の子要素**（wrapの直下ブロック＝見出し/本文/表）。`applyPos` が `style.translate` で適用＝PDFにも反映。「✋移動」ボタンでmoveModeトグル→ドラッグ＋矢印キー微調整（Shiftで大）。型変更時は `pos` クリア
-- UIは `#slideopt` パネル（`buildSlideOpt()`）。これら app側関数は render非依存なのでブラウザ埋込のみ（satoriバッチ/QAには無関係）
-
-### ミニエディタ機能（2026-06-11 第2弾で拡張）
-`{tplId,theme,data,bg,over,pos}` に加え：`el`（要素別スタイル `{idx:{sc,bold,al,box,hide}}`）／`free`（自由レイヤー配列 `[{type:text|image|shape|icon,x,y,...}]`）。ロゴは**デッキ横断**で `localStorage 'buzzlogo'`、ブランドカラーは `'buzzbrand'`。
-- **#1 文字サイズ/太字** `el[idx].sc/bold`・**#4 表示/非表示** `hide`（live時は半透明・出力時display:none）・**#5 整列** `al`(alignSelf)・**#8 枠影** `box`：`applyEl(root,s,live)` が `style.scale/translate/alignSelf` 等で適用
-- **#2 スナップ**：ドラッグ中 `computeSnap`（中央540/675・セーフ枠100/980/150/1190に±12pxで吸着）＋`showGuide` 青ガイド線
-- **#3 Undo/Redo**：`save()`→`scheduleHist`（450msデバウンス）でスナップショット。Ctrl+Z/Y・↶↷ボタン
-- **#6 グラデ背景** `bg.mode='grad'`(fill/fill2/angle)・**#7 画像位置** `bg.pos/fit`（9分割位置＋cover/contain）
-- **#9 ブランドカラー** `brand[]`＝各カラー欄に＋保存＆スウォッチ・**#10 一括** `applyBgAll/applyStyleAll`・**#11 PNG書出** `exportPng`（CDNの`html-to-image`を動的import・1080×1350）
-- **#13 はみ出し警告** `checkOverflow`（root.scrollHeight>clientHeight）→`#ovwarn`
-- **#14 ロゴ/透かし** `logo`(text/image/pos/color/size/opacity)＝`applyOverlay`で全スライドに付与・**#15/#16 自由レイヤー＋アイコン/絵文字** `s.free`＝`freeHtml`描画＋`enableFreeDrag`。`applyOverlay`はテンプレ無改修でルートに後付け、`enableDrag`は`.freeel/.logoel`をスキップしブロックindex整合を保つ
-- 未実装（保留）：#12 テキスト一括置換
+## ブラウザ・エディタ機能（2026-06-11 大改修・詳細は EDITOR_HANDOVER_2026-06-11.md）
+スライド1枚 = `{tplId, theme, data}` ＋任意で `bg`(背景上書き)/`over`(フォント色上書き)/`pos`(移動)/`el`(要素別スタイル)/`free`(自由レイヤー)。
+ロゴ/ブランド色はデッキ横断で localStorage（`buzzlogo`/`buzzbrand`）。**全機能テンプレ無改修**で `paint()`=`slideHtml→applyBg→applyEl→applyOverlay` の後処理として乗る。
+- **編集モード**（画像上の大トグル `#movebtn`/`toggleMove`）：ブロック/自由要素をドラッグ移動（スナップ＋ガイド線）・右上✕で削除（Deleteキー可）・右下⤡でサイズ変更。矢印キー微調整。
+- **背景**：標準/塗り/グラデ/画像（cover・contain＋9分割位置＋白黒オーバーレイ濃さ）。「全スライドへ」一括可。
+- **フォント/色**：見出し/本文フォント＋文字色/アクセント/サブ色を個別上書き。ブランドカラー保存・一括適用。
+- **自由レイヤー**：＋文字/画像/図形/アイコン（絵文字はテキスト直入力）。**ロゴ/透かし**は全スライド共通。
+- **Undo/Redo**（Ctrl+Z/Y・「戻す」「やり直し」）／**リセット**（このスライドを初期化）。
+- **画像保存**（旧PDFを置換）：1枚保存/全部保存/選んで保存。**html2canvas で 1080×1350×2倍**、複数枚は**JSZipでZIP**。PDFは小ボタンで残置。
+- 内部実装の鉄則（重要）：移動/拡大は **`transform`** で適用（html2canvasが個別`translate`/`scale`を解釈しないため）。ブラウザ書き出しは **html2canvas**（html-to-imageは真っ黒で不可）。`enableDrag`は`.freeel/.logoel`スキップ。書き出し/ZIP/ブランド色はCDN動的import＝ネット必須。
+- 未実装（保留）：**#12 テキスト一括置換** のみ。
 
 ## 何ができるか（1ソース → 2出力）
 - **核**＝`build_templates.mjs`：全テンプレ（純関数 `render(data,theme)=>HTML文字列`）を定義
