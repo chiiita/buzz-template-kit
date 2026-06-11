@@ -757,6 +757,27 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +'<div style="position:absolute;left:34px;bottom:40px;display:flex;background:#1a1a1a;color:#fff;font-size:24px;font-weight:700;padding:6px 14px;">'+d.leftSub+'</div>'
         +'<div style="position:absolute;right:34px;top:40px;display:flex;background:#1a1a1a;color:#fff;font-size:24px;font-weight:700;padding:6px 14px;">'+d.rightSub+'</div>'
       +'</div>';}},
+{id:"yt_howto",name:"Y23 教育HowTo（電球＋人物右）",cat:"サムネ",fmt:"youtube",fields:[{"key":"top","label":"上 緑帯テキスト","def":"超ラクに作れる！"},{"key":"small","label":"小ラベル","def":"YouTube"},{"key":"big","label":"特大（紺・白フチ・改行可）","def":"サムネイル"},{"key":"foot","label":"下段","def":"簡単テンプレート"},{"key":"person","label":"人物 右(任意)","type":"file","def":""}],render:(d,t)=>{const NV='#16335c',GR='#3bb3a0';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:130px 70px 50px;font-family:'+t.head+';color:'+NV+';background:linear-gradient(180deg,#dcf1ed,#bbe5df);">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:400px;height:auto;"/>':'')
+        +'<div style="position:absolute;top:0;left:0;width:100%;display:flex;align-items:center;justify-content:center;background:'+GR+';padding:12px 0;"><div style="display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:#fff;margin-right:16px;">'+icon('lightbulb','#F2B900',38,2)+'</div><div style="display:flex;font-size:48px;font-weight:900;color:#1a1a1a;">'+d.top+'</div></div>'
+        +'<div style="position:relative;display:flex;font-size:40px;font-weight:700;letter-spacing:10px;color:#5a6b7a;margin-bottom:6px;">'+d.small+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:150px;font-weight:900;line-height:1.0;color:'+NV+';text-shadow:'+outline('#ffffff')+';">'+nl(d.big)+'</div>'
+        +'<div style="position:relative;display:flex;margin-top:14px;background:'+NV+';color:#fff;font-size:48px;font-weight:900;padding:8px 28px;border-radius:10px;">'+d.foot+'</div>'
+      +'</div>';}},
+{id:"yt_money_buzz",name:"Y24 王道バズ・数字（金キラ）",cat:"サムネ",fmt:"youtube",fields:[{"key":"top","label":"上 黒帯テキスト","def":"初心者が確実に"},{"key":"line2","label":"赤帯 白文字","def":"WEBデザインで"},{"key":"unitL","label":"数字 前","def":"月"},{"key":"num","label":"特大数字","def":"5"},{"key":"unitR","label":"数字 後","def":"万"},{"key":"verb","label":"動詞（紺）","def":"稼ぐ"},{"key":"foot","label":"小（方法）","def":"方法"},{"key":"person","label":"人物 右(任意)","type":"file","def":""}],render:(d,t)=>{const RD='#E0352B',NV='#16335c';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:24px 70px 26px;font-family:'+t.head+';background:radial-gradient(circle at 50% 44%, #ffe98a, #f3c01e);">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:420px;height:auto;"/>':'')
+        +'<div style="position:absolute;top:26px;left:60px;display:flex;background:#1a1a1a;color:#fff;font-size:40px;font-weight:900;padding:8px 22px;border-radius:10px;">'+d.top+'</div>'
+        +'<div style="position:relative;display:flex;background:'+RD+';color:#fff;font-size:64px;font-weight:900;padding:6px 24px;border-radius:10px;text-shadow:'+outline('#8e1f18')+';margin-bottom:10px;">'+d.line2+'</div>'
+        +'<div style="position:relative;display:flex;align-items:baseline;">'
+          +'<div style="display:flex;font-size:96px;font-weight:900;color:'+RD+';text-shadow:'+outline('#ffffff')+';">'+d.unitL+'</div>'
+          +'<div style="display:flex;font-size:240px;font-weight:900;color:'+RD+';line-height:.9;text-shadow:'+outline('#ffffff')+';">'+d.num+'</div>'
+          +'<div style="display:flex;font-size:110px;font-weight:900;color:'+RD+';text-shadow:'+outline('#ffffff')+';">'+d.unitR+'</div>'
+          +'<div style="display:flex;font-size:150px;font-weight:900;color:'+NV+';text-shadow:'+outline('#ffffff')+';margin-left:8px;">'+d.verb+'</div>'
+          +'<div style="display:flex;font-size:50px;font-weight:900;color:#1a1a1a;margin-left:6px;">'+d.foot+'</div>'
+        +'</div>'
+      +'</div>';}},
 {id:"note_basic",name:"N1 ベーシック",cat:"サムネ",fmt:"note",fields:[{"key":"title","label":"タイトル（改行で折る）","def":"note運用で\n月10万円までの全記録"},{"key":"sub","label":"サブ","def":"ゼロから3ヶ月でやったこと"},{"key":"author","label":"著者","def":"@kuro"}],render:(d,t)=>wrapAt(1920,1006,{bg:t.bg,color:t.ink,font:t.head,align:'stretch',pad:'110px 150px'},`
       <div style="display:flex;flex-direction:column;font-size:132px;font-weight:900;line-height:1.3;">${nl(d.title)}</div>
       <div style="display:flex;width:180px;height:12px;background:${t.accent};margin:36px 0;border-radius:6px;"></div>
