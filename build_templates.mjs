@@ -19,6 +19,10 @@ function icon(name,color,px,sw){const inner=ICONS[name];if(!inner)return '';cons
 // 紙グレイン(ブラウザCSS用)＋手描きマーカー(画像背景用)
 const NOISE_B64=b64('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/></filter><rect width="160" height="160" filter="url(#n)"/></svg>');
 function markerBg(color){return b64('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M8 22 Q 80 10 150 19 T 292 15" stroke="'+color+'" stroke-width="34" fill="none" stroke-linecap="round" opacity="0.9"/></svg>');}
+// おきる風マスコット（白い玉・閉じ目で笑顔）デフォルト＝ユーザーが本物PNGをアップで差し替え可
+const BLOB_URI='data:image/svg+xml;base64,'+b64('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220"><path d="M100 10C45 10 24 92 26 142 28 196 62 210 100 210 138 210 172 196 174 142 176 92 155 10 100 10Z" fill="#fff" stroke="#2b2b2b" stroke-width="6"/><path d="M58 118q14 16 28 0" fill="none" stroke="#2b2b2b" stroke-width="6" stroke-linecap="round"/><path d="M114 118q14 16 28 0" fill="none" stroke="#2b2b2b" stroke-width="6" stroke-linecap="round"/><path d="M84 152q16 14 32 0" fill="none" stroke="#2b2b2b" stroke-width="6" stroke-linecap="round"/></svg>');
+// 赤い手書き風の矢印（証拠スクショを指す）
+const ARROW_URI='data:image/svg+xml;base64,'+b64('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100"><path d="M120 18C70 6 24 24 22 74" fill="none" stroke="#E0352B" stroke-width="12" stroke-linecap="round"/><path d="M22 74l30-10M22 74l8-30" fill="none" stroke="#E0352B" stroke-width="12" stroke-linecap="round"/></svg>');
 // 改行(\n)を入れた位置だけで折る＝勝手な改行は足さない。入れなければ普通に流れる
 function nl(s){return String(s).split('\n').filter(x=>x.length).map(x=>'<div style="display:flex;">'+x+'</div>').join('');}
 // 袋文字(フチ文字)＝多方向textShadowで縁取り＋ドロップシャドウ。美容PR系の金フチ見出し用
@@ -740,20 +744,52 @@ const TEMPLATES = [
       <div style="display:flex;flex-direction:column;margin-top:30px;font-size:38px;color:${t.sub};">${nl(d.sub)}</div>
       <div style="display:flex;margin-top:40px;font-size:46px;font-weight:900;color:${t.accent};">${d.handle}</div>`) },
 
-  // ===== YouTube サムネ（1280×720）※参考画像が来たら本実装。現状は仮 =====
-  { id:'yt_basic', name:'Y1 ベーシック', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'big',label:'特大ワード（改行で折る）',def:'月5万\n稼ぐ方法'},{key:'sub',label:'サブ',def:'初心者でもできた'},{key:'badge',label:'バッジ',def:'保存版'}],
-    render:(d,t)=>wrapAt(1280,720,{bg:t.bg,color:t.ink,font:t.head,align:'stretch',pad:'70px 90px'},`
-      <div style="display:flex;align-self:flex-start;background:${t.accent};color:${t.onAccent};font-size:34px;font-weight:900;padding:12px 26px;border-radius:10px;margin-bottom:28px;">${d.badge}</div>
-      <div style="display:flex;flex-direction:column;font-size:150px;font-weight:900;font-family:${t.display};line-height:1.05;color:${t.ink};text-shadow:8px 8px 0 ${t.accent};">${nl(d.big)}</div>
-      <div style="display:flex;margin-top:26px;font-size:48px;font-weight:700;color:${t.sub};">${d.sub}</div>`) },
-  { id:'yt_photo', name:'Y2 写真＋見出し', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'photo',label:'写真をアップ',type:'file',def:''},{key:'big',label:'見出し（改行で折る）',def:'これ知らないと\n損します'},{key:'tag',label:'右下タグ',def:'徹底解説'}],
-    render:(d,t)=>{const bg=d.photo?`background-image:url(${d.photo});background-size:cover;background-position:center;`:`background-color:${t.panelSoft};`;
-      return `<div style="width:1280px;height:720px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding:64px 80px;font-family:${t.head};${bg}">
-        <div style="display:flex;flex-direction:column;align-self:flex-start;background:rgba(0,0,0,0.6);border-radius:20px;padding:30px 40px;"><div style="display:flex;flex-direction:column;font-size:110px;font-weight:900;color:#fff;line-height:1.15;">${nl(d.big)}</div></div>
-        <div style="display:flex;align-self:flex-start;background:${t.accent};color:${t.onAccent};font-size:36px;font-weight:900;padding:10px 24px;border-radius:8px;margin-top:22px;">${d.tag}</div>
-      </div>`;} },
+  // ===== YouTube サムネ（1280×720）おきる系（生活写真＋クリームパネル＋黄色袋文字＋マスコット） =====
+  // 装飾(マスコット/ロゴ/スクショ/矢印)は多重背景レイヤーで重ねる＝satoriのabsolute制約回避。文字のみ通常フロー
+  { id:'yt_okiru_panel', name:'Y1 パネル＋黄色強調', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'kicker',label:'上の手書き帯',def:'リアルな収益額公開してます'},
+      {key:'pre',label:'見出し上段（【】で赤強調・改行可）',def:'主婦がnote始めたら\n1ヶ月で【〇〇〇万円】'},
+      {key:'big',label:'特大ワード（黄色袋文字・改行可）',def:'稼いで人生変わった話'},
+      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
+      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''},
+      {key:'proof',label:'証拠スクショ 左下(任意)',type:'file',def:''}],
+    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
+      const hot=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="color:#E0352B;font-weight:900;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:70px 90px;font-family:'+t.head+';color:'+t.ink+';'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.12);"></div>':'')
+        +'<div style="position:absolute;top:32px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:'+t.ink+';">＼ '+d.kicker+' ／</div></div>'
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:60px;top:48px;width:150px;"/>':'')
+        +(d.proof?'<img src="'+d.proof+'" style="position:absolute;left:58px;bottom:54px;width:360px;"/>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(247,242,230,.82);border-radius:26px;padding:34px 52px;">'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-size:62px;font-weight:900;line-height:1.25;">'+hot(d.pre)+'</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-family:'+t.display+';font-size:94px;line-height:1.12;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';margin-top:16px;">'+nl(d.big)+'</div>'
+        +'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:24px;bottom:8px;width:210px;"/>'
+      +'</div>';} },
+  { id:'yt_okiru_big', name:'Y2 特大ワード＋証拠', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'kicker',label:'上の手書き帯',def:'Threadsで月収600万 二児のママが教える'},
+      {key:'lead',label:'リード（【】で赤マーカー・改行可）',def:'【最短で】ゼロイチ達成したい！'},
+      {key:'big',label:'特大ワード（黄色袋文字・改行可）',def:'スレッズ始め方'},
+      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
+      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''},
+      {key:'proof',label:'証拠スクショ 左下(任意)',type:'file',def:''},
+      {key:'arrow',label:'赤い矢印',type:'select',options:['出す','消す'],def:'出す'}],
+    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
+      const mk=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="background:#E0352B;color:#fff;font-weight:900;padding:0 14px;border-radius:8px;text-shadow:none;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 80px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.05);"></div>':'')
+        +'<div style="position:absolute;top:24px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:42px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:56px;top:120px;width:120px;"/>':'')
+        +(d.proof?'<img src="'+d.proof+'" style="position:absolute;left:56px;bottom:48px;width:320px;"/>':'')
+        +(d.proof&&d.arrow!=='消す'?'<img src="'+ARROW_URI+'" style="position:absolute;left:392px;bottom:86px;width:120px;"/>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-size:70px;font-weight:900;line-height:1.2;text-shadow:'+outline('#ffffff','rgba(0,0,0,0.1)')+';">'+mk(d.lead)+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-family:'+t.display+';font-size:148px;line-height:1.0;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';margin-top:10px;">'+nl(d.big)+'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:20px;bottom:6px;width:215px;"/>'
+      +'</div>';} },
 
   // ===== note 見出し画像（1280×670）※参考画像が来たら本実装。現状は仮 =====
   { id:'note_basic', name:'N1 ベーシック', cat:'サムネ', fmt:'note',
@@ -913,6 +949,8 @@ const page=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>�
 const KAKU=${JSON.stringify(KAKU)}, DELA=${JSON.stringify(DELA)}, MIN=${JSON.stringify(MIN)}, MARU=${JSON.stringify(MARU)}, HAND=${JSON.stringify(HAND)};
 const THEMES=${JSON.stringify(THEMES)};
 const FORMATS=${JSON.stringify(FORMATS)};
+const BLOB_URI=${JSON.stringify(BLOB_URI)};
+const ARROW_URI=${JSON.stringify(ARROW_URI)};
 const ICONS=${JSON.stringify(ICONS)};
 const shade=${shade.toString()};
 const b64=${b64.toString()};
