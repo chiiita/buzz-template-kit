@@ -96,7 +96,7 @@ const THEMES = {
 const FORMATS = {
   ig:      { name:'Instagram カルーセル', w:1080, h:1350, multi:true,  cats:['表紙','中身','締め'] },
   youtube: { name:'YouTube サムネイル',   w:1280, h:720,  multi:false, cats:['サムネ'] },
-  note:    { name:'note 見出し画像',       w:1280, h:670,  multi:false, cats:['サムネ'] },
+  note:    { name:'note 見出し画像',       w:1920, h:1006, multi:false, cats:['サムネ'] },
 };
 // 可変サイズのセーフゾーン枠。pad未指定はフォーマット汎用、wrap()はIG既定(1080×1350)
 function wrapAt(w, h, o, inner){
@@ -758,18 +758,18 @@ const TEMPLATES = [
   // ===== note 見出し画像（1280×670）※参考画像が来たら本実装。現状は仮 =====
   { id:'note_basic', name:'N1 ベーシック', cat:'サムネ', fmt:'note',
     fields:[{key:'title',label:'タイトル（改行で折る）',def:'note運用で\n月10万円までの全記録'},{key:'sub',label:'サブ',def:'ゼロから3ヶ月でやったこと'},{key:'author',label:'著者',def:'@kuro'}],
-    render:(d,t)=>wrapAt(1280,670,{bg:t.bg,color:t.ink,font:t.head,align:'stretch',pad:'70px 90px'},`
-      <div style="display:flex;flex-direction:column;font-size:88px;font-weight:900;line-height:1.3;">${nl(d.title)}</div>
-      <div style="display:flex;width:120px;height:8px;background:${t.accent};margin:24px 0;border-radius:4px;"></div>
-      <div style="display:flex;font-size:40px;color:${t.sub};">${d.sub}</div>
-      <div style="display:flex;margin-top:20px;font-size:34px;font-weight:700;color:${t.accent};">${d.author}</div>`) },
+    render:(d,t)=>wrapAt(1920,1006,{bg:t.bg,color:t.ink,font:t.head,align:'stretch',pad:'110px 150px'},`
+      <div style="display:flex;flex-direction:column;font-size:132px;font-weight:900;line-height:1.3;">${nl(d.title)}</div>
+      <div style="display:flex;width:180px;height:12px;background:${t.accent};margin:36px 0;border-radius:6px;"></div>
+      <div style="display:flex;font-size:58px;color:${t.sub};">${d.sub}</div>
+      <div style="display:flex;margin-top:28px;font-size:50px;font-weight:700;color:${t.accent};">${d.author}</div>`) },
   { id:'note_quote', name:'N2 余白・上品', cat:'サムネ', fmt:'note',
     fields:[{key:'label',label:'ラベル',def:'ESSAY'},{key:'title',label:'タイトル（改行で折る）',def:'続けられる人の\nたった1つの習慣'},{key:'author',label:'著者',def:'@kuro'}],
-    render:(d,t)=>wrapAt(1280,670,{bg:t.bg,color:t.ink,font:t.head,align:'center',pad:'70px 90px'},`
-      <div style="display:flex;font-family:${t.body};font-size:30px;letter-spacing:6px;color:${t.accent};">${d.label}</div>
-      <div style="display:flex;width:70px;height:2px;background:${t.accent};margin:20px 0 30px;"></div>
-      <div style="display:flex;flex-direction:column;align-items:center;font-size:78px;font-weight:700;line-height:1.45;">${nl(d.title)}</div>
-      <div style="display:flex;font-family:${t.body};font-size:32px;color:${t.sub};margin-top:34px;">${d.author}</div>`) },
+    render:(d,t)=>wrapAt(1920,1006,{bg:t.bg,color:t.ink,font:t.head,align:'center',pad:'110px 150px'},`
+      <div style="display:flex;font-family:${t.body};font-size:44px;letter-spacing:9px;color:${t.accent};">${d.label}</div>
+      <div style="display:flex;width:100px;height:3px;background:${t.accent};margin:30px 0 44px;"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;font-size:116px;font-weight:700;line-height:1.45;">${nl(d.title)}</div>
+      <div style="display:flex;font-family:${t.body};font-size:46px;color:${t.sub};margin-top:48px;">${d.author}</div>`) },
 ];
 
 // ---- ① QA画像（satori）----
