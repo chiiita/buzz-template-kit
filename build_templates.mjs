@@ -939,6 +939,46 @@ const TEMPLATES = [
         +'<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;align-items:center;background:'+NV+';color:#fff;padding:0 40px;height:96px;"><div style="display:flex;align-items:center;background:#E0352B;border-radius:8px;padding:4px 16px;font-size:32px;font-weight:900;margin-right:18px;">LIVE</div><div style="display:flex;font-size:48px;font-weight:900;margin-right:20px;">'+d.date+'</div><div style="display:flex;font-size:42px;font-weight:900;flex:1;">'+d.time+'</div>'+(d.lecturer?'<div style="display:flex;font-size:32px;font-weight:700;">'+d.lecturer+'</div>':'')+'</div>'
       +'</div>';} },
 
+  // Y10 ← #9 清潔ウェビナー告知（水色・青下線・日付・名前帯） pin/107101297384974867
+  { id:'yt_webinar', name:'Y10 ウェビナー告知（清潔）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
+      {key:'kicker',label:'小見出し(任意)',def:'PRODUCT WEBINAR'},
+      {key:'title',label:'見出し（【】青下線・改行可）',def:'成長するプロダクトに\n【共通する条件】とは?'},
+      {key:'date',label:'日付',def:'2050.3.24 wed.'},
+      {key:'time',label:'時間',def:'19:30-21:00'},
+      {key:'online',label:'配信ラベル',def:'ONLINE'},
+      {key:'name',label:'登壇者 帯(任意)',def:'登壇：田中 太郎'},
+      {key:'person',label:'人物 切り抜き 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const NV='#16335c',BL='#2f7fe0';const hot=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="background-image:linear-gradient(transparent 58%, #a9d6ff 58%);">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:80px;font-family:'+t.head+';color:'+NV+';background:linear-gradient(135deg,#ffffff,#e8f1fb);">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:420px;height:auto;"/>':'')
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:80px;top:52px;width:150px;"/>':'')
+        +'<div style="position:relative;display:flex;font-size:32px;font-weight:900;letter-spacing:3px;color:'+BL+';margin-bottom:14px;">'+d.kicker+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:92px;font-weight:900;line-height:1.24;">'+hot(d.title)+'</div>'
+        +'<div style="position:absolute;left:80px;bottom:52px;display:flex;align-items:center;"><div style="display:flex;background:'+NV+';color:#fff;font-size:30px;font-weight:900;padding:8px 18px;border-radius:8px;margin-right:16px;">'+d.online+'</div><div style="display:flex;font-size:44px;font-weight:900;margin-right:18px;">'+d.date+'</div><div style="display:flex;font-size:38px;font-weight:700;">'+d.time+'</div></div>'
+        +(d.name?'<div style="position:absolute;right:0;bottom:0;display:flex;background:'+NV+';color:#fff;font-size:28px;font-weight:700;padding:8px 20px;">'+d.name+'</div>':'')
+      +'</div>';} },
+  // Y11 ← #2 縦長人物セミナー告知（参加無料円・青囲み見出し） pin/298785756552172881
+  { id:'yt_seminar_v', name:'Y11 セミナー告知（人物左）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'person',label:'人物 切り抜き 左(任意)',type:'file',def:''},
+      {key:'kicker',label:'上 黒帯キッカー',def:'起業する前に知っておきたい！'},
+      {key:'free',label:'丸バッジ（改行可）',def:'参加\n無料'},
+      {key:'title',label:'見出し（【】青囲み・改行可）',def:'ビジネス\n【基礎】セミナー'},
+      {key:'date',label:'日付',def:'2050.3.24 wed.'},
+      {key:'online',label:'右下ラベル',def:'オンライン開催'},
+      {key:'lecturer',label:'講師 左下(任意)',def:'セミナー講師 小澤 杏奈'}],
+    render:(d,t)=>{const NV='#16335c',BL='#2f7fe0';const box=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;align-items:center;">'+line.replace(/【([^】]*)】/g,'<span style="display:flex;background:'+BL+';color:#fff;border-radius:12px;padding:0 14px;margin:0 4px;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:130px 80px 120px;font-family:'+t.head+';color:'+NV+';background:linear-gradient(135deg,#eaf3fc,#cfe4f7);">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;left:20px;bottom:0;width:440px;height:auto;"/>':'')
+        +'<div style="position:absolute;top:28px;left:50%;transform:translateX(-50%);display:flex;background:#1a1a1a;color:#fff;font-size:34px;font-weight:900;padding:10px 26px;border-radius:10px;">'+d.kicker+'</div>'
+        +(d.free?'<div style="position:absolute;top:108px;right:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;width:160px;height:160px;border-radius:50%;background:'+BL+';color:#fff;font-size:44px;font-weight:900;line-height:1.05;border:5px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.2);">'+nl(d.free)+'</div>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-end;font-size:100px;font-weight:900;line-height:1.22;">'+box(d.title)+'</div>'
+        +(d.lecturer?'<div style="position:absolute;left:80px;bottom:34px;display:flex;font-size:28px;font-weight:700;">'+d.lecturer+'</div>':'')
+        +'<div style="position:absolute;right:80px;bottom:34px;display:flex;align-items:center;"><div style="display:flex;font-size:42px;font-weight:900;margin-right:16px;">'+d.date+'</div><div style="display:flex;background:'+NV+';color:#fff;font-size:30px;font-weight:900;padding:8px 18px;border-radius:8px;">'+d.online+'</div></div>'
+      +'</div>';} },
+
   // ===== note 見出し画像（1280×670）※参考画像が来たら本実装。現状は仮 =====
   { id:'note_basic', name:'N1 ベーシック', cat:'サムネ', fmt:'note',
     fields:[{key:'title',label:'タイトル（改行で折る）',def:'note運用で\n月10万円までの全記録'},{key:'sub',label:'サブ',def:'ゼロから3ヶ月でやったこと'},{key:'author',label:'著者',def:'@kuro'}],
