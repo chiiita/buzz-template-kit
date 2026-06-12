@@ -944,6 +944,62 @@ const TEMPLATES = [
         +'<div style="position:absolute;right:70px;top:200px;display:flex;">'+tree()+'</div>'
       +'</div>';} },
 
+  // ===== ▼ 学習・副業 系（デスクトップ/サムネ 由来） ▼ =====
+  // 提供12 顔出し＋PC画面＋実績（英語学習インフルエンサー型）
+  { id:'yt_face_pc', name:'顔＋PC画面＋実績', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真(任意)',type:'file',def:''},
+      {key:'big',label:'左 特大（黄色・改行可）',def:'ずっと\nコレしてた'},
+      {key:'pc',label:'中央 PC/参考画面(任意)',type:'file',def:''},
+      {key:'specs',label:'右上 実績（改行）',def:'TOEIC一発満点\nTOEFL110点\n← 純日本人'},
+      {key:'person',label:'人物 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#e7ddd0;');const pc=d.pc?('background:url('+d.pc+') center/cover no-repeat;'):'background:#2a2a2a;';
+      const sp=String(d.specs).split('\n').filter(function(x){return x.length;}).map(function(x){return '<div style="display:flex;">'+x+'</div>';}).join('');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:470px;height:auto;"/>':'')
+        +'<div style="position:absolute;left:60px;bottom:50px;display:flex;width:450px;height:290px;border:9px solid #1a1a1a;border-radius:12px;'+pc+'"></div>'
+        +'<div style="position:absolute;left:40px;top:30px;display:flex;flex-direction:column;font-size:108px;font-weight:900;line-height:1.05;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.big)+'</div>'
+        +'<div style="position:absolute;right:30px;top:24px;display:flex;flex-direction:column;align-items:flex-end;font-size:46px;font-weight:900;line-height:1.2;color:#1a1a1a;text-shadow:'+outline('#ffffff')+';">'+sp+'</div>'
+      +'</div>';} },
+  // 提供07 切り抜き風 賑やか副業（リベ大型・お金イラスト＋白赤フチ＋数字）
+  { id:'yt_libe', name:'切り抜き風 賑やか副業', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'badge',label:'左上バッジ',def:'2026年最新版'},
+      {key:'big',label:'特大（白・赤フチ・改行可）',def:'稼げる副業'},
+      {key:'num',label:'数字',def:'19'},
+      {key:'unit',label:'単位',def:'選'},
+      {key:'charL',label:'キャラ画像 左下(任意)',type:'file',def:''},
+      {key:'charR',label:'キャラ画像 右下(任意)',type:'file',def:''},
+      {key:'brand',label:'右下バッジ',def:'公式切り抜き'}],
+    render:(d,t)=>{
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px;font-family:'+t.head+';background:radial-gradient(circle at 50% 40%, #ffe06a, #f0b21e);">'
+        +(d.charL?'<img src="'+d.charL+'" style="position:absolute;left:10px;bottom:0;width:230px;height:auto;"/>':'')
+        +(d.charR?'<img src="'+d.charR+'" style="position:absolute;right:10px;bottom:0;width:230px;height:auto;"/>':'')
+        +'<div style="position:absolute;top:26px;left:34px;display:flex;background:#2a2a2a;color:#fff;font-size:46px;font-weight:900;padding:8px 22px;border-radius:10px;text-shadow:'+outline('#000000')+';">'+d.badge+'</div>'
+        +'<div style="position:relative;display:flex;font-size:160px;font-weight:900;color:#fff;line-height:1.0;text-shadow:'+outline('#d11a12')+';">'+nl(d.big)+'</div>'
+        +'<div style="position:relative;display:flex;align-items:baseline;margin-top:10px;"><div style="display:flex;font-size:200px;font-weight:900;color:#e0241a;line-height:.9;text-shadow:'+outline('#ffffff')+';">'+d.num+'</div><div style="display:flex;font-size:100px;font-weight:900;color:#e0241a;text-shadow:'+outline('#ffffff')+';">'+d.unit+'</div></div>'
+        +'<div style="position:absolute;right:30px;bottom:24px;display:flex;align-items:center;background:#fff;color:#1a1a1a;font-size:30px;font-weight:900;padding:6px 16px;border-radius:8px;"><div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#2a2a2a;color:#fff;margin-right:8px;">A</div>'+d.brand+'</div>'
+      +'</div>';} },
+  // 提供33 白地解説 赤大文字（黄マーカー帯＋赤特大＋赤下線＋いらすと＋吹き出し）
+  { id:'yt_explain_white', name:'白地解説 赤大文字', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'marker',label:'上 黄マーカー帯',def:'絶対に数弱を克服！'},
+      {key:'big',label:'赤 特大（【】白抜き・改行可）',def:'数学の勉強法!'},
+      {key:'bimg',label:'Before イラスト(任意)',type:'file',def:''},
+      {key:'aimg',label:'After イラスト(任意)',type:'file',def:''},
+      {key:'bubble',label:'吹き出し（【】赤・改行可）',def:'これで\n数学力【覚醒】'},
+      {key:'book',label:'教材画像 右下(任意)',type:'file',def:''}],
+    render:(d,t)=>{const bb=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="color:#e0241a;font-weight:900;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:24px 50px;font-family:'+t.head+';color:#1a1a1a;background:#fafafa;">'
+        +'<div style="position:relative;display:flex;align-self:flex-start;background:#FFE24A;color:#1a1a1a;font-size:52px;font-weight:900;padding:8px 24px;transform:rotate(-2deg);">'+d.marker+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:150px;font-weight:900;line-height:1.0;color:#e0241a;text-shadow:'+outline('#ffffff')+';margin-top:14px;">'+nl(d.big)+'</div>'
+        +'<div style="position:relative;display:flex;width:1000px;height:6px;background:#e0241a;border-radius:3px;margin-top:8px;"></div>'
+        +(d.bimg?'<img src="'+d.bimg+'" style="position:absolute;left:60px;bottom:30px;width:180px;height:auto;"/>':'')
+        +(d.aimg?'<img src="'+d.aimg+'" style="position:absolute;left:280px;bottom:30px;width:180px;height:auto;"/>':'')
+        +(d.book?'<img src="'+d.book+'" style="position:absolute;right:50px;bottom:30px;width:170px;height:auto;"/>':'')
+        +'<div style="position:absolute;left:520px;bottom:70px;display:flex;flex-direction:column;background:#fff;border:5px solid #1a1a1a;border-radius:20px;padding:14px 26px;font-size:48px;font-weight:900;line-height:1.15;">'+bb(d.bubble)+'</div>'
+      +'</div>';} },
+
   // ===== ▼▼▼ 旧50型（アーカイブ・下に表示） ▼▼▼ =====
   // ===== YouTube Pinterest参考由来（出典は design_kb/youtube_templates_roadmap.md） =====
   // Y5 ← #3 ビジネス解説（赤黒・人物右・吹き出し・下帯） pin/26599454046060050
