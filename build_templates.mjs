@@ -1214,6 +1214,150 @@ const TEMPLATES = [
         +'<div style="position:absolute;left:70px;bottom:50px;display:flex;align-items:center;"><div style="display:flex;flex-direction:column;align-items:center;"><img src="'+ROBOT_URI+'" style="width:110px;height:101px;filter:drop-shadow(0 0 10px rgba(207,132,86,.6));"/><div style="display:flex;font-size:26px;font-weight:700;margin-top:2px;">'+d.label+'</div></div><div style="display:flex;font-size:54px;font-weight:900;color:#888;margin:0 20px 30px;">→</div>'+(d.target?'<img src="'+d.target+'" style="width:150px;height:auto;margin-bottom:30px;"/>':'<div style="display:flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:24px;background:#222;color:#1aa0c0;font-size:60px;font-weight:900;margin-bottom:30px;">▣</div>')+'</div>'
       +'</div>';} },
 
+  // 提供01 顔出し＋右多行テロップ＋手書き注釈（英語解説系）
+  { id:'yt_face_annot', name:'顔出し＋右テロップ＋注釈', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'人物写真をアップ',type:'file',def:''},
+      {key:'big',label:'右 多行（【】赤box・《》黄・改行可）',def:'なぜ日本人は《英語》\n【聞き取れない?!】'},
+      {key:'annot',label:'手書き注釈 左下（改行可）',def:'日本で育った\nアメリカ人'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#6a7a5a;');const mk=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="background:#e02418;color:#fff;padding:0 12px;border-radius:6px;text-shadow:none;">$1</span>').replace(/《([^》]*)》/g,'<span style="color:#FFE24A;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:40px 50px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-end;font-size:96px;font-weight:900;line-height:1.12;text-shadow:'+outline('#1f1f1f')+';">'+mk(d.big)+'</div>'
+        +(d.annot?'<div style="position:absolute;left:40px;bottom:40px;display:flex;flex-direction:column;align-items:center;font-family:Yomogi;font-size:34px;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.7);"><img src="'+ARROW_URI+'" style="width:60px;height:43px;transform:rotate(-90deg);filter:brightness(2);margin-bottom:6px;"/>'+String(d.annot).split('\n').filter(function(x){return x.length;}).map(function(x){return '<div style="display:flex;">'+x+'</div>';}).join('')+'</div>':'')
+      +'</div>';} },
+  // 提供03 番組型（上ブランド帯＋2人分割＋下大セリフ）令和の虎系
+  { id:'yt_program_2p', name:'番組型 2人＋下セリフ', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'brand',label:'上 ブランド帯',def:'学生版 令和の虎'},
+      {key:'sub',label:'上帯 右',def:'59人目 FULL'},
+      {key:'i1',label:'左 人物(任意)',type:'file',def:''},
+      {key:'i2',label:'右 人物(任意)',type:'file',def:''},
+      {key:'big',label:'下 大セリフ（改行可）',def:'地獄の一丁目、行くか?'}],
+    render:(d,t)=>{const li=d.i1?('background:url('+d.i1+') center/cover;'):'background:#555;';const ri=d.i2?('background:url('+d.i2+') center/cover;'):'background:#666;';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#fff;">'
+        +'<div style="display:flex;width:640px;height:720px;'+li+'"></div>'
+        +'<div style="display:flex;width:640px;height:720px;'+ri+'"></div>'
+        +'<div style="position:absolute;top:0;left:0;width:100%;display:flex;align-items:center;background:#1e6fd0;padding:10px 30px;"><div style="display:flex;font-size:46px;font-weight:900;font-style:italic;flex:1;text-shadow:'+outline('#0a3a7a')+';">'+d.brand+'</div><div style="display:flex;font-size:40px;font-weight:900;">'+d.sub+'</div></div>'
+        +'<div style="position:absolute;left:0;bottom:30px;width:100%;display:flex;justify-content:center;"><div style="display:flex;flex-direction:column;align-items:center;font-size:96px;font-weight:900;line-height:1.05;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.big)+'</div></div>'
+      +'</div>';} },
+
+  { id:'yt_subtitle_speech', name:'字幕スピーチ型（上帯＋中央字幕＋下キーワード）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'img',label:'背景 人物(任意)',type:'file',def:''},
+      {key:'htop',label:'上帯 左小見出し（改行可）',def:'ハーバード大学\n卒業式 2026'},
+      {key:'big',label:'上帯 大タイトル',def:'爆笑スピーチ'},
+      {key:'sub',label:'中央サブ字幕',def:'ハーバード卒の天才コメディアン'},
+      {key:'sub2',label:'サブ右 小',def:'コナン・オブライエン'},
+      {key:'key',label:'下 大キーワード',def:'肩書きを捨てる勇気'},
+      {key:'badge',label:'右下バッジ',def:'日英字幕'}],
+    render:(d,t)=>{const bg=d.img?('background:url('+d.img+') center/cover;'):'background:linear-gradient(160deg,#3a4a5a,#1a2530);';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#fff;'+bg+'">'
+        +'<div style="position:absolute;top:0;left:0;width:100%;display:flex;align-items:center;background:#0d0d0d;padding:8px 26px;">'
+          +'<div style="display:flex;flex-direction:column;font-size:40px;font-weight:900;line-height:1.08;color:#FFE24A;text-shadow:'+outline('#1a1a1a')+';margin-right:24px;">'+nl(d.htop)+'</div>'
+          +'<div style="display:flex;font-size:92px;font-weight:900;color:#FFE24A;text-shadow:'+outline('#1a1a1a')+';">'+d.big+'</div>'
+        +'</div>'
+        +'<div style="position:absolute;top:150px;left:0;width:100%;display:flex;flex-direction:column;align-items:center;">'
+          +'<div style="display:flex;font-size:58px;font-weight:900;color:#fff;text-shadow:'+outline('#1a1a1a')+';">'+d.sub+'</div>'
+          +'<div style="display:flex;font-size:40px;font-weight:900;color:#fff;text-shadow:'+outline('#1a1a1a')+';margin-top:6px;">'+d.sub2+'</div>'
+        +'</div>'
+        +'<div style="position:absolute;left:0;bottom:34px;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-size:104px;font-weight:900;color:#ff2b2b;text-shadow:'+outline('#fff')+';">'+d.key+'</div></div>'
+        +'<div style="position:absolute;right:26px;bottom:30px;display:flex;background:#FFE24A;color:#111;font-size:38px;font-weight:900;padding:6px 18px;">'+d.badge+'</div>'
+      +'</div>';} },
+
+  { id:'yt_phrase_compare', name:'英文比較型（フレーズ下線強調＋下結論）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'img',label:'背景 写真(任意)',type:'file',def:''},
+      {key:'lines',label:'比較フレーズ（改行可・《》下線強調）',def:'I left 《office》\nI left 《the office》'},
+      {key:'concl',label:'下 結論テロップ',def:'全く違うから注意!'}],
+    render:(d,t)=>{const bg=d.img?('background:url('+d.img+') center/cover;'):'background:linear-gradient(160deg,#6f7d6a,#3c453a);';
+      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;border-bottom:9px solid #ff7ab0;margin:0 6px;">$1</span>');};
+      const lines=String(d.lines).split('\n').map(function(l){return '<div style="display:flex;align-items:flex-end;font-size:74px;font-weight:900;color:#fff;text-shadow:'+outline('#222')+';margin-bottom:14px;">'+mk(l)+'</div>';}).join('');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#fff;'+bg+'">'
+        +'<div style="position:absolute;left:44px;top:80px;display:flex;flex-direction:column;">'+lines+'</div>'
+        +'<div style="position:absolute;left:0;bottom:30px;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-size:96px;font-weight:900;color:#FFE24A;text-shadow:'+outline('#222')+';">'+d.concl+'</div></div>'
+      +'</div>';} },
+
+  { id:'yt_variety_labels', name:'番組型 複数人物＋縦書きラベル＋下大タイトル', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'i1',label:'左 人物(任意)',type:'file',def:''},
+      {key:'i2',label:'中 人物(任意)',type:'file',def:''},
+      {key:'i3',label:'右 人物(任意)',type:'file',def:''},
+      {key:'brand',label:'上 ブランド',def:'wakatte.TV'},
+      {key:'lab1',label:'縦ラベル 左',def:'英語満点'},
+      {key:'lab2',label:'縦ラベル 中',def:'完全無双'},
+      {key:'lab3',label:'縦ラベル 右',def:'過去問の鬼'},
+      {key:'big',label:'下 大タイトル',def:'早慶W合格'}],
+    render:(d,t)=>{const cell=function(im,fb){return '<div style="display:flex;width:427px;height:720px;background:'+(im?('url('+im+') center/cover'):fb)+';"></div>';};
+      const vl=function(s,left,top,bg){return '<div style="position:absolute;top:'+top+'px;left:'+left+'px;display:flex;flex-direction:column;align-items:center;background:'+bg+';padding:10px 8px;font-size:36px;font-weight:900;color:#fff;line-height:1.04;text-shadow:'+outline('#1a1a1a')+';">'+String(s).split('').map(function(c){return '<div style="display:flex;">'+c+'</div>';}).join('')+'</div>';};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#fff;">'
+        +cell(d.i1,'#5a6b7a')+cell(d.i2,'#6a5a4a')+cell(d.i3,'#4a5a6a')
+        +vl(d.lab1,40,26,'#c01818')+vl(d.lab2,556,86,'#c01818')+vl(d.lab3,1180,26,'#2a8a3a')
+        +'<div style="position:absolute;top:18px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-size:40px;font-weight:900;font-style:italic;color:#FFE24A;text-shadow:'+outline('#1a1a1a')+';">'+d.brand+'</div></div>'
+        +'<div style="position:absolute;left:0;bottom:24px;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-size:128px;font-weight:900;color:#FFE24A;text-shadow:'+outline('#1a1a1a')+';">'+d.big+'</div></div>'
+      +'</div>';} },
+
+  { id:'yt_media_interview', name:'メディア対談型（右人物＋左多段見出し＋下肩書き）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'img',label:'右 人物写真(任意)',type:'file',def:''},
+      {key:'small',label:'上 小ラベル',def:'佐藤優が教える'},
+      {key:'l1',label:'見出し1（白）',def:'外国語勉強法の'},
+      {key:'l2',label:'見出し2（黄・特大）',def:'基礎の基礎'},
+      {key:'band',label:'下帯（青地白）',def:'AI時代に求められる語学力'},
+      {key:'brand',label:'右上 ロゴ',def:'COURRiER'},
+      {key:'role',label:'下 肩書き',def:'作家・元外務省主任分析官'},
+      {key:'name',label:'下 名前',def:'佐藤 優'}],
+    render:(d,t)=>{const person=d.img?('<div style="position:absolute;right:0;top:0;width:360px;height:720px;background:url('+d.img+') center/cover;display:flex;"></div>'):'<div style="position:absolute;right:0;top:0;width:360px;height:720px;background:linear-gradient(160deg,#2a4a78,#16335c);display:flex;"></div>';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#fff;background:linear-gradient(150deg,#2a5db5,#11346f);">'
+        +person
+        +'<div style="position:absolute;left:40px;top:78px;width:780px;display:flex;flex-direction:column;">'
+          +'<div style="display:flex;font-size:38px;font-weight:900;font-style:italic;color:#dfe9ff;text-shadow:'+outline('#0c2a5c')+';">'+d.small+'</div>'
+          +'<div style="display:flex;font-size:84px;font-weight:900;color:#fff;line-height:1.06;text-shadow:'+outline('#0c2a5c')+';margin-top:4px;">'+d.l1+'</div>'
+          +'<div style="display:flex;font-size:116px;font-weight:900;color:#FFE24A;line-height:1.02;text-shadow:'+outline('#0c2a5c')+';">'+d.l2+'</div>'
+          +'<div style="display:flex;align-items:center;background:#0e4fc0;padding:8px 18px;margin-top:14px;"><div style="display:flex;font-size:46px;font-weight:900;color:#fff;">'+d.band+'</div></div>'
+        +'</div>'
+        +'<div style="position:absolute;top:24px;right:24px;display:flex;background:#fff;color:#11346f;font-size:30px;font-weight:900;letter-spacing:2px;padding:6px 16px;">'+d.brand+'</div>'
+        +'<div style="position:absolute;left:40px;bottom:26px;display:flex;align-items:center;"><div style="display:flex;font-size:30px;font-weight:900;color:#dfe9ff;margin-right:16px;">'+d.role+'</div><div style="display:flex;font-size:40px;font-weight:900;color:#fff;">'+d.name+'</div></div>'
+      +'</div>';} },
+
+  { id:'yt_pivot', name:'番組メディア型（上白パネル多色＋下帯＋縦ブランド）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'img',label:'背景 写真(任意)',type:'file',def:''},
+      {key:'head',label:'上見出し（改行可・【】橙/《》緑）',def:'どうすれば【日本人】は\n《英語》が話せるのか?'},
+      {key:'label',label:'中央ラベル',def:'カリスマ英語教師 安河内哲也'},
+      {key:'face',label:'ゲスト顔(任意)',type:'file',def:''},
+      {key:'bottom',label:'下帯テロップ',def:'カリスマ英語教師の結論'},
+      {key:'brand',label:'右 縦ブランド',def:'PIVOT TALK'}],
+    render:(d,t)=>{const bg=d.img?('background:url('+d.img+') center/cover;'):'background:linear-gradient(160deg,#2b3a4a,#10202c);';
+      const mk=function(s){return String(s).replace(/【([^】]*)】/g,'<span style="display:flex;color:#ff5a1f;">$1</span>').replace(/《([^》]*)》/g,'<span style="display:flex;color:#1aa33a;">$1</span>');};
+      const headHtml=String(d.head).split('\n').map(function(l){return '<div style="display:flex;align-items:center;">'+mk(l)+'</div>';}).join('');
+      const face=d.face?('<div style="position:absolute;right:24px;top:300px;width:170px;height:200px;background:url('+d.face+') center/cover;display:flex;border:4px solid #fff;"></div>'):'';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#fff;'+bg+'">'
+        +'<div style="position:absolute;top:0;left:0;width:100%;display:flex;flex-direction:column;background:rgba(255,255,255,0.96);color:#141414;padding:22px 34px;font-size:66px;font-weight:900;line-height:1.1;">'+headHtml+'</div>'
+        +'<div style="position:absolute;left:34px;top:300px;display:flex;background:rgba(0,0,0,0.55);color:#fff;font-size:30px;font-weight:900;padding:6px 16px;">'+d.label+'</div>'
+        +face
+        +'<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;align-items:center;background:#1aa33a;padding:14px 34px;"><div style="display:flex;font-size:64px;font-weight:900;color:#fff;text-shadow:'+outline('#0c5e22')+';">'+d.bottom+'</div></div>'
+        +'<div style="position:absolute;right:0;top:230px;display:flex;background:#111;color:#fff;font-size:26px;font-weight:900;letter-spacing:3px;padding:6px 12px;transform:rotate(90deg);transform-origin:right top;">'+d.brand+'</div>'
+      +'</div>';} },
+
+  { id:'yt_news_tv', name:'報道・ニュース型（局ロゴ＋上テロ＋下帯）', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'img',label:'背景 写真(任意)',type:'file',def:''},
+      {key:'badge',label:'局ロゴ 数字',def:'6'},
+      {key:'badge2',label:'局ロゴ 英字',def:'ABC'},
+      {key:'top',label:'上テロップ',def:'大人の“自習室”'},
+      {key:'bottom',label:'下帯テロップ',def:'勉強する理由は—'}],
+    render:(d,t)=>{const bg=d.img?('background:url('+d.img+') center/cover;'):'background:linear-gradient(160deg,#b07a45,#6b4a28);';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#fff;'+bg+'">'
+        +'<div style="position:absolute;top:0;left:0;width:100%;height:54px;display:flex;background:#000;"></div>'
+        +'<div style="position:absolute;bottom:0;left:0;width:100%;height:42px;display:flex;background:#000;"></div>'
+        +'<div style="position:absolute;top:64px;left:24px;display:flex;align-items:center;">'
+          +'<div style="display:flex;align-items:center;justify-content:center;width:50px;height:50px;background:#e8740c;font-size:34px;font-weight:900;">'+d.badge+'</div>'
+          +'<div style="display:flex;align-items:center;justify-content:center;height:50px;background:#fff;color:#e8740c;font-size:24px;font-weight:900;padding:0 8px;">'+d.badge2+'</div>'
+        +'</div>'
+        +'<div style="position:absolute;top:64px;right:30px;display:flex;font-size:74px;font-weight:900;color:#fff;text-shadow:'+outline('#1763c4')+';">'+d.top+'</div>'
+        +'<div style="position:absolute;left:0;bottom:42px;width:100%;display:flex;align-items:center;background:#1763c4;padding:12px 36px;"><div style="display:flex;font-size:60px;font-weight:900;color:#fff;text-shadow:'+outline('#0c3c80')+';">'+d.bottom+'</div></div>'
+      +'</div>';} },
+
   // ===== ▼▼▼ 旧50型（アーカイブ・下に表示） ▼▼▼ =====
   // ===== YouTube Pinterest参考由来（出典は design_kb/youtube_templates_roadmap.md） =====
   // Y5 ← #3 ビジネス解説（赤黒・人物右・吹き出し・下帯） pin/26599454046060050

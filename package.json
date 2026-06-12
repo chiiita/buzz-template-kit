@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node build_templates.mjs",
     "deck": "node build_templates.mjs --deck",
-    "collect": "node pinterest_collect.mjs"
+    "collect": "node pinterest_collect.mjs",
+    "deploy": "bash deploy.sh"
   },
   "dependencies": {
     "satori": "^0.26.0",

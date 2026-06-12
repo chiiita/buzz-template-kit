@@ -10,8 +10,12 @@
 ## 🌐 公開状況（2026-06-10〜）
 - **公開URL（誰でも利用可）**：https://buzz-template-kit.vercel.app
 - **GitHub**：`github.com/chiiita/buzz-template-kit`（commit author＝`chiiita <61923324+chiiita@users.noreply.github.com>`固定）
-- **デプロイ**：Vercel（`vercel.json`で静的配信・**ビルド不要でルート`index.html`を配信**）。**当環境はTLS遮断のためgit pushはユーザー端末で**（数学クエストと同方式）
-- **更新フロー**：型追加→`node build_templates.mjs`で`index.html`再生成→ユーザーが `git add -A && git commit -m "add template" && git push`→**Vercel自動デプロイ**
+- **デプロイ**：Vercel（`vercel.json`で静的配信・**ビルド不要でルート`index.html`を配信**）。**当環境はTLS遮断のためデプロイはユーザー端末で**（数学クエストと同方式）
+- **デプロイコマンド（どのターミナル・どのcwdからでもOK）**：
+  - いちばん簡単 → `bash "/Volumes/CIRAGO/クラウドコード/バズ型テンプレ集/deploy.sh"`
+  - プロジェクト内なら → `npm run deploy`
+  - `deploy.sh`が【ビルド→git add→commit（author/committerをchiiitaに環境変数で強制＝マシンのgit設定に依存しない）→push origin main】を一括実行。引数でコミットメッセージ指定可（例 `npm run deploy "字幕型を追加"`）。push後1〜2分でVercel自動反映
+- **更新フロー**：型追加→（手動なら`node build_templates.mjs`で再生成）→`npm run deploy` か `bash deploy.sh`→**Vercel自動デプロイ**
 - **現在の規模**：73型（表紙21／中身32／締め20）× 28テーマ
 
 ## ブラウザ・エディタ機能（2026-06-11 大改修・詳細は EDITOR_HANDOVER_2026-06-11.md）
@@ -107,4 +111,4 @@ node images_to_pdf.mjs <画像dir> <out.pdf>                  # PNG群→PDF
 3. 参考画像を**目視**→構造分解（レイアウト/配色/階層/装飾）
 4. `build_templates.mjs`の`TEMPLATES`に1要素追加（上記パターン）
 5. `node build_templates.mjs`→`dist/QA/<id>.png`で**目視確認**（崩れ/はみ出し/薬機法語）
-6. ユーザーに提示→OKなら更新コマンド案内：`git add -A && git commit -m "add template" && git push`
+6. ユーザーに提示→OKなら更新コマンド案内：`npm run deploy` または `bash "/Volumes/CIRAGO/クラウドコード/バズ型テンプレ集/deploy.sh"`（ビルド込みで一括）
