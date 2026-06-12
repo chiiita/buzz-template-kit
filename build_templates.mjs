@@ -1362,6 +1362,40 @@ const TEMPLATES = [
         +'<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;align-items:center;background:rgba(255,255,255,.95);padding:14px 40px;"><div style="display:flex;font-size:44px;font-weight:900;color:#2a2a2a;margin-right:10px;">'+d.pre+'</div><div style="display:flex;font-size:96px;font-weight:900;color:'+GN+';line-height:1;text-shadow:'+outline('#ffffff')+';margin-right:24px;">'+d.big+'</div><div style="display:flex;flex:1;font-size:36px;font-weight:900;color:#2a2a2a;">'+d.date+'</div></div>'
       +'</div>';} },
 
+  // Y35 ← ゲーム実況 特大袋文字煽り（背景＋上ラベル＋黒袋文字＋人物＋バッジ） yt_ref7 #7 pin/787567053577849319
+  { id:'yt_game_challenge', name:'Y35 ゲーム実況・特大煽り', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'ゲーム背景(任意)',type:'file',def:''},
+      {key:'label',label:'上 ラベル',def:'優勝をかけた'},
+      {key:'title',label:'特大タイトル（改行可）',def:'プロへの\n挑戦状'},
+      {key:'person',label:'人物 右(任意)',type:'file',def:''},
+      {key:'badge',label:'左下バッジ(任意)',def:'GRAND PRIX'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:linear-gradient(135deg,#2a3a8a,#0e1428);');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:80px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.3);"></div>':'')
+        +(d.person?'<img src="'+d.person+'" style="position:absolute;right:0;bottom:0;width:430px;height:auto;"/>':'')
+        +'<div style="position:absolute;top:30px;left:50%;transform:translateX(-50%);display:flex;background:#FFE24A;color:#1a1a1a;font-size:40px;font-weight:900;padding:8px 26px;border-radius:10px;">'+d.label+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:170px;font-weight:900;line-height:.98;color:#161616;text-shadow:'+outline('#ffffff')+';">'+nl(d.title)+'</div>'
+        +(d.badge?'<div style="position:absolute;left:40px;bottom:40px;display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:50%;background:#e9c64e;border:5px solid #fff;color:#5a4410;font-size:30px;font-weight:900;text-align:center;line-height:1.05;">'+d.badge+'</div>':'')
+      +'</div>';} },
+  // Y36 ← 配信/イベント告知（色背景＋色袋文字2段＋黄サブ＋キャラ右＋日時） yt_ref7 #10 pin/502925483402799967
+  { id:'yt_stream_event', name:'Y36 配信・イベント告知', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景(任意・無は赤)',type:'file',def:''},
+      {key:'year',label:'右上 年',def:'2023'},
+      {key:'title',label:'特大（青袋文字・改行可）',def:'ゆく年\nくる年'},
+      {key:'sub',label:'下段（黄袋文字）',def:'カウントダウン！'},
+      {key:'date',label:'日時',def:'12月31日 23時30分より！'},
+      {key:'char',label:'キャラ/人物 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:radial-gradient(circle at 40% 40%, #e8473a, #a51f16);');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 70px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.char?'<img src="'+d.char+'" style="position:absolute;right:0;bottom:0;width:430px;height:auto;"/>':'')
+        +(d.year?'<div style="position:absolute;top:34px;right:46px;display:flex;background:#FFE24A;color:#a51f16;font-size:54px;font-weight:900;padding:4px 20px;border-radius:10px;text-shadow:none;">'+d.year+'</div>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:150px;font-weight:900;line-height:1.0;color:#2f7fe0;text-shadow:'+outline('#ffffff')+';">'+nl(d.title)+'</div>'
+        +'<div style="position:relative;display:flex;margin-top:12px;font-size:120px;font-weight:900;color:#FFE24A;line-height:1.0;text-shadow:'+outline('#1f1f1f')+';">'+d.sub+'</div>'
+        +'<div style="position:relative;display:flex;margin-top:14px;background:#1a1a1a;color:#fff;font-size:34px;font-weight:900;padding:6px 20px;border-radius:8px;">'+d.date+'</div>'
+      +'</div>';} },
+
   // ===== note 見出し画像（1280×670）※参考画像が来たら本実装。現状は仮 =====
   { id:'note_basic', name:'N1 ベーシック', cat:'サムネ', fmt:'note',
     fields:[{key:'title',label:'タイトル（改行で折る）',def:'note運用で\n月10万円までの全記録'},{key:'sub',label:'サブ',def:'ゼロから3ヶ月でやったこと'},{key:'author',label:'著者',def:'@kuro'}],
