@@ -612,6 +612,58 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:104px;font-weight:900;line-height:1.08;color:#fff;text-shadow:'+outline('#caa12e')+';">'+nl(d.big)+'</div>'
         +'<div style="position:relative;display:flex;margin-top:18px;font-size:42px;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,.7);">'+d.sub2+'</div>'
       +'</div>';}},
+{id:"okiru8",name:"おきるママ⑧ パネル白黄＋2ロゴ",cat:"おきるママ",fmt:"youtube",fields:[{"key":"photo","label":"背景写真をアップ","type":"file","def":""},{"key":"top","label":"上 キッカー（【】赤）","def":"この順番【真似するだけ】"},{"key":"p1","label":"パネル1段目（白）","def":"1日1時間で稼ぐ"},{"key":"p2","label":"パネル2段目（黄色・改行可）","def":"Threads × note 副業"},{"key":"logo1","label":"ロゴ画像 左下1(任意)","type":"file","def":""},{"key":"logo2","label":"ロゴ画像 左下2(任意)","type":"file","def":""},{"key":"mascot","label":"マスコット 右(任意)","type":"file","def":""}],render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');const tp=String(d.top).replace(/【([^】]*)】/g,'<span style="color:#e02418;">$1</span>');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px 60px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.08);"></div>':'')
+        +'<div style="position:absolute;top:30px;left:50%;transform:translateX(-50%);display:flex;font-size:56px;font-weight:900;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+tp+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(247,243,233,.5);border-radius:24px;padding:24px 56px;margin-top:30px;">'
+          +'<div style="display:flex;font-size:92px;font-weight:900;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+d.p1+'</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-size:128px;font-weight:900;color:#FFE24A;line-height:1.0;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.p2)+'</div>'
+        +'</div>'
+        +(d.logo1?'<img src="'+d.logo1+'" style="position:absolute;left:40px;bottom:40px;width:120px;"/>':'')
+        +(d.logo2?'<img src="'+d.logo2+'" style="position:absolute;left:172px;bottom:40px;width:120px;"/>':'')
+        +'<img src="'+mas+'" style="position:absolute;right:30px;top:130px;width:170px;"/>'
+      +'</div>';}},
+{id:"okiru9",name:"おきるママ⑨ 写真直書き＋大ロゴ",cat:"おきるママ",fmt:"youtube",fields:[{"key":"photo","label":"背景写真をアップ","type":"file","def":""},{"key":"top","label":"上 小（白・【】黄・改行可）","def":"2026年\n在宅で【月5万円！】"},{"key":"big","label":"下 特大（黄色袋文字・改行可）","def":"note副業の始め方"},{"key":"logo","label":"大ロゴ画像(任意)","type":"file","def":""},{"key":"mascot","label":"マスコット 右下(任意)","type":"file","def":""}],render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#2a2a2a;');const tp=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="color:#FFE24A;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:40px 60px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.2);"></div>':'')
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;right:50px;top:60px;width:300px;"/>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:72px;font-weight:900;line-height:1.15;text-shadow:'+outline('#1f1f1f')+';">'+tp(d.top)+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:150px;font-weight:900;line-height:1.0;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.big)+'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:20px;bottom:10px;width:175px;"/>'
+      +'</div>';}},
+{id:"okiru10",name:"おきるママ⑩ 全面袋文字3段",cat:"おきるママ",fmt:"youtube",fields:[{"key":"photo","label":"背景写真(任意・薄め)","type":"file","def":""},{"key":"top","label":"左上（黒袋文字）","def":"2026年"},{"key":"kicker","label":"右上 手書き帯","def":"理解するとバズる！"},{"key":"l1","label":"1段目（黒袋文字）","def":"Threads"},{"key":"l2","label":"2段目（黄色袋文字）","def":"アルゴリズム"},{"key":"l3","label":"3段目（黒袋文字）","def":"徹底解説"},{"key":"mascot","label":"丸ロゴ マスコット 左(任意)","type":"file","def":""}],render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#efece7;');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px 50px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.45);"></div>':'')
+        +'<div style="position:absolute;top:24px;left:0;width:100%;display:flex;align-items:center;justify-content:center;"><div style="display:flex;font-size:70px;font-weight:900;color:#1a1a1a;text-shadow:'+outline('#ffffff')+';margin-right:24px;">'+d.top+'</div><div style="display:flex;font-family:Yomogi;font-size:48px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;margin-top:60px;">'
+          +'<div style="display:flex;font-size:130px;font-weight:900;color:#1a1a1a;line-height:1.0;text-shadow:'+outline('#ffffff')+';">'+d.l1+'</div>'
+          +'<div style="display:flex;font-size:130px;font-weight:900;color:#FFE24A;line-height:1.0;text-shadow:'+outline('#1f1f1f')+';">'+d.l2+'</div>'
+          +'<div style="display:flex;font-size:130px;font-weight:900;color:#1a1a1a;line-height:1.0;text-shadow:'+outline('#ffffff')+';">'+d.l3+'</div>'
+        +'</div>'
+        +'<div style="position:absolute;left:34px;bottom:40px;display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:50%;background:#fff;border:3px solid #ddd;"><img src="'+mas+'" style="width:96px;height:88px;"/></div>'
+      +'</div>';}},
+{id:"okiru11",name:"おきるママ⑪ パネル赤黄＋2ロゴ",cat:"おきるママ",fmt:"youtube",fields:[{"key":"photo","label":"背景写真をアップ","type":"file","def":""},{"key":"badge","label":"赤バッジ(任意)","def":"2026最新版！"},{"key":"kicker","label":"パネル上 手書き帯","def":"毎日収入が入ってくる"},{"key":"big","label":"大見出し（【】赤・《》黄・改行可）","def":"月5万の【不労所得】を\n《得る方法》"},{"key":"logo1","label":"ロゴ 左上(任意)","type":"file","def":""},{"key":"logo2","label":"ロゴ 右上(任意)","type":"file","def":""},{"key":"mascot","label":"マスコット 右(任意)","type":"file","def":""}],render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');const mk=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="color:#e02418;">$1</span>').replace(/《([^》]*)》/g,'<span style="color:#FFE24A;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px 60px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.12);"></div>':'')
+        +(d.logo1?'<img src="'+d.logo1+'" style="position:absolute;left:40px;top:34px;width:120px;"/>':'')
+        +(d.logo2?'<img src="'+d.logo2+'" style="position:absolute;right:40px;top:34px;width:120px;"/>':'')
+        +(d.badge?'<div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);display:flex;background:#e02418;color:#fff;font-size:44px;font-weight:900;padding:6px 24px;border-radius:10px;text-shadow:'+outline('#7a120c')+';">'+d.badge+'</div>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(0,0,0,.32);border-radius:24px;padding:26px 56px;margin-top:30px;">'
+          +'<div style="display:flex;font-family:Yomogi;font-size:42px;font-weight:700;color:#fff;margin-bottom:6px;">＼ '+d.kicker+' ／</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-size:118px;font-weight:900;line-height:1.05;text-shadow:'+outline('#1f1f1f')+';">'+mk(d.big)+'</div>'
+        +'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:24px;bottom:10px;width:190px;"/>'
+      +'</div>';}},
+{id:"okiru12",name:"おきるママ⑫ ラジオ/音声",cat:"おきるママ",fmt:"youtube",fields:[{"key":"label","label":"上 番組名（手書き黄）","def":"おきるラジオ #06"},{"key":"title","label":"中央 タイトル（白・改行可）","def":"主婦のスレッズ副業の\n始祖がキターーーー！！"},{"key":"mascotL","label":"左 マスコット(任意)","type":"file","def":""},{"key":"mascotR","label":"右 マスコット(任意)","type":"file","def":""}],render:(d,t)=>{const ml=d.mascotL||BLOB_URI;const mr=d.mascotR||BLOB_URI;
+      const wave=[40,70,30,90,55,100,45,80,35,65,50].map(function(h){return '<div style="display:flex;width:10px;height:'+h+'px;background:#FFE24A;border-radius:5px;margin:0 4px;"></div>';}).join('');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px;font-family:'+t.head+';color:#fff;background:linear-gradient(135deg,#6a6a6a,#4a4a4a);">'
+        +'<div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);display:flex;font-family:Yomogi;font-size:46px;font-weight:700;color:#FFE24A;letter-spacing:3px;">'+d.label+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:78px;font-weight:900;line-height:1.25;text-shadow:0 2px 8px rgba(0,0,0,.5);">'+nl(d.title)+'</div>'
+        +'<div style="position:absolute;left:50%;bottom:60px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;"><div style="display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:#FFE24A;margin-right:14px;">'+icon('message-circle','#4a4a4a',36,2.4)+'</div>'+wave+'</div>'
+        +'<img src="'+ml+'" style="position:absolute;left:40px;bottom:50px;width:150px;"/>'
+        +'<img src="'+mr+'" style="position:absolute;right:40px;bottom:50px;width:150px;"/>'
+      +'</div>';}},
 {id:"yt_cc_pixel",name:"ピクセル特大ロゴ",cat:"サムネ",fmt:"youtube",fields:[{"key":"top","label":"上 白見出し","def":"アプリが量産可能に！"},{"key":"big","label":"特大ピクセル（改行可）","def":"CLAUDE\nCODE"},{"key":"sub","label":"右下 サブ（白）","def":"入門"}],render:(d,t)=>{const OR='#cf8456';
       return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:30px 70px;font-family:'+t.head+';background:#0b0b0d;color:#fff;">'
         +'<div style="position:absolute;top:24px;left:0;width:100%;display:flex;justify-content:center;font-size:84px;font-weight:900;text-shadow:'+outline('#000000')+';">'+d.top+'</div>'
