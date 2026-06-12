@@ -23,6 +23,10 @@ function markerBg(color){return b64('<svg xmlns="http://www.w3.org/2000/svg" vie
 const BLOB_URI='data:image/svg+xml;base64,'+b64('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220"><path d="M100 10C45 10 24 92 26 142 28 196 62 210 100 210 138 210 172 196 174 142 176 92 155 10 100 10Z" fill="#fff" stroke="#2b2b2b" stroke-width="6"/><path d="M58 118q14 16 28 0" fill="none" stroke="#2b2b2b" stroke-width="6" stroke-linecap="round"/><path d="M114 118q14 16 28 0" fill="none" stroke="#2b2b2b" stroke-width="6" stroke-linecap="round"/><path d="M84 152q16 14 32 0" fill="none" stroke="#2b2b2b" stroke-width="6" stroke-linecap="round"/></svg>');
 // 赤い手書き風の矢印（証拠スクショを指す）
 const ARROW_URI='data:image/svg+xml;base64,'+b64('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100"><path d="M120 18C70 6 24 24 22 74" fill="none" stroke="#E0352B" stroke-width="12" stroke-linecap="round"/><path d="M22 74l30-10M22 74l8-30" fill="none" stroke="#E0352B" stroke-width="12" stroke-linecap="round"/></svg>');
+// ピクセルロボ・マスコット（オレンジ・>< 目）通常＋王冠。アップ差し替え可
+const ROBOT_BODY='<rect x="16" y="16" width="88" height="64" rx="14" fill="#c8794e"/><rect x="32" y="80" width="16" height="22" rx="3" fill="#c8794e"/><rect x="72" y="80" width="16" height="22" rx="3" fill="#c8794e"/><path d="M34 42 L50 53 L34 64" fill="none" stroke="#2e2018" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M86 42 L70 53 L86 64" fill="none" stroke="#2e2018" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><rect x="50" y="66" width="20" height="6" rx="3" fill="#2e2018"/>';
+const ROBOT_URI='data:image/svg+xml;base64,'+b64('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110">'+ROBOT_BODY+'</svg>');
+const ROBOT_KING_URI='data:image/svg+xml;base64,'+b64('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -22 120 132"><path d="M38 14 L36 -12 L52 0 L60 -18 L68 0 L84 -12 L82 14 Z" fill="#f2c63c" stroke="#b58a18" stroke-width="2.5"/><circle cx="60" cy="-8" r="3.5" fill="#7a3df0"/>'+ROBOT_BODY+'</svg>');
 // 改行(\n)を入れた位置だけで折る＝勝手な改行は足さない。入れなければ普通に流れる
 function nl(s){return String(s).split('\n').filter(x=>x.length).map(x=>'<div style="display:flex;">'+x+'</div>').join('');}
 // 袋文字(フチ文字)＝多方向textShadowで縁取り＋ドロップシャドウ。美容PR系の金フチ見出し用
@@ -746,6 +750,66 @@ const TEMPLATES = [
 
   // ★★★ NEW（実在サムネ起点の新作）はこの直下〜次の区切りまでに追加 → リスト/ギャラリー上部に表示 ★★★
   // ===== YouTube 新作枠（ここに1枚=1型で忠実に追加。番号は上から自動採番） =====
+  // 共通：黒背景＋白太ゴシック見出し（【】でオレンジ強調）＋ピクセルロボ＋顔アップ。Claude Code系チャンネル
+  // 提供③ ピクセル特大「CLAUDE CODE 入門」
+  { id:'yt_cc_pixel', name:'ピクセル特大ロゴ', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'top',label:'上 白見出し',def:'アプリが量産可能に！'},
+      {key:'big',label:'特大ピクセル（改行可）',def:'CLAUDE\nCODE'},
+      {key:'sub',label:'右下 サブ（白）',def:'入門'}],
+    render:(d,t)=>{const OR='#cf8456';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:30px 70px;font-family:'+t.head+';background:#0b0b0d;color:#fff;">'
+        +'<div style="position:absolute;top:24px;left:0;width:100%;display:flex;justify-content:center;font-size:84px;font-weight:900;text-shadow:'+outline('#000000')+';">'+d.top+'</div>'
+        +'<div style="position:relative;display:flex;align-items:flex-end;margin-top:90px;"><div style="display:flex;flex-direction:column;font-size:175px;font-weight:900;line-height:.96;letter-spacing:6px;color:'+OR+';text-shadow:8px 8px 0 #4a2e1c, '+outline('#2a1a10')+';">'+nl(d.big)+'</div><div style="display:flex;font-size:90px;font-weight:900;color:#fff;margin-left:24px;margin-bottom:14px;text-shadow:'+outline('#000000')+';">'+d.sub+'</div></div>'
+      +'</div>';} },
+  // 提供① 会社経営：組織図（社長ロボ→4部門）＋顔右
+  { id:'yt_cc_org', name:'組織図＋顔', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'title',label:'上 白見出し（【】橙強調）',def:'【Claude Code】で会社経営！'},
+      {key:'boss',label:'トップ 役職',def:'社長'},
+      {key:'c1',label:'部門1',def:'営業'},{key:'c2',label:'部門2',def:'開発'},{key:'c3',label:'部門3',def:'人事'},{key:'c4',label:'部門4',def:'財務'},
+      {key:'face',label:'顔写真 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const OR='#cf8456';const title=String(d.title).replace(/【([^】]*)】/g,'<span style="color:'+OR+';">$1</span>');
+      const child=function(lb){return '<div style="display:flex;flex-direction:column;align-items:center;"><div style="display:flex;width:3px;height:20px;background:'+OR+';"></div><img src="'+ROBOT_URI+'" style="width:80px;height:73px;filter:drop-shadow(0 0 10px rgba(207,132,86,.7));"/><div style="display:flex;font-size:28px;font-weight:900;color:#fff;margin-top:2px;">'+lb+'</div></div>';};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:24px 60px;font-family:'+t.head+';background:#0b0b0d;color:#fff;">'
+        +(d.face?'<img src="'+d.face+'" style="position:absolute;right:0;bottom:0;width:430px;height:auto;"/>':'')
+        +'<div style="position:relative;display:flex;font-size:80px;font-weight:900;text-shadow:'+outline('#000000')+';">'+title+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;margin-top:14px;margin-right:300px;">'
+          +'<div style="display:flex;align-items:flex-end;"><img src="'+ROBOT_KING_URI+'" style="width:110px;height:121px;filter:drop-shadow(0 0 14px rgba(207,132,86,.8));"/><div style="display:flex;font-size:30px;font-weight:900;color:#fff;margin-left:8px;margin-bottom:18px;">'+d.boss+'</div></div>'
+          +'<div style="display:flex;width:3px;height:24px;background:'+OR+';"></div>'
+          +'<div style="display:flex;width:560px;height:3px;background:'+OR+';"></div>'
+          +'<div style="display:flex;justify-content:space-between;width:620px;">'+child(d.c1)+child(d.c2)+child(d.c3)+child(d.c4)+'</div>'
+        +'</div>'
+      +'</div>';} },
+  // 提供② 投資：チャート＋緑損益＋赤矢印＋ロボ＋顔右
+  { id:'yt_cc_chart', name:'チャート＋証拠＋顔', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'title',label:'上 白見出し（【】橙強調）',def:'【Claude Code】に投資させてみた！'},
+      {key:'chart',label:'チャート画像 左(任意)',type:'file',def:''},
+      {key:'profit',label:'損益（緑）',def:'+$53.44'},
+      {key:'arrow',label:'赤い矢印',type:'select',options:['出す','消す'],def:'出す'},
+      {key:'face',label:'顔写真 右(任意)',type:'file',def:''}],
+    render:(d,t)=>{const OR='#cf8456';const title=String(d.title).replace(/【([^】]*)】/g,'<span style="color:'+OR+';">$1</span>');const chart=d.chart?('background:url('+d.chart+') center/cover no-repeat;'):'background:#141414;';
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:24px 60px;font-family:'+t.head+';background:#0b0b0d;color:#fff;">'
+        +(d.face?'<img src="'+d.face+'" style="position:absolute;right:0;bottom:0;width:420px;height:auto;"/>':'')
+        +'<div style="position:relative;display:flex;font-size:74px;font-weight:900;text-shadow:'+outline('#000000')+';">'+title+'</div>'
+        +'<div style="position:absolute;left:60px;top:150px;display:flex;flex-direction:column;width:560px;height:430px;border:2px solid #2a2a2a;border-radius:10px;'+chart+'"><div style="display:flex;align-self:flex-start;margin:14px;background:#0a0a0a;border:2px solid #1d4d2a;border-radius:8px;padding:6px 18px;font-size:54px;font-weight:900;color:#2fe06a;font-family:monospace;">'+d.profit+'</div></div>'
+        +(d.arrow!=='消す'?'<img src="'+ARROW_URI+'" style="position:absolute;left:660px;top:300px;width:130px;transform:scaleX(-1) rotate(8deg);filter:brightness(1.1);"/>':'')
+        +'<img src="'+ROBOT_URI+'" style="position:absolute;left:800px;top:250px;width:130px;height:119px;filter:drop-shadow(0 0 12px rgba(207,132,86,.8));"/>'
+      +'</div>';} },
+  // 提供④ 起業入門：顔中央＋両脇に組織ツリー
+  { id:'yt_cc_face_org', name:'顔中央＋両脇組織', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'title',label:'上 白見出し（【】橙強調）',def:'【Claude Code】起業入門！'},
+      {key:'face',label:'顔写真 中央(任意)',type:'file',def:''}],
+    render:(d,t)=>{const OR='#cf8456';const title=String(d.title).replace(/【([^】]*)】/g,'<span style="color:'+OR+';">$1</span>');
+      const tree=function(){return '<div style="display:flex;flex-direction:column;align-items:center;"><img src="'+ROBOT_KING_URI+'" style="width:96px;height:106px;filter:drop-shadow(0 0 12px rgba(207,132,86,.8));"/><div style="display:flex;width:3px;height:18px;background:'+OR+';"></div><div style="display:flex;width:150px;height:3px;background:'+OR+';"></div><div style="display:flex;justify-content:space-between;width:190px;"><div style="display:flex;flex-direction:column;align-items:center;"><div style="display:flex;width:3px;height:14px;background:'+OR+';"></div><img src="'+ROBOT_URI+'" style="width:66px;height:60px;"/></div><div style="display:flex;flex-direction:column;align-items:center;"><div style="display:flex;width:3px;height:14px;background:'+OR+';"></div><img src="'+ROBOT_URI+'" style="width:66px;height:60px;"/></div></div></div>';};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:24px 60px;font-family:'+t.head+';background:#0b0b0d;color:#fff;">'
+        +(d.face?'<img src="'+d.face+'" style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:380px;height:auto;"/>':'')
+        +'<div style="position:relative;display:flex;font-size:78px;font-weight:900;text-shadow:'+outline('#000000')+';">'+title+'</div>'
+        +'<div style="position:absolute;left:70px;top:200px;display:flex;">'+tree()+'</div>'
+        +'<div style="position:absolute;right:70px;top:200px;display:flex;">'+tree()+'</div>'
+      +'</div>';} },
 
   // ===== ▼▼▼ 旧50型（アーカイブ・下に表示） ▼▼▼ =====
   // ===== YouTube サムネ（1280×720）おきる系：参考1枚＝1型。装飾は絶対配置(satori通過OK) =====
@@ -1690,6 +1754,8 @@ const THEMES=${JSON.stringify(THEMES)};
 const FORMATS=${JSON.stringify(FORMATS)};
 const BLOB_URI=${JSON.stringify(BLOB_URI)};
 const ARROW_URI=${JSON.stringify(ARROW_URI)};
+const ROBOT_URI=${JSON.stringify(ROBOT_URI)};
+const ROBOT_KING_URI=${JSON.stringify(ROBOT_KING_URI)};
 const ICONS=${JSON.stringify(ICONS)};
 const shade=${shade.toString()};
 const b64=${b64.toString()};
