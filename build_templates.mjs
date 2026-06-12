@@ -978,6 +978,41 @@ const TEMPLATES = [
         +'<img src="'+ml+'" style="position:absolute;left:40px;bottom:50px;width:150px;"/>'
         +'<img src="'+mr+'" style="position:absolute;right:40px;bottom:50px;width:150px;"/>'
       +'</div>';} },
+  // ⑬ ロゴ遷移（A→B＋下テキスト）（おきるママ/12）
+  { id:'okiru13', name:'おきるママ⑬ ロゴ遷移', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'logoA',label:'左ロゴ画像(任意)',type:'file',def:''},
+      {key:'tgt1',label:'右ロゴ1(任意)',type:'file',def:''},
+      {key:'tgt2',label:'右ロゴ2(任意)',type:'file',def:''},
+      {key:'line1',label:'下 1行目（白）',def:'今年Threadsで稼ぎたいなら'},
+      {key:'line2',label:'下 2行目（【】黄）',def:'これ【一択】です'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#7a7468;');const l2=String(d.line2).replace(/【([^】]*)】/g,'<span style="color:#FFE24A;">$1</span>');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:50px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.28);"></div>':'')
+        +'<div style="position:relative;display:flex;align-items:center;margin-bottom:30px;">'
+          +(d.logoA?'<img src="'+d.logoA+'" style="width:130px;"/>':'<div style="display:flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:26px;background:#000;color:#fff;font-size:64px;font-weight:900;">@</div>')
+          +'<div style="display:flex;font-size:60px;font-weight:900;color:#fff;margin:0 24px;text-shadow:'+outline('#1f1f1f')+';">→</div>'
+          +'<div style="display:flex;flex-direction:column;">'+(d.tgt1?'<img src="'+d.tgt1+'" style="width:200px;margin-bottom:8px;"/>':'<div style="display:flex;align-items:center;justify-content:center;width:200px;height:70px;background:#fff;color:#222;font-size:36px;font-weight:900;border-radius:8px;margin-bottom:8px;">Tips</div>')+(d.tgt2?'<img src="'+d.tgt2+'" style="width:200px;"/>':'<div style="display:flex;align-items:center;justify-content:center;width:200px;height:70px;background:#fff;color:#e0622a;font-size:36px;font-weight:900;border-radius:8px;">Brain</div>')+'</div>'
+        +'</div>'
+        +'<div style="position:relative;display:flex;font-size:52px;font-weight:900;text-shadow:'+outline('#1f1f1f')+';">'+d.line1+'</div>'
+        +'<div style="position:relative;display:flex;font-size:72px;font-weight:900;text-shadow:'+outline('#1f1f1f')+';">'+l2+'</div>'
+      +'</div>';} },
+  // ⑭ スケジュール（左テキスト＋右1日タイムリスト）（おきるママ/16）
+  { id:'okiru14', name:'おきるママ⑭ 1日スケジュール', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'top',label:'左上 小（白）',def:'ワンオペ・ワーママ'},
+      {key:'big',label:'左 大（【】黄・改行可）',def:'副業で\n【月15万円稼いだ】\n1日のスケジュール'},
+      {key:'items',label:'右 時刻リスト（改行 "5:00 起床"）',def:'5:00 起床\n6:00 朝ご飯\n7:00 登園\n9:00 出社\n17:30 退社\n19:00 お迎え\n19:30 夜ご飯\n20:30 お風呂\n21:30 寝かしつけ\n22:30 副業'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#3a3a3a;');const bg2=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="color:#FFE24A;">$1</span>')+'</div>';}).join('');};
+      const li=String(d.items).split('\n').filter(function(x){return x.length;}).map(function(it){return '<div style="display:flex;font-size:34px;font-weight:700;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6);margin-bottom:4px;">'+it+'</div>';}).join('');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.32);"></div>':'')
+        +'<div style="position:absolute;left:54px;top:40px;display:flex;font-size:42px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.6);">'+d.top+'</div>'
+        +'<div style="position:absolute;left:54px;bottom:60px;display:flex;flex-direction:column;font-size:78px;font-weight:900;line-height:1.2;text-shadow:'+outline('#1f1f1f')+';">'+bg2(d.big)+'</div>'
+        +'<div style="position:absolute;right:60px;top:40px;display:flex;flex-direction:column;">'+li+'</div>'
+      +'</div>';} },
 
   // ===== ▼ Claude Code系 ▼ =====
   // 共通：黒背景＋白太ゴシック見出し（【】でオレンジ強調）＋ピクセルロボ＋顔アップ。Claude Code系チャンネル
