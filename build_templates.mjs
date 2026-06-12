@@ -750,6 +750,139 @@ const TEMPLATES = [
 
   // ★★★ NEW（実在サムネ起点の新作）はこの直下〜次の区切りまでに追加 → リスト/ギャラリー上部に表示 ★★★
   // ===== YouTube 新作枠（ここに1枚=1型で忠実に追加。番号は上から自動採番） =====
+  // ★★★ おきるママ（最上部グループ M）★★★ デスクトップ/サムネ/おきるママ 由来
+  { id:'okiru1', name:'おきるママ① 始め方（特大黄色＋証拠）', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'kicker',label:'上の手書き帯',def:'Threadsで月収600万 二児のママが教える'},
+      {key:'lead',label:'リード行（【】で赤マーカー）',def:'【最短】でゼロイチ達成したい！'},
+      {key:'big',label:'特大ワード（黄色袋文字・改行可）',def:'スレッズ始め方'},
+      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
+      {key:'proof',label:'証拠スクショ 左下(任意)',type:'file',def:''},
+      {key:'arrow',label:'赤い矢印',type:'select',options:['出す','消す'],def:'出す'},
+      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
+    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
+      const mk=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="background:#E0352B;color:#fff;font-weight:900;padding:0 14px;border-radius:8px;text-shadow:none;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 80px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.05);"></div>':'')
+        +'<div style="position:absolute;top:24px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:42px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:56px;top:118px;width:130px;"/>':'')
+        +(d.proof?'<img src="'+d.proof+'" style="position:absolute;left:56px;bottom:46px;width:330px;"/>':'')
+        +(d.proof&&d.arrow!=='消す'?'<img src="'+ARROW_URI+'" style="position:absolute;left:402px;bottom:84px;width:120px;"/>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-size:72px;font-weight:900;line-height:1.2;text-shadow:'+outline('#ffffff','rgba(0,0,0,0.1)')+';margin-left:150px;">'+mk(d.lead)+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-family:'+t.head+';font-weight:900;font-size:150px;line-height:1.0;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';margin-top:10px;">'+nl(d.big)+'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:20px;bottom:6px;width:215px;"/>'
+      +'</div>';} },
+  { id:'okiru2', name:'おきるママ② note主婦（黒文字＋赤囲み）', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'kicker',label:'上の手書き帯',def:'リアルな収益額公開してます'},
+      {key:'body',label:'本文（【】で赤囲み・改行で3行）',def:'主婦がnote始めたら\n1ヶ月で【〇〇〇万円】\n稼いで人生変わった話'},
+      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
+      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
+    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
+      const mk=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="color:#E0352B;border:4px solid #E0352B;border-radius:10px;padding:0 10px;font-weight:900;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:70px 90px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.1);"></div>':'')
+        +'<div style="position:absolute;top:34px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:54px;top:46px;width:160px;"/>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(247,243,233,.86);border-radius:24px;padding:40px 64px;font-size:80px;font-weight:900;line-height:1.4;">'+mk(d.body)+'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:22px;bottom:8px;width:205px;"/>'
+      +'</div>';} },
+  { id:'okiru3', name:'おきるママ③ 完全版バッジ＋白黄2段', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'badge',label:'左上バッジ',def:'完全版'},
+      {key:'kicker',label:'パネル内 手書き帯',def:'初心者でもできる'},
+      {key:'line1',label:'1段目（白袋文字・改行可）',def:'スレッズ副業'},
+      {key:'line2',label:'2段目（黄色袋文字・改行可）',def:'完全解説'},
+      {key:'logo',label:'ロゴ画像 左下(任意)',type:'file',def:''},
+      {key:'proof',label:'証拠スクショ 右上(任意)',type:'file',def:''},
+      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
+    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 90px;font-family:'+t.head+';'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.06);"></div>':'')
+        +(d.badge?'<div style="position:absolute;top:30px;left:36px;display:flex;background:#E0352B;color:#fff;font-size:40px;font-weight:900;padding:12px 24px;border-radius:12px;">'+d.badge+'</div>':'')
+        +(d.proof?'<img src="'+d.proof+'" style="position:absolute;right:40px;top:34px;width:320px;"/>':'')
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:54px;bottom:40px;width:120px;"/>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(244,239,228,.72);border-radius:24px;padding:30px 60px;">'
+          +'<div style="display:flex;font-family:Yomogi;font-size:38px;font-weight:700;color:#1a1a1a;margin-bottom:10px;">＼ '+d.kicker+' ／</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-family:'+t.head+';font-size:108px;font-weight:900;line-height:1.1;color:#ffffff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.line1)+'</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-family:'+t.head+';font-weight:900;font-size:120px;line-height:1.05;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';margin-top:6px;">'+nl(d.line2)+'</div>'
+        +'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:20px;bottom:6px;width:205px;"/>'
+      +'</div>';} },
+  { id:'okiru4', name:'おきるママ④ パネル白＋大黄色＋カード', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'kicker',label:'上の手書き帯',def:'Threadsのみで月8桁達成！'},
+      {key:'line1',label:'1段目（白袋文字・改行可）',def:'Threadsこれを意識したら'},
+      {key:'line2',label:'2段目（大・黄色袋文字・改行可）',def:'バズりました'},
+      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
+      {key:'proof',label:'証拠カード 下(任意)',type:'file',def:''},
+      {key:'arrow',label:'赤い矢印',type:'select',options:['出す','消す'],def:'出す'},
+      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
+    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:54px 80px;font-family:'+t.head+';'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.06);"></div>':'')
+        +'<div style="position:absolute;top:24px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:50px;top:40px;width:118px;"/>':'')
+        +(d.proof?'<img src="'+d.proof+'" style="position:absolute;left:60px;bottom:34px;width:520px;"/>':'')
+        +(d.proof&&d.arrow!=='消す'?'<img src="'+ARROW_URI+'" style="position:absolute;left:600px;bottom:60px;width:110px;transform:scaleX(-1);"/>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(244,239,228,.7);border-radius:24px;padding:26px 56px;margin-bottom:30px;">'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-size:78px;font-weight:900;line-height:1.15;color:#ffffff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.line1)+'</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:center;font-family:'+t.head+';font-weight:900;font-size:150px;line-height:1.0;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';margin-top:6px;">'+nl(d.line2)+'</div>'
+        +'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:18px;bottom:6px;width:200px;"/>'
+      +'</div>';} },
+  // ⑤ 多行強調（写真直書き・【】赤/《》黄・手書き右上）デスクトップ おきるママ/13
+  { id:'okiru5', name:'おきるママ⑤ 多行強調', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'kicker',label:'右上 手書き帯',def:'1年間の収益額も暴露します!!'},
+      {key:'body',label:'本文（改行・【】赤・《》黄）',def:'SNS初心者の主婦が\nスレッズ《1年》ガチったら\n【〇,〇〇〇万円】稼いで\n《脱サラ》してしまった話'},
+      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
+      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
+    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
+      const mk=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="color:#E0352B;font-weight:900;">$1</span>').replace(/《([^》]*)》/g,'<span style="color:#FFE24A;font-weight:900;">$1</span>')+'</div>';}).join('');};
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 80px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.18);"></div>':'')
+        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:40px;top:34px;width:110px;"/>':'<div style="position:absolute;left:40px;top:34px;display:flex;align-items:center;justify-content:center;width:90px;height:90px;border-radius:22px;background:#000;color:#fff;font-size:54px;font-weight:900;">@</div>')
+        +'<div style="position:absolute;top:40px;right:50px;display:flex;font-family:Yomogi;font-size:36px;font-weight:700;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.7);">＼ '+d.kicker+' ／</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;font-size:72px;font-weight:900;line-height:1.3;text-shadow:'+outline('#1f1f1f')+';">'+mk(d.body)+'</div>'
+        +'<img src="'+mas+'" style="position:absolute;right:18px;bottom:6px;width:200px;"/>'
+      +'</div>';} },
+  // ⑥ ご報告トーク（全面写真＋レターボックス＋丸ロゴ＋特大白語）デスクトップ おきるママ/08
+  { id:'okiru6', name:'おきるママ⑥ ご報告トーク', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'name',label:'丸ロゴ 名前',def:'おきるママ'},
+      {key:'word',label:'特大ワード（白・改行可）',def:'ご報告'},
+      {key:'mascot',label:'丸ロゴ マスコット(任意)',type:'file',def:''}],
+    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#3a3a3a;');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:0 0 90px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.12);"></div>':'')
+        +'<div style="position:absolute;top:70px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:50%;background:#fff;"><img src="'+mas+'" style="width:80px;height:73px;"/></div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:130px;font-weight:900;text-shadow:0 3px 16px rgba(0,0,0,.6);">'+nl(d.word)+'</div>'
+      +'</div>';} },
+  // ⑦ イベント告知（写真＋手書き上ラベル＋上下サブ＋大見出し白金）デスクトップ おきるママ/20
+  { id:'okiru7', name:'おきるママ⑦ イベント告知', cat:'おきるママ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'label',label:'上 手書きラベル',def:'脱サラジオ特別企画'},
+      {key:'sub1',label:'上サブ',def:'総額○○万円!?!'},
+      {key:'big',label:'大見出し（白＋金フチ・改行可）',def:'年末大感謝プレゼント'},
+      {key:'sub2',label:'下サブ',def:'今年1年ありがとうございました'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#6a5a4a;');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.28);"></div>':'')
+        +'<div style="position:relative;display:flex;font-family:Yomogi;font-size:38px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.6);margin-bottom:18px;">'+d.label+'</div>'
+        +'<div style="position:relative;display:flex;font-size:64px;font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,.6);margin-bottom:8px;">'+d.sub1+'</div>'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:104px;font-weight:900;line-height:1.08;color:#fff;text-shadow:'+outline('#caa12e')+';">'+nl(d.big)+'</div>'
+        +'<div style="position:relative;display:flex;margin-top:18px;font-size:42px;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,.7);">'+d.sub2+'</div>'
+      +'</div>';} },
+
+  // ===== ▼ Claude Code系 ▼ =====
   // 共通：黒背景＋白太ゴシック見出し（【】でオレンジ強調）＋ピクセルロボ＋顔アップ。Claude Code系チャンネル
   // 提供③ ピクセル特大「CLAUDE CODE 入門」
   { id:'yt_cc_pixel', name:'ピクセル特大ロゴ', cat:'サムネ', fmt:'youtube',
@@ -812,96 +945,6 @@ const TEMPLATES = [
       +'</div>';} },
 
   // ===== ▼▼▼ 旧50型（アーカイブ・下に表示） ▼▼▼ =====
-  // ===== YouTube サムネ（1280×720）おきる系：参考1枚＝1型。装飾は絶対配置(satori通過OK) =====
-  // 参考① スレッズ始め方：ロゴ左上＋赤マーカー語＋特大黄色＋証拠＋矢印
-  { id:'yt_thumb1', name:'Y1 始め方（特大黄色＋証拠）', cat:'アーカイブ', fmt:'youtube',
-    fields:[
-      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
-      {key:'kicker',label:'上の手書き帯',def:'Threadsで月収600万 二児のママが教える'},
-      {key:'lead',label:'リード行（【】で赤マーカー）',def:'【最短】でゼロイチ達成したい！'},
-      {key:'big',label:'特大ワード（黄色袋文字・改行可）',def:'スレッズ始め方'},
-      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
-      {key:'proof',label:'証拠スクショ 左下(任意)',type:'file',def:''},
-      {key:'arrow',label:'赤い矢印',type:'select',options:['出す','消す'],def:'出す'},
-      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      const mk=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="background:#E0352B;color:#fff;font-weight:900;padding:0 14px;border-radius:8px;text-shadow:none;">$1</span>')+'</div>';}).join('');};
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 80px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.05);"></div>':'')
-        +'<div style="position:absolute;top:24px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:42px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
-        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:56px;top:118px;width:130px;"/>':'')
-        +(d.proof?'<img src="'+d.proof+'" style="position:absolute;left:56px;bottom:46px;width:330px;"/>':'')
-        +(d.proof&&d.arrow!=='消す'?'<img src="'+ARROW_URI+'" style="position:absolute;left:402px;bottom:84px;width:120px;"/>':'')
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-size:72px;font-weight:900;line-height:1.2;text-shadow:'+outline('#ffffff','rgba(0,0,0,0.1)')+';margin-left:150px;">'+mk(d.lead)+'</div>'
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;font-family:'+t.head+';font-weight:900;font-size:150px;line-height:1.0;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';margin-top:10px;">'+nl(d.big)+'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:20px;bottom:6px;width:215px;"/>'
-      +'</div>';} },
-  // 参考② note主婦：noteロゴ＋クリームパネルに黒3行＋赤囲み数字（黄色なし）
-  { id:'yt_thumb2', name:'Y2 パネル黒文字＋赤囲み', cat:'アーカイブ', fmt:'youtube',
-    fields:[
-      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
-      {key:'kicker',label:'上の手書き帯',def:'リアルな収益額公開してます'},
-      {key:'body',label:'本文（【】で赤囲み・改行で3行）',def:'主婦がnote始めたら\n1ヶ月で【〇〇〇万円】\n稼いで人生変わった話'},
-      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
-      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      const mk=function(s){return String(s).split('\n').filter(function(x){return x.length;}).map(function(line){return '<div style="display:flex;">'+line.replace(/【([^】]*)】/g,'<span style="color:#E0352B;border:4px solid #E0352B;border-radius:10px;padding:0 10px;font-weight:900;">$1</span>')+'</div>';}).join('');};
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:70px 90px;font-family:'+t.head+';color:#1a1a1a;'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(255,255,255,.1);"></div>':'')
-        +'<div style="position:absolute;top:34px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
-        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:54px;top:46px;width:160px;"/>':'')
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(247,243,233,.86);border-radius:24px;padding:40px 64px;font-size:80px;font-weight:900;line-height:1.4;">'+mk(d.body)+'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:22px;bottom:8px;width:205px;"/>'
-      +'</div>';} },
-  // 参考③ 完全解説：完全版バッジ＋右上スクショ＋クリームパネル(白袋文字＋黄色袋文字)＋ロゴ左下
-  { id:'yt_thumb3', name:'Y3 完全版バッジ＋白黄2段', cat:'アーカイブ', fmt:'youtube',
-    fields:[
-      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
-      {key:'badge',label:'左上バッジ',def:'完全版'},
-      {key:'kicker',label:'パネル内 手書き帯',def:'初心者でもできる'},
-      {key:'line1',label:'1段目（白袋文字・改行可）',def:'スレッズ副業'},
-      {key:'line2',label:'2段目（黄色袋文字・改行可）',def:'完全解説'},
-      {key:'logo',label:'ロゴ画像 左下(任意)',type:'file',def:''},
-      {key:'proof',label:'証拠スクショ 右上(任意)',type:'file',def:''},
-      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 90px;font-family:'+t.head+';'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.06);"></div>':'')
-        +(d.badge?'<div style="position:absolute;top:30px;left:36px;display:flex;background:#E0352B;color:#fff;font-size:40px;font-weight:900;padding:12px 24px;border-radius:12px;">'+d.badge+'</div>':'')
-        +(d.proof?'<img src="'+d.proof+'" style="position:absolute;right:40px;top:34px;width:320px;"/>':'')
-        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:54px;bottom:40px;width:120px;"/>':'')
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(244,239,228,.72);border-radius:24px;padding:30px 60px;">'
-          +'<div style="display:flex;font-family:Yomogi;font-size:38px;font-weight:700;color:#1a1a1a;margin-bottom:10px;">＼ '+d.kicker+' ／</div>'
-          +'<div style="display:flex;flex-direction:column;align-items:center;font-family:'+t.head+';font-size:108px;font-weight:900;line-height:1.1;color:#ffffff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.line1)+'</div>'
-          +'<div style="display:flex;flex-direction:column;align-items:center;font-family:'+t.head+';font-weight:900;font-size:120px;line-height:1.05;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';margin-top:6px;">'+nl(d.line2)+'</div>'
-        +'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:20px;bottom:6px;width:205px;"/>'
-      +'</div>';} },
-  // 参考④ バズりました：ロゴ左上＋クリームパネル(白袋文字＋大黄色)＋下に3カードスクショ＋矢印
-  { id:'yt_thumb4', name:'Y4 パネル白＋大黄色＋カード', cat:'アーカイブ', fmt:'youtube',
-    fields:[
-      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
-      {key:'kicker',label:'上の手書き帯',def:'Threadsのみで月8桁達成！'},
-      {key:'line1',label:'1段目（白袋文字・改行可）',def:'Threadsこれを意識したら'},
-      {key:'line2',label:'2段目（大・黄色袋文字・改行可）',def:'バズりました'},
-      {key:'logo',label:'ロゴ画像 左上(任意)',type:'file',def:''},
-      {key:'proof',label:'証拠カード 下(任意)',type:'file',def:''},
-      {key:'arrow',label:'赤い矢印',type:'select',options:['出す','消す'],def:'出す'},
-      {key:'mascot',label:'マスコット画像 右下(任意)',type:'file',def:''}],
-    render:(d,t)=>{const mas=d.mascot||BLOB_URI;const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:'+t.panelSoft+';');
-      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:54px 80px;font-family:'+t.head+';'+photo+'">'
-        +(d.photo?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.06);"></div>':'')
-        +'<div style="position:absolute;top:24px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:Yomogi;font-size:40px;font-weight:700;color:#1a1a1a;">＼ '+d.kicker+' ／</div></div>'
-        +(d.logo?'<img src="'+d.logo+'" style="position:absolute;left:50px;top:40px;width:118px;"/>':'')
-        +(d.proof?'<img src="'+d.proof+'" style="position:absolute;left:60px;bottom:34px;width:520px;"/>':'')
-        +(d.proof&&d.arrow!=='消す'?'<img src="'+ARROW_URI+'" style="position:absolute;left:600px;bottom:60px;width:110px;transform:scaleX(-1);"/>':'')
-        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;background:rgba(244,239,228,.7);border-radius:24px;padding:26px 56px;margin-bottom:30px;">'
-          +'<div style="display:flex;flex-direction:column;align-items:center;font-size:78px;font-weight:900;line-height:1.15;color:#ffffff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.line1)+'</div>'
-          +'<div style="display:flex;flex-direction:column;align-items:center;font-family:'+t.head+';font-weight:900;font-size:150px;line-height:1.0;color:#FFE24A;text-shadow:'+outline('#1f1f1f')+';margin-top:6px;">'+nl(d.line2)+'</div>'
-        +'</div>'
-        +'<img src="'+mas+'" style="position:absolute;right:18px;bottom:6px;width:200px;"/>'
-      +'</div>';} },
-
   // ===== YouTube Pinterest参考由来（出典は design_kb/youtube_templates_roadmap.md） =====
   // Y5 ← #3 ビジネス解説（赤黒・人物右・吹き出し・下帯） pin/26599454046060050
   { id:'yt_biz_explain', name:'Y5 ビジネス解説（人物右）', cat:'アーカイブ', fmt:'youtube',
@@ -1767,7 +1810,7 @@ const faceSVG=${faceSVG.toString()};
 const wrapAt=${wrapAt.toString()};
 const wrap=${wrap.toString()};
 const TEMPLATES=[${tplJs}];
-const NUMMAP={};(function(){const cnt={},L={'表紙':'A','中身':'B','締め':'C'};TEMPLATES.forEach(t=>{const f=t.fmt||'ig';const key=f+'/'+t.cat;cnt[key]=(cnt[key]||0)+1;const letter=t.cat==='アーカイブ'?'A':f==='youtube'?'Y':f==='note'?'N':(L[t.cat]||'');const cl=t.name.replace(/^[A-Z]\\d+\\s+/,'').replace(/^[A-Z]\\s+/,'').replace(/（[^）]*）\\s*$/,'');NUMMAP[t.id]=letter+cnt[key]+' '+cl;});})();
+const NUMMAP={};(function(){const cnt={},L={'表紙':'A','中身':'B','締め':'C'};TEMPLATES.forEach(t=>{const f=t.fmt||'ig';const key=f+'/'+t.cat;cnt[key]=(cnt[key]||0)+1;const letter=t.cat==='おきるママ'?'M':t.cat==='アーカイブ'?'A':f==='youtube'?'Y':f==='note'?'N':(L[t.cat]||'');const cl=t.name.replace(/^[A-Z]\\d+\\s+/,'').replace(/^[A-Z]\\s+/,'').replace(/（[^）]*）\\s*$/,'');NUMMAP[t.id]=letter+cnt[key]+' '+cl;});})();
 const getTpl=id=>TEMPLATES.find(t=>t.id===id);
 const defaults=t=>Object.fromEntries(t.fields.map(f=>[f.key,f.def]));
 const INITIAL_DECK=[['cover_target','money'],['content_grid','money'],['content_hero','money'],['content_steps','money'],['content_ranking','money'],['content_qa','money'],['cta_save','money']].map(([id,th])=>({tplId:id,theme:th,data:defaults(getTpl(id))}));
