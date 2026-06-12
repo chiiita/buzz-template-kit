@@ -1000,6 +1000,33 @@ const TEMPLATES = [
         +'<div style="position:absolute;left:520px;bottom:70px;display:flex;flex-direction:column;background:#fff;border:5px solid #1a1a1a;border-radius:20px;padding:14px 26px;font-size:48px;font-weight:900;line-height:1.15;">'+bb(d.bubble)+'</div>'
       +'</div>';} },
 
+  // 提供02 シネマ風シリーズ（写真＋左上シリーズロゴ＋下部大見出し・一部赤）河野玄斗系
+  { id:'yt_cinema', name:'シネマ風シリーズ', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'series1',label:'シリーズ名 上（白）',def:'河野玄斗の'},
+      {key:'series2',label:'シリーズ名 中（赤）',def:'赤門道場'},
+      {key:'season',label:'シーズン（白）',def:'- Season Ⅳ -'},
+      {key:'big',label:'下部 大見出し（【】赤・改行可）',def:'全員で、【東大】へ。'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#42352c;');const bb=String(d.big).replace(/【([^】]*)】/g,'<span style="color:#e02418;">$1</span>');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:0 70px 50px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +'<div style="position:absolute;top:34px;left:46px;display:flex;flex-direction:column;align-items:center;background:rgba(0,0,0,.4);border-radius:12px;padding:14px 24px;"><div style="display:flex;font-size:36px;font-weight:700;">'+d.series1+'</div><div style="display:flex;font-size:66px;font-weight:900;color:#e02418;text-shadow:'+outline('#1f1f1f')+';">'+d.series2+'</div><div style="display:flex;font-size:30px;font-weight:700;letter-spacing:2px;">'+d.season+'</div></div>'
+        +'<div style="position:relative;display:flex;font-size:118px;font-weight:900;line-height:1.05;text-shadow:'+outline('#1f1f1f')+';">'+bb+'</div>'
+      +'</div>';} },
+  // 提供26 顔出し上下テロップ（写真全面＋上下袋文字＋赤boxサブ）超定番
+  { id:'yt_telop', name:'顔出し上下テロップ', cat:'サムネ', fmt:'youtube',
+    fields:[
+      {key:'photo',label:'背景写真をアップ',type:'file',def:''},
+      {key:'top',label:'上 テロップ（白袋文字・改行可）',def:'めっっっっちゃキツいけど'},
+      {key:'sub',label:'赤box サブ',def:'死ぬほど聞こえる'},
+      {key:'bottom',label:'下 テロップ（白袋文字・改行可）',def:'リスニング爆上げ法'}],
+    render:(d,t)=>{const photo=d.photo?('background:url('+d.photo+') center/cover no-repeat;'):('background:#7a8a6a;');
+      return '<div style="width:1280px;height:720px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:24px 50px;font-family:'+t.head+';color:#fff;'+photo+'">'
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:96px;font-weight:900;line-height:1.05;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.top)+'</div>'
+        +(d.sub?'<div style="position:absolute;left:40px;bottom:200px;display:flex;background:#e02418;color:#fff;font-size:44px;font-weight:900;padding:4px 18px;text-shadow:'+outline('#7a120c')+';">'+d.sub+'</div>':'')
+        +'<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:104px;font-weight:900;line-height:1.05;color:#fff;text-shadow:'+outline('#1f1f1f')+';">'+nl(d.bottom)+'</div>'
+      +'</div>';} },
+
   // ===== ▼▼▼ 旧50型（アーカイブ・下に表示） ▼▼▼ =====
   // ===== YouTube Pinterest参考由来（出典は design_kb/youtube_templates_roadmap.md） =====
   // Y5 ← #3 ビジネス解説（赤黒・人物右・吹き出し・下帯） pin/26599454046060050
