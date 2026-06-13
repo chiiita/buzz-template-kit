@@ -2505,9 +2505,10 @@ const TEMPLATES = [
       {key:'img',label:'右 人物(任意)',type:'file',def:''},
       {key:'lines',label:'赤袋文字（改行可）',def:'流されないで！\n最終段階に突入\n●●を備えよ！'}],
     render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:0;top:0;width:620px;height:1006px;background:url(${d.img}) center/cover;display:flex;"></div>`:'';
+      const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;font-family:'Dela Gothic One';${metal('fire')}${xstroke(9,'#240202')}">${l}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(circle at 40% 40%,#1a2150,#06081e);">`
         +right
-        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:150px;font-weight:900;color:#ee1c1c;line-height:1.12;text-shadow:${outline('#111')};">${nl(d.lines)}</div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:142px;line-height:1.16;">${lines}</div>`
       +`</div>`;} },
 
   { id:'note_b64', name:'note 映画ポスター型（上キャッチ＋下特大タイトル）', cat:'サムネ', fmt:'note',
@@ -2572,9 +2573,9 @@ const TEMPLATES = [
       {key:'left',label:'左 小',def:'22歳'},
       {key:'right',label:'右 小',def:'大学生'}],
     render:(d,t)=>`<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:center;align-items:center;background:#fbfbf9;font-family:'Zen Maru Gothic';">`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:200px;font-weight:900;color:#141414;line-height:0.98;">${nl(d.big)}</div>`
-        +`<div style="position:absolute;left:30%;top:50%;transform:translate(-50%,-50%);display:flex;font-size:60px;font-weight:700;color:#222;">${d.left}</div>`
-        +`<div style="position:absolute;right:30%;top:50%;transform:translate(50%,-50%);display:flex;font-size:60px;font-weight:700;color:#222;">${d.right}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:188px;font-weight:900;color:#141414;line-height:1.12;">${nl(d.big)}</div>`
+        +`<div style="position:absolute;left:24%;top:50%;transform:translate(-50%,-50%);display:flex;font-size:60px;font-weight:700;color:#222;">${d.left}</div>`
+        +`<div style="position:absolute;right:24%;top:50%;transform:translate(50%,-50%);display:flex;font-size:60px;font-weight:700;color:#222;">${d.right}</div>`
       +`</div>` },
 
   { id:'note_b71', name:'note 明朝・淡写真＋上ラベル＋中央2行', cat:'サムネ', fmt:'note',
