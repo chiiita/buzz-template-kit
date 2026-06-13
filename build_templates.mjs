@@ -31,6 +31,13 @@ const ROBOT_KING_URI='data:image/svg+xml;base64,'+b64('<svg xmlns="http://www.w3
 function nl(s){return String(s).split('\n').filter(x=>x.length).map(x=>'<div style="display:flex;">'+x+'</div>').join('');}
 // 袋文字(フチ文字)＝多方向textShadowで縁取り＋ドロップシャドウ。美容PR系の金フチ見出し用
 function outline(stroke,drop){const o=5;return [o+'px 0 '+stroke,'-'+o+'px 0 '+stroke,'0 '+o+'px '+stroke,'0 -'+o+'px '+stroke,o+'px '+o+'px '+stroke,'-'+o+'px '+o+'px '+stroke,o+'px -'+o+'px '+stroke,'-'+o+'px -'+o+'px '+stroke,'7px 9px 0 '+(drop||'rgba(0,0,0,0.15)')].join(',');}
+// ===== 質感アップグレード用ヘルパー（ブラウザ本番向け・satori QAでは一部無視）=====
+// 本物の太いフチ文字。-webkit-text-strokeで滑らかな縁取り＋ドロップ影。outline()より格段にキレイ（html-to-image書出で反映）
+function xstroke(px,color,drop){return `-webkit-text-stroke:${px}px ${color};paint-order:stroke fill;text-shadow:0 ${Math.round(px*1.4)}px 0 ${drop||'rgba(0,0,0,0.22)'},0 3px 14px rgba(0,0,0,0.32);`;}
+// 金属/光沢グラデ文字（gold/silver/fire/ice プリセット or 任意3色）。background-clip:textで塗りをグラデに
+function metal(preset){const P={gold:['#fff6cf','#f1c75a','#a9711d'],silver:['#ffffff','#cfd6df','#8a93a0'],fire:['#ffe08a','#ff6a1f','#c01717'],ice:['#eafbff','#7fd0ff','#1f7fd0'],red:['#ff8a7a','#ee2b1c','#9c0f0f']};const c=Array.isArray(preset)?preset:(P[preset]||P.gold);return `background:linear-gradient(180deg,${c[0]},${c[1]} 52%,${c[2]});-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;`;}
+// 発光（グラデ文字にも効くようfilterで）。色＋ぼかしpx
+function glowf(color,blur){return `filter:drop-shadow(0 0 ${blur||18}px ${color})${blur?` drop-shadow(0 0 ${Math.round(blur*2)}px ${color})`:''};`;}
 // 顔の図解（resvgはSVG内textを描画しないので顔は図形のみ・%はHTML側でゾーン色対応リストにする）
 function faceSVG(cf,cc,cj,v){const H='#7C6A56';
 const capD='<path d="M78,295 Q66,88 230,88 Q394,88 382,295 Q380,180 230,180 Q80,180 78,295 Z" fill="'+H+'"/>';
@@ -2077,8 +2084,8 @@ const TEMPLATES = [
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(180deg,#3a2a6a,#c0512a 60%,#e88a3a);';
       const star=(css)=>`<div style="position:absolute;display:flex;width:34px;height:34px;background:#fff;transform:rotate(45deg);box-shadow:0 0 20px #fff;${css}"></div>`;
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;font-size:196px;font-weight:900;color:#141414;text-shadow:${outline('#fff')};">${d.title}</div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:64px;font-weight:900;color:#fff;line-height:1.3;text-shadow:${outline('#222')};margin-top:22px;">${nl(d.sub)}</div>`
+        +`<div style="display:flex;font-family:'Dela Gothic One';font-size:184px;color:#141414;${xstroke(15,'#ffffff')}">${d.title}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:64px;font-weight:900;color:#fff;line-height:1.3;${xstroke(7,'#222')}margin-top:22px;">${nl(d.sub)}</div>`
         +star('top:200px;left:380px;')+star('top:165px;right:440px;')+star('top:255px;right:320px;')
       +`</div>`;} },
 
@@ -2168,10 +2175,10 @@ const TEMPLATES = [
       {key:'img',label:'背景 画像(任意・暗め)',type:'file',def:''},
       {key:'big',label:'右 特大（《》黄・改行可）',def:'《42%》の\n墓標'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#1a1226,#3a2630);';
-      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#FFE24A;">$1</span>');};
+      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;'+metal('gold')+glowf('rgba(255,205,80,0.6)',16)+'">$1</span>');};
       const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;justify-content:flex-end;">${mk(l)}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:flex-end;align-items:center;padding-right:90px;${bg}">`
-        +`<div style="display:flex;flex-direction:column;align-items:flex-end;font-size:240px;font-weight:900;color:#fff;line-height:0.98;text-shadow:${outline('#1a1a1a')};">${lines}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:flex-end;font-family:'Dela Gothic One';font-size:228px;color:#fff;line-height:0.98;${xstroke(13,'#161616')}">${lines}</div>`
       +`</div>`;} },
 
   { id:'note_b13', name:'note ダークゲーム＋特大2行(白/赤)', cat:'サムネ', fmt:'note',
@@ -2311,9 +2318,10 @@ const TEMPLATES = [
       {key:'img',label:'右 画像(任意)',type:'file',def:''},
       {key:'lines',label:'赤袋文字（改行可）',def:'金融崩壊の\n兆候が\n出揃いました！'}],
     render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:0;top:0;width:760px;height:1006px;background:url(${d.img}) center/cover;display:flex;"></div>`:'';
+      const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;font-family:'Dela Gothic One';${metal('fire')}${xstroke(11,'#111')}">${l}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#ffffff;">`
         +right
-        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:158px;font-weight:900;color:#e0140f;line-height:1.08;text-shadow:${outline('#111')};">${nl(d.lines)}</div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:152px;line-height:1.1;">${lines}</div>`
       +`</div>`;} },
 
   { id:'note_b43', name:'note イラスト＋上薄タイトル＋下周年バッジ', cat:'サムネ', fmt:'note',
@@ -3071,7 +3079,7 @@ for(const [k,th] of Object.entries(THEMES)){
 const tplJs = TEMPLATES.map(t=>`{id:${JSON.stringify(t.id)},name:${JSON.stringify(t.name)},cat:${JSON.stringify(t.cat)},fmt:${JSON.stringify(t.fmt||'ig')},fields:${JSON.stringify(t.fields)},render:${t.render.toString()}}`).join(',\n');
 const page=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>バズ型テンプレ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho:wght@600;700;800&family=Yomogi&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Reggae+One&family=Rampart+One&family=RocknRoll+One&family=Mochiy+Pop+One&family=Yusei+Magic&family=Shippori+Mincho:wght@600;700;800&family=Yomogi&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
  :root{--bg:#0d0d11;--surface:#15151b;--elev:#1d1d25;--hover:#2c2c37;--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.14);--txt:#ECECF1;--muted:#9696a6;--faint:#6c6c7a;--ac:#F0463A;--acd:#cd3529;--acsoft:rgba(240,70,58,.16);--ok:#1fb867;--blue:#4f86ff;--r:10px;--rl:14px;--sh:0 12px 40px rgba(0,0,0,.5)}
  *{box-sizing:border-box} body{margin:0;font-family:'Zen Kaku Gothic New',system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:var(--bg);color:var(--txt);display:flex;height:100vh;overflow:hidden;font-size:13px}
@@ -3167,6 +3175,9 @@ const icon=${icon.toString()};
 const markerBg=${markerBg.toString()};
 const nl=${nl.toString()};
 const outline=${outline.toString()};
+const xstroke=${xstroke.toString()};
+const metal=${metal.toString()};
+const glowf=${glowf.toString()};
 const faceSVG=${faceSVG.toString()};
 const wrapAt=${wrapAt.toString()};
 const wrap=${wrap.toString()};
@@ -3224,13 +3235,19 @@ function brandRow(tg,saveHex){let s='<span class="swrow">';brand.forEach(functio
 function brandRow2(prop,saveHex){let s='<span class="swrow">';brand.forEach(function(c){s+='<button class="sw" title="'+c+'" style="background:'+c+'" onclick="setFree(\\''+prop+'\\',\\''+c+'\\')"></button>';});s+='<button class="sw addsw" title="この色を保存" onclick="addBrand(\\''+saveHex+'\\')">+</button></span>';return s;}
 function applyBgAll(){const s=slide();if(!confirm('この背景を全スライドに適用しますか？'))return;const b=s.bg?JSON.parse(JSON.stringify(s.bg)):null;deck.forEach(function(x){if(x!==s)x.bg=b?JSON.parse(JSON.stringify(b)):undefined;});renderCard();renderDeck();save();}
 function applyStyleAll(){const s=slide();if(!confirm('このフォント・文字色を全スライドに適用しますか？'))return;const o=s.over?JSON.parse(JSON.stringify(s.over)):null;deck.forEach(function(x){if(x!==s)x.over=o?JSON.parse(JSON.stringify(o)):undefined;});renderCard();renderDeck();save();}
-async function exportPng(all){let h2c;try{const m=await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm');h2c=m.default||m;}catch(e){alert('画像化ライブラリを読み込めませんでした。ネット接続のある環境でお試しください。');return;}
+// Safari は foreignObject 書出が真っ黒になるので html2canvas にフォールバック。Chrome等は html-to-image で本物のCSS(フチ文字/グラデ文字/発光)をそのまま書出
+function isSafari(){var ua=navigator.userAgent;return /Safari/.test(ua)&&!/Chrome|Chromium|Edg|OPR|Brave/.test(ua);}
+async function snapDataUrl(host){
+ if(!isSafari()){try{const m=await import('https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/+esm');const url=await m.toPng(host,{width:CW,height:CH,pixelRatio:2,cacheBust:true,skipFonts:false});if(url&&url.length>5000)return url;}catch(e){}}
+ const m=await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm');const h2c=m.default||m;const canvas=await h2c(host,{width:CW,height:CH,scale:2,backgroundColor:null,useCORS:true,logging:false});return canvas.toDataURL('image/png');
+}
+async function exportPng(all){
  const idxs=Array.isArray(all)?all:(all?deck.map(function(_,i){return i;}):[cur]);if(!idxs.length){alert('保存する画像が選ばれていません。');return;}
  try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;}catch(e){}
  let zip=null;if(idxs.length>1){try{const z=await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');const JSZip=z.default||z;zip=new JSZip();}catch(e){zip=null;}}
  const host=document.createElement('div');host.style.cssText='position:fixed;left:-99999px;top:0;width:'+CW+'px;height:'+CH+'px;background:#fff';document.body.appendChild(host);
  for(let n=0;n<idxs.length;n++){const i=idxs[n];host.innerHTML='';paint(host,deck[i],false);const name=(fmt==='ig'?'slide_':fmt+'_')+String(i+1).padStart(2,'0')+'.png';
-  try{const canvas=await h2c(host,{width:CW,height:CH,scale:2,backgroundColor:null,useCORS:true,logging:false});const url=canvas.toDataURL('image/png');
+  try{const url=await snapDataUrl(host);
    if(zip){zip.file(name,url.split(',')[1],{base64:true});}else{const a=document.createElement('a');a.href=url;a.download=name;a.click();}
   }catch(e){alert('スライド'+(i+1)+'の画像化に失敗: '+e.message);}
   await new Promise(function(r){setTimeout(r,zip?40:300);});}
