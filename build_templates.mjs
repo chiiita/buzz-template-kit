@@ -2140,7 +2140,7 @@ const TEMPLATES = [
       {key:'title',label:'下 中央 大見出し',def:'学習・自己啓発'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#cfe0f0,#aac4e0);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;padding-bottom:240px;${bg}">`
-        +`<div style="display:flex;font-size:172px;font-weight:900;color:#10243f;text-shadow:0 0 30px rgba(255,255,255,0.92),0 4px 30px rgba(255,255,255,0.92);">${d.title}</div>`
+        +`<div style="display:flex;font-family:'Dela Gothic One';font-size:156px;color:#10243f;${xstroke(11,'#ffffff','rgba(0,0,0,0.22)')}">${d.title}</div>`
       +`</div>`;} },
 
   { id:'note_b05', name:'note 夕焼け＋白黒フチ3行テロップ', cat:'サムネ', fmt:'note',
@@ -2149,7 +2149,7 @@ const TEMPLATES = [
       {key:'lines',label:'テロップ（改行で複数行）',def:'SNS運用\nロードマップ\n合計5つを一気見'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(180deg,#2a3a6a,#c0542a 55%,#f0a050);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:150px;font-weight:900;color:#fff;line-height:1.24;text-shadow:${outline('#1a1a1a')};">${nl(d.lines)}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-family:'Dela Gothic One';font-size:138px;color:#fff;line-height:1.32;${xstroke(13,'#1a1a1a')}">${nl(d.lines)}</div>`
       +`</div>`;} },
 
   { id:'note_b07', name:'note 人物写真＋中央特大フチ＋下帯', cat:'サムネ', fmt:'note',
@@ -2160,8 +2160,8 @@ const TEMPLATES = [
       {key:'band',label:'下帯テキスト',def:'【自己紹介】人事部長になるまでの歩み'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#9fb6cc,#5a7390);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;font-size:64px;font-weight:900;color:#fff;text-shadow:${outline('#2a3a4a')};">${d.small}</div>`
-        +`<div style="display:flex;font-size:230px;font-weight:900;color:#fff;line-height:1;text-shadow:${outline('#243244')};">${d.big}</div>`
+        +`<div style="display:flex;font-size:64px;font-weight:900;color:#fff;${xstroke(7,'#2a3a4a')}">${d.small}</div>`
+        +`<div style="display:flex;font-family:'Dela Gothic One';font-size:206px;color:#fff;line-height:1.05;${xstroke(14,'#243244')}">${d.big}</div>`
         +`<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;justify-content:center;align-items:center;background:#e8497f;padding:24px 0;"><div style="display:flex;font-size:50px;font-weight:900;color:#fff;">${d.band}</div></div>`
       +`</div>`;} },
 
@@ -2209,9 +2209,9 @@ const TEMPLATES = [
       {key:'btn',label:'下 ボタン',def:'ボタン一つで解析完了！'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#dfeae0,#aac6b2);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;font-size:58px;font-weight:900;color:#16335c;text-shadow:${outline('#fff')};">${d.tag}</div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:104px;font-weight:900;color:#16335c;line-height:1.18;text-shadow:${outline('#fff')};margin:14px 0;">${nl(d.big)}</div>`
-        +`<div style="display:flex;font-size:48px;font-weight:900;color:#16335c;text-shadow:${outline('#fff','rgba(0,0,0,0)')};">${d.sub}</div>`
+        +`<div style="display:flex;font-size:58px;font-weight:900;color:#16335c;${xstroke(7,'#ffffff')}">${d.tag}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:104px;font-weight:900;color:#16335c;line-height:1.18;${xstroke(11,'#ffffff')}margin:14px 0;">${nl(d.big)}</div>`
+        +`<div style="display:flex;font-size:48px;font-weight:900;color:#16335c;${xstroke(5,'#fff','rgba(0,0,0,0)')}">${d.sub}</div>`
         +`<div style="display:flex;align-items:center;justify-content:center;background:#1763c4;color:#fff;font-size:50px;font-weight:900;padding:18px 50px;border-radius:50px;margin-top:30px;box-shadow:0 8px 0 #0e3f86;">${d.btn}</div>`
       +`</div>`;} },
 
@@ -2234,7 +2234,7 @@ const TEMPLATES = [
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#e62418;">$1</span>');};
       const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;justify-content:flex-end;">${mk(l)}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:flex-end;align-items:center;padding-right:130px;${bg}">`
-        +`<div style="display:flex;flex-direction:column;align-items:flex-end;font-size:210px;font-weight:900;color:#fff;line-height:1.0;text-shadow:${outline('#161616')};">${lines}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:flex-end;font-family:'Dela Gothic One';font-size:196px;color:#fff;line-height:1.06;${xstroke(13,'#161616')}">${lines}</div>`
       +`</div>`;} },
 
   { id:'note_b15', name:'note 人物写真＋特大名前＋斜めロゴ', cat:'サムネ', fmt:'note',
@@ -2245,8 +2245,8 @@ const TEMPLATES = [
       {key:'name',label:'特大 名前',def:'安藤昌教'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#7a8a6a,#4a5a3a);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:70px;${bg}">`
-        +`<div style="display:flex;font-size:54px;font-weight:900;color:#fff;text-shadow:${outline('#2a2a2a')};margin-bottom:6px;">${d.sub}</div>`
-        +`<div style="display:flex;font-size:200px;font-weight:900;color:#fff;line-height:1;text-shadow:${outline('#222')};">${d.name}</div>`
+        +`<div style="display:flex;font-size:54px;font-weight:900;color:#fff;${xstroke(6,'#2a2a2a')}margin-bottom:6px;">${d.sub}</div>`
+        +`<div style="display:flex;font-family:'Dela Gothic One';font-size:188px;color:#fff;line-height:1.04;${xstroke(14,'#222')}">${d.name}</div>`
         +`<div style="position:absolute;top:60px;right:-30px;display:flex;background:#e21f2b;color:#fff;font-size:48px;font-weight:900;padding:12px 70px;transform:rotate(-8deg);">${d.brand}</div>`
       +`</div>`;} },
 
@@ -2290,8 +2290,8 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-left:110px;${bg}">`
         +`<div style="position:absolute;top:46px;left:110px;display:flex;background:rgba(255,255,255,0.85);color:#3a2466;font-size:36px;font-weight:900;padding:8px 26px;border-radius:8px;">${d.topband}</div>`
         +`<div style="position:absolute;top:40px;right:60px;display:flex;background:#e23a2a;color:#fff;font-size:44px;font-weight:900;padding:10px 32px;border-radius:10px;">${d.ep}</div>`
-        +`<div style="display:flex;flex-direction:column;font-size:128px;font-weight:900;color:#fff;line-height:1.16;text-shadow:${outline('#2a1a4a')};">${lines}</div>`
-        +`<div style="display:flex;align-items:center;justify-content:center;background:#2a7ad8;color:#fff;font-size:50px;font-weight:900;padding:14px 40px;border-radius:14px;margin-top:30px;width:fit-content;text-shadow:${outline('#15467e')};">${d.band}</div>`
+        +`<div style="display:flex;flex-direction:column;font-size:128px;font-weight:900;color:#fff;line-height:1.16;${xstroke(10,'#2a1a4a')}">${lines}</div>`
+        +`<div style="display:flex;align-items:center;justify-content:center;background:#2a7ad8;color:#fff;font-size:50px;font-weight:900;padding:14px 40px;border-radius:14px;margin-top:30px;width:fit-content;${xstroke(5,'#15467e')}">${d.band}</div>`
         +`<div style="display:flex;margin-top:24px;">${tags}</div>`
       +`</div>`;} },
 
@@ -2338,7 +2338,7 @@ const TEMPLATES = [
       const boxes=String(d.boxes).split('/').map(function(x){const p=x.split('|');return `<div style="display:flex;flex-direction:column;align-items:center;background:rgba(15,20,30,0.55);padding:12px 44px;margin:0 16px;border-radius:10px;"><div style="display:flex;font-size:38px;color:#fff;">${p[0]||''}</div><div style="display:flex;font-size:74px;font-weight:900;color:#FFE24A;">${p[1]||''}</div></div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
         +`<div style="position:absolute;top:60px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;background:rgba(0,0,0,0.45);color:#fff;font-size:42px;font-weight:700;padding:10px 30px;">${d.top}</div></div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:148px;font-weight:900;color:#fff;line-height:1.1;text-shadow:${outline('#1a1a1a')};">${lines}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-family:'Dela Gothic One';font-size:138px;color:#fff;line-height:1.18;${xstroke(12,'#1a1a1a')}">${lines}</div>`
         +`<div style="display:flex;margin-top:34px;">${boxes}</div>`
       +`</div>`;} },
 
@@ -2402,8 +2402,8 @@ const TEMPLATES = [
       {key:'c2',label:'右上 大文字',def:'兄'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#e8e8e8,#cfcfcf);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
-        +`<div style="position:absolute;left:34%;top:44%;display:flex;font-size:300px;font-weight:900;color:#1a1a1a;text-shadow:${outline('#fff')};">${d.c1}</div>`
-        +`<div style="position:absolute;right:9%;top:8%;display:flex;font-size:260px;font-weight:900;color:#1a1a1a;text-shadow:${outline('#fff')};">${d.c2}</div>`
+        +`<div style="position:absolute;left:34%;top:44%;display:flex;font-size:300px;font-weight:900;color:#1a1a1a;${xstroke(16,'#fff')}">${d.c1}</div>`
+        +`<div style="position:absolute;right:9%;top:8%;display:flex;font-size:260px;font-weight:900;color:#1a1a1a;${xstroke(15,'#fff')}">${d.c2}</div>`
       +`</div>`;} },
 
   { id:'note_b47', name:'note 白＋上 詩的細字＋中央水彩', cat:'サムネ', fmt:'note',
@@ -2423,7 +2423,7 @@ const TEMPLATES = [
       {key:'cells',label:'4セル（見出し|説明 を / 区切り）',def:'リアルな運営データの完全共有|会員数や売上、効果のある最新施策を数字で公開/生々しい「失敗」のプロセスを講義化|ボツ企画や大失敗した運用プランを共有/単発有料記事の完全無料化|数千円で販売する有料テンプレを会員は無料/高単価ビジネスに特化した戦略|月額制で長期的に稼ぐ仕組みを構築'}],
     render:(d,t)=>{const cells=String(d.cells).split('/').map(function(x){const p=x.split('|');return `<div style="display:flex;flex-direction:column;width:780px;height:228px;background:rgba(255,255,255,0.08);border:2px solid rgba(120,170,230,0.5);border-radius:18px;padding:24px 30px;margin-bottom:22px;"><div style="display:flex;font-size:44px;font-weight:900;color:#7fd0ff;margin-bottom:10px;">${p[0]||''}</div><div style="display:flex;font-size:32px;font-weight:500;color:#dde6f0;line-height:1.35;">${p[1]||''}</div></div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:50px 100px;background:linear-gradient(160deg,#16335c,#0c2038);font-family:${t.head};">`
-        +`<div style="display:flex;font-size:78px;font-weight:900;color:#fff;margin-bottom:34px;text-shadow:${outline('#0a1830')};">${d.title}</div>`
+        +`<div style="display:flex;font-size:78px;font-weight:900;color:#fff;margin-bottom:34px;${xstroke(7,'#0a1830')}">${d.title}</div>`
         +`<div style="display:flex;flex-wrap:wrap;width:1620px;justify-content:space-between;">${cells}</div>`
       +`</div>`;} },
 
@@ -2463,8 +2463,8 @@ const TEMPLATES = [
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#FFE24A;">$1</span>').replace(/〈([^〉]*)〉/g,'<span style="display:flex;color:#5ad0ff;">$1</span>');};
       const ml=String(d.multi).split('\n').map(function(l){return `<div style="display:flex;justify-content:flex-end;">${mk(l)}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
-        +`<div style="position:absolute;top:80px;left:90px;display:flex;font-size:54px;font-weight:900;color:#fff;text-shadow:${outline('#1a1a1a','rgba(0,0,0,0)')};">${d.small}</div>`
-        +`<div style="position:absolute;top:70px;right:90px;display:flex;flex-direction:column;align-items:flex-end;font-size:76px;font-weight:900;color:#fff;line-height:1.25;text-shadow:${outline('#1a1a1a','rgba(0,0,0,0)')};">${ml}</div>`
+        +`<div style="position:absolute;top:80px;left:90px;display:flex;font-size:54px;font-weight:900;color:#fff;${xstroke(6,'#1a1a1a','rgba(0,0,0,0)')}">${d.small}</div>`
+        +`<div style="position:absolute;top:70px;right:90px;display:flex;flex-direction:column;align-items:flex-end;font-size:76px;font-weight:900;color:#fff;line-height:1.25;${xstroke(8,'#1a1a1a','rgba(0,0,0,0)')}">${ml}</div>`
         +`<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;justify-content:center;align-items:center;background:rgba(210,90,140,0.9);padding:18px 0;"><div style="display:flex;font-size:50px;font-weight:900;color:#fff;">${d.band}</div></div>`
       +`</div>`;} },
 
@@ -2484,8 +2484,8 @@ const TEMPLATES = [
       {key:'big',label:'特大（丸ゴシック袋文字）',def:'note'}],
     render:(d,t)=>{const ill=d.img?`<div style="position:absolute;right:70px;top:50%;transform:translateY(-50%);width:780px;height:640px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-left:150px;background:linear-gradient(160deg,#bcc9d8,#a6b6c8);">`
-        +`<div style="display:flex;font-size:110px;font-weight:900;color:#1a1a1a;text-shadow:${outline('#fff')};margin-bottom:4px;">${d.small}</div>`
-        +`<div style="display:flex;font-family:'Zen Maru Gothic';font-size:300px;font-weight:900;color:#1a1a1a;line-height:0.9;text-shadow:${outline('#fff')};">${d.big}</div>`
+        +`<div style="display:flex;font-size:110px;font-weight:900;color:#1a1a1a;${xstroke(9,'#fff')}margin-bottom:4px;">${d.small}</div>`
+        +`<div style="display:flex;font-family:'Zen Maru Gothic';font-size:300px;font-weight:900;color:#1a1a1a;line-height:0.9;${xstroke(13,'#fff')}">${d.big}</div>`
         +ill
       +`</div>`;} },
 
@@ -2495,7 +2495,7 @@ const TEMPLATES = [
       {key:'left',label:'左 縦ラベル',def:'氷砂糖'},
       {key:'right',label:'右 縦ラベル',def:'きび砂糖'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#fbd3df,#f3b9cd);';
-      const vs=(s,css)=>`<div style="position:absolute;display:flex;flex-direction:column;align-items:center;font-size:96px;font-weight:900;color:#3a2218;line-height:1.05;text-shadow:${outline('#fff')};${css}">`+String(s).split('').map(c=>`<div style="display:flex;">${c}</div>`).join('')+`</div>`;
+      const vs=(s,css)=>`<div style="position:absolute;display:flex;flex-direction:column;align-items:center;font-size:96px;font-weight:900;color:#3a2218;line-height:1.05;${xstroke(8,'#fff')}${css}">`+String(s).split('').map(c=>`<div style="display:flex;">${c}</div>`).join('')+`</div>`;
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
         +vs(d.left,'left:70px;top:50%;transform:translateY(-50%);')+vs(d.right,'right:70px;top:50%;transform:translateY(-50%);')
       +`</div>`;} },
@@ -2520,7 +2520,7 @@ const TEMPLATES = [
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#cfe2ee,#9bb6c8);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:80px;${bg}">`
         +`<div style="position:absolute;top:50px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-size:42px;font-weight:700;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${d.catch}</div></div>`
-        +`<div style="display:flex;font-size:130px;font-weight:900;color:#fff;text-shadow:${outline('#1a3a6a')};">${d.title}</div>`
+        +`<div style="display:flex;font-size:130px;font-weight:900;color:#fff;${xstroke(10,'#1a3a6a')}">${d.title}</div>`
         +`<div style="display:flex;font-size:56px;font-weight:900;color:#ffd84a;margin-top:10px;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${d.date}</div>`
       +`</div>`;} },
 
@@ -2531,8 +2531,8 @@ const TEMPLATES = [
       {key:'big',label:'特大（丸ゴシック袋文字）',def:'note'}],
     render:(d,t)=>{const ill=d.img?`<div style="position:absolute;right:70px;top:50%;transform:translateY(-50%);width:780px;height:640px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-left:150px;background:linear-gradient(160deg,#f7e4d6,#f0d4c0);">`
-        +`<div style="display:flex;font-size:110px;font-weight:900;color:#1a1a1a;text-shadow:${outline('#fff')};margin-bottom:4px;">${d.small}</div>`
-        +`<div style="display:flex;font-family:'Zen Maru Gothic';font-size:300px;font-weight:900;color:#1a1a1a;line-height:0.9;text-shadow:${outline('#fff')};">${d.big}</div>`
+        +`<div style="display:flex;font-size:110px;font-weight:900;color:#1a1a1a;${xstroke(9,'#fff')}margin-bottom:4px;">${d.small}</div>`
+        +`<div style="display:flex;font-family:'Zen Maru Gothic';font-size:300px;font-weight:900;color:#1a1a1a;line-height:0.9;${xstroke(13,'#fff')}">${d.big}</div>`
         +ill
       +`</div>`;} },
 
@@ -2595,7 +2595,7 @@ const TEMPLATES = [
       {key:'big',label:'中央 特大',def:'普通がしんどい'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#dfe4e8,#bcc6cc);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;font-size:188px;font-weight:900;color:#fff;text-shadow:${outline('#2a2a2a')};">${d.big}</div>`
+        +`<div style="display:flex;font-family:'Dela Gothic One';font-size:176px;color:#fff;${xstroke(13,'#2a2a2a')}">${d.big}</div>`
       +`</div>`;} },
 
   { id:'note_b74', name:'note キラ背景＋角括弧ラベル＋中央3行（マラソン型）', cat:'サムネ', fmt:'note',
@@ -2632,7 +2632,7 @@ const TEMPLATES = [
       const chips=String(d.chips).split(',').map(function(x){return `<div style="display:flex;align-items:center;justify-content:center;background:rgba(120,60,200,0.45);border:2px solid #b070ff;color:#fff;font-size:28px;font-weight:700;padding:10px 18px;margin:0 8px;border-radius:12px;">${x}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
         +`<div style="display:flex;background:#ffd21e;color:#1a1a1a;font-size:40px;font-weight:900;padding:8px 28px;border-radius:8px;margin-bottom:18px;">${d.top}</div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:118px;font-weight:900;color:#fff;line-height:1.1;text-shadow:${outline('#1a0a3a')};">${lines}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:118px;font-weight:900;color:#fff;line-height:1.1;${xstroke(9,'#1a0a3a')}">${lines}</div>`
         +`<div style="display:flex;font-size:42px;font-weight:900;letter-spacing:8px;color:#ffd21e;margin:18px 0;">${d.menu}</div>`
         +`<div style="display:flex;">${chips}</div>`
       +`</div>`;} },
@@ -2646,9 +2646,9 @@ const TEMPLATES = [
       {key:'brand',label:'右下 バッジ',def:'ポス鳥のNEWS分析'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#2a2018,#0e0c16);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;font-size:90px;font-weight:900;color:#fff;text-shadow:${outline('#1a1a1a')};">${d.l1}</div>`
+        +`<div style="display:flex;font-size:90px;font-weight:900;color:#fff;${xstroke(8,'#1a1a1a')}">${d.l1}</div>`
         +`<div style="display:flex;background:#ffffff;color:#c4161c;font-size:96px;font-weight:900;padding:6px 40px;margin:14px 0;">${d.l2}</div>`
-        +`<div style="display:flex;font-size:66px;font-weight:900;color:#fff;text-shadow:${outline('#1a1a1a')};">${d.l3}</div>`
+        +`<div style="display:flex;font-size:66px;font-weight:900;color:#fff;${xstroke(7,'#1a1a1a')}">${d.l3}</div>`
         +`<div style="position:absolute;right:40px;bottom:34px;display:flex;background:#d11a1a;color:#fff;font-size:40px;font-weight:900;padding:8px 26px;border-radius:8px;">「${d.brand}」</div>`
       +`</div>`;} },
 
@@ -2661,9 +2661,9 @@ const TEMPLATES = [
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(135deg,#3a1a6a,#1a2a6a,#6a1a4a);';
       const mk=function(s,c){return String(s).replace(/《([^》]*)》/g,`<span style="display:flex;color:${c};">$1</span>`);};
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;align-items:center;font-size:96px;font-weight:900;color:#fff;text-shadow:${outline('#1a1a1a')};">${mk(d.top,'#ff3a3a')}</div>`
-        +`<div style="display:flex;align-items:center;font-size:110px;font-weight:900;color:#fff;text-shadow:${outline('#10204a')};margin:6px 0;">${mk(d.mid,'#5ad0ff')}</div>`
-        +`<div style="display:flex;align-items:center;font-size:170px;font-weight:900;color:#fff;text-shadow:${outline('#3a2a00')};">${mk(d.big,'#ffd21e')}</div>`
+        +`<div style="display:flex;align-items:center;font-size:96px;font-weight:900;color:#fff;${xstroke(9,'#1a1a1a')};">${mk(d.top,'#ff3a3a')}</div>`
+        +`<div style="display:flex;align-items:center;font-size:110px;font-weight:900;color:#fff;${xstroke(9,'#10204a')};margin:6px 0;">${mk(d.mid,'#5ad0ff')}</div>`
+        +`<div style="display:flex;align-items:center;font-size:170px;font-weight:900;color:#fff;${xstroke(9,'#3a2a00')};">${mk(d.big,'#ffd21e')}</div>`
       +`</div>`;} },
 
   { id:'note_s13', name:'note 暖色イラスト＋上 赤フチ2行', cat:'サムネ', fmt:'note',
@@ -2674,7 +2674,7 @@ const TEMPLATES = [
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#e0241c;">$1</span>');};
       const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding-top:90px;${bg}">`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:118px;font-weight:900;color:#fff;line-height:1.18;text-shadow:${outline('#b81810')};">${lines}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:118px;font-weight:900;color:#fff;line-height:1.18;${xstroke(9,'#b81810')};">${lines}</div>`
       +`</div>`;} },
 
   { id:'note_s14', name:'note 金炎LP＋特大英字＋下チップ', cat:'サムネ', fmt:'note',
@@ -2688,7 +2688,7 @@ const TEMPLATES = [
       const chips=String(d.chips).split(',').map(function(x){return `<div style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);border:2px solid #ffb02a;color:#ffd24a;font-size:30px;font-weight:900;padding:10px 20px;margin:0 8px;border-radius:10px;">${x}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
         +`<div style="display:flex;font-size:38px;font-weight:700;color:#ffe6b0;margin-bottom:10px;">${d.top}</div>`
-        +`<div style="display:flex;font-size:230px;font-weight:900;color:#ffd24a;line-height:1;text-shadow:${outline('#5a2a00')};">${d.big}</div>`
+        +`<div style="display:flex;font-size:230px;font-weight:900;color:#ffd24a;line-height:1;${xstroke(9,'#5a2a00')};">${d.big}</div>`
         +`<div style="display:flex;font-size:42px;font-weight:900;color:#fff;margin:16px 0;">${d.sub}</div>`
         +`<div style="display:flex;">${chips}</div>`
       +`</div>`;} },
@@ -2718,7 +2718,7 @@ const TEMPLATES = [
         +ill
         +`<div style="display:flex;flex-direction:column;align-items:center;background:#fff;border-radius:34px;padding:44px 90px;">`
           +`<div style="display:flex;background:#ffe24a;color:#2a2a2a;font-size:50px;font-weight:900;padding:8px 44px;border-radius:30px;margin-bottom:26px;">${d.badge}</div>`
-          +`<div style="display:flex;flex-direction:column;align-items:center;font-size:108px;font-weight:900;color:#5a6a78;line-height:1.15;text-shadow:${outline('#dde6ec','rgba(0,0,0,0)')};">${nl(d.big)}</div>`
+          +`<div style="display:flex;flex-direction:column;align-items:center;font-size:108px;font-weight:900;color:#5a6a78;line-height:1.15;${xstroke(9,'#dde6ec','rgba(0,0,0,0)')};">${nl(d.big)}</div>`
           +`<div style="display:flex;align-items:baseline;margin-top:22px;"><div style="display:flex;font-size:100px;font-weight:900;color:#2a3a48;">${d.num}</div><div style="display:flex;font-size:42px;font-weight:900;color:#2a3a48;margin-left:8px;">${d.unit}</div></div>`
         +`</div>`
       +`</div>`;} },
@@ -2734,7 +2734,7 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:120px;background:linear-gradient(150deg,#5a3a8a,#2a1a5a);">`
         +right
         +`<div style="position:relative;display:flex;background:rgba(0,0,0,0.4);color:#fff;font-size:40px;font-weight:900;padding:8px 24px;border-radius:8px;margin-bottom:10px;">${d.top}</div>`
-        +`<div style="position:relative;display:flex;font-size:220px;font-weight:900;color:#fff;line-height:1;text-shadow:${outline('#3a1a6a')};">${d.big}</div>`
+        +`<div style="position:relative;display:flex;font-size:220px;font-weight:900;color:#fff;line-height:1;${xstroke(9,'#3a1a6a')};">${d.big}</div>`
         +`<div style="position:relative;display:flex;font-size:42px;font-weight:900;color:#fff;margin:14px 0;">${d.sub}</div>`
         +`<div style="position:relative;display:flex;background:#e85a9a;color:#fff;font-size:52px;font-weight:900;padding:10px 32px;border-radius:10px;">${d.band}</div>`
       +`</div>`;} },
@@ -2751,8 +2751,8 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:120px;background:linear-gradient(150deg,#dff0f2,#c2e6ea);">`
         +right
         +`<div style="position:relative;display:flex;font-size:40px;font-weight:900;color:#2a4a50;margin-bottom:10px;">${d.top}</div>`
-        +`<div style="position:relative;display:flex;font-size:168px;font-weight:900;color:#15323a;line-height:1;text-shadow:${outline('#fff')};">${d.big}</div>`
-        +`<div style="position:relative;display:flex;background:#e85a9a;color:#fff;font-size:78px;font-weight:900;padding:8px 34px;border-radius:14px;margin:16px 0;text-shadow:${outline('#a83a6a')};">${d.band}</div>`
+        +`<div style="position:relative;display:flex;font-size:168px;font-weight:900;color:#15323a;line-height:1;${xstroke(9,'#fff')};">${d.big}</div>`
+        +`<div style="position:relative;display:flex;background:#e85a9a;color:#fff;font-size:78px;font-weight:900;padding:8px 34px;border-radius:14px;margin:16px 0;${xstroke(9,'#a83a6a')};">${d.band}</div>`
         +`<div style="position:relative;display:flex;font-size:40px;font-weight:900;color:#2a4a50;">${d.sub}</div>`
         +`<div style="position:absolute;right:40px;bottom:34px;display:flex;font-size:36px;font-weight:700;color:#2a4a50;">${d.author}</div>`
       +`</div>`;} },
@@ -2811,7 +2811,7 @@ const TEMPLATES = [
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#ffd24a;">$1</span>');};
       const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:142px;font-weight:900;color:#fff;line-height:1.04;text-shadow:${outline('#3a2600')};">${lines}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:142px;font-weight:900;color:#fff;line-height:1.04;${xstroke(9,'#3a2600')};">${lines}</div>`
         +`<div style="display:flex;background:rgba(0,0,0,0.55);color:#ffe6b0;font-size:38px;font-weight:900;padding:12px 30px;border-radius:10px;margin-top:26px;">${d.sub}</div>`
       +`</div>`;} },
 
@@ -2822,7 +2822,7 @@ const TEMPLATES = [
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#3a4a5a,#1a2230);';
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#e0241c;">$1</span>');};
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:center;align-items:flex-end;padding-bottom:60px;${bg}">`
-        +`<div style="display:flex;align-items:center;font-family:Yomogi;font-size:160px;font-weight:700;color:#fff;text-shadow:${outline('#1a1a1a')};">${mk(d.big)}</div>`
+        +`<div style="display:flex;align-items:center;font-family:Yomogi;font-size:160px;font-weight:700;color:#fff;${xstroke(9,'#1a1a1a')};">${mk(d.big)}</div>`
       +`</div>`;} },
 
   { id:'note_s34', name:'note ミニマル紫＋中央2行＋下 日付/ブランド', cat:'サムネ', fmt:'note',
@@ -2849,8 +2849,8 @@ const TEMPLATES = [
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#3a3228,#16120c);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
         +`<div style="position:absolute;left:70px;bottom:90px;display:flex;flex-direction:column;">`
-          +`<div style="display:flex;font-size:92px;font-weight:900;color:#ffd21e;text-shadow:${outline('#1a1a1a')};">${d.l1}</div>`
-          +`<div style="display:flex;font-size:104px;font-weight:900;color:#fff;text-shadow:${outline('#c01818')};">${d.l2}</div>`
+          +`<div style="display:flex;font-size:92px;font-weight:900;color:#ffd21e;${xstroke(9,'#1a1a1a')};">${d.l1}</div>`
+          +`<div style="display:flex;font-size:104px;font-weight:900;color:#fff;${xstroke(9,'#c01818')};">${d.l2}</div>`
         +`</div>`
         +`<div style="position:absolute;top:70px;right:80px;display:flex;flex-direction:column;align-items:flex-end;font-size:46px;font-weight:700;color:#e0e0e0;line-height:1.4;text-shadow:0 2px 8px rgba(0,0,0,0.7);">${nl(d.corner)}</div>`
       +`</div>`;} },
@@ -2864,7 +2864,7 @@ const TEMPLATES = [
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;font-size:1.5em;">$1</span>');};
       const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;align-items:flex-end;">${mk(l)}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:110px;${bg}">`
-        +`<div style="display:flex;flex-direction:column;font-size:90px;font-weight:900;color:#fff;line-height:1.1;text-shadow:${outline('#3a2230')};">${lines}</div>`
+        +`<div style="display:flex;flex-direction:column;font-size:90px;font-weight:900;color:#fff;line-height:1.1;${xstroke(9,'#3a2230')};">${lines}</div>`
         +`<div style="display:flex;font-size:42px;font-weight:700;color:#fff;margin-top:20px;text-shadow:0 2px 8px rgba(0,0,0,0.6);">${d.sub}</div>`
       +`</div>`;} },
 
@@ -2878,7 +2878,7 @@ const TEMPLATES = [
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(150deg,#3a2e26,#140e0a);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
         +`<div style="display:flex;border:2px solid rgba(255,255,255,0.7);padding:8px 30px;color:#fff;font-size:46px;font-weight:700;margin-bottom:14px;text-shadow:0 2px 8px rgba(0,0,0,0.6);">${d.label}</div>`
-        +`<div style="display:flex;font-size:160px;font-weight:900;color:#fff;line-height:1;text-shadow:${outline('#1a1a1a','rgba(0,0,0,0)')};">${d.big}</div>`
+        +`<div style="display:flex;font-size:160px;font-weight:900;color:#fff;line-height:1;${xstroke(9,'#1a1a1a','rgba(0,0,0,0)')};">${d.big}</div>`
         +`<div style="display:flex;font-size:48px;font-weight:700;color:#fff;margin-top:10px;text-shadow:0 2px 8px rgba(0,0,0,0.6);">${d.s1}</div>`
         +`<div style="display:flex;font-size:72px;font-weight:900;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${d.s2}</div>`
       +`</div>`;} },
@@ -2889,7 +2889,7 @@ const TEMPLATES = [
       {key:'big',label:'左下 特大',def:'訴状着弾'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:#f6edd6;';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;align-items:flex-end;border:18px solid #c9a94e;${bg}">`
-        +`<div style="display:flex;margin:0 0 70px 70px;font-size:200px;font-weight:900;color:#1a1a1a;line-height:1;text-shadow:${outline('#f6edd6','rgba(0,0,0,0)')};">${d.big}</div>`
+        +`<div style="display:flex;margin:0 0 70px 70px;font-size:200px;font-weight:900;color:#1a1a1a;line-height:1;${xstroke(9,'#f6edd6','rgba(0,0,0,0)')};">${d.big}</div>`
       +`</div>`;} },
 
   { id:'note_s43', name:'note 2×2マトリクス図解（スライド型）', cat:'サムネ', fmt:'note',
@@ -2924,7 +2924,7 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:50px 60px;background:linear-gradient(160deg,#4a3a8a,#241a52);font-family:${t.head};">`
         +`<div style="display:flex;flex-direction:column;width:460px;">${box('ランクバトル',d.season)}${box('バトルルール',d.rule)}${box('開催期間',d.period)}</div>`
         +`<div style="display:flex;flex-direction:column;align-items:center;width:560px;">`
-          +`<div style="display:flex;background:linear-gradient(90deg,#1a2a6a,#3a4a9a);border:3px solid #e8c860;border-radius:16px;padding:18px 50px;font-size:72px;font-weight:900;color:#8ad0ff;text-shadow:${outline('#16204a')};">${d.badge}</div>`
+          +`<div style="display:flex;background:linear-gradient(90deg,#1a2a6a,#3a4a9a);border:3px solid #e8c860;border-radius:16px;padding:18px 50px;font-size:72px;font-weight:900;color:#8ad0ff;${xstroke(9,'#16204a')};">${d.badge}</div>`
           +`<div style="display:flex;font-size:40px;color:#c8c0f0;margin-top:26px;">順位</div>`
           +`<div style="display:flex;font-size:120px;font-weight:900;color:#8ad0ff;line-height:1;">${d.rank}</div>`
           +`<div style="display:flex;font-size:34px;color:#c8c0f0;margin-top:14px;">最終レート</div>`
@@ -2946,8 +2946,8 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:100px;background:linear-gradient(150deg,#ffd0e0,#ffe8c0);">`
         +right
         +`<div style="position:relative;display:flex;align-items:center;margin-bottom:8px;"><div style="display:flex;background:#ff0000;color:#fff;font-size:54px;font-weight:900;padding:6px 26px;border-radius:14px;">YouTube</div></div>`
-        +`<div style="position:relative;display:flex;align-items:center;font-size:110px;font-weight:900;color:#1a1a1a;text-shadow:${outline('#fff')};">${mk(d.l1)}</div>`
-        +`<div style="position:relative;display:flex;font-size:200px;font-weight:900;color:#ff2a82;line-height:1;text-shadow:${outline('#fff')};">${d.l2}</div>`
+        +`<div style="position:relative;display:flex;align-items:center;font-size:110px;font-weight:900;color:#1a1a1a;${xstroke(9,'#fff')};">${mk(d.l1)}</div>`
+        +`<div style="position:relative;display:flex;font-size:200px;font-weight:900;color:#ff2a82;line-height:1;${xstroke(9,'#fff')};">${d.l2}</div>`
         +`<div style="position:relative;display:flex;align-items:center;margin-top:10px;"><div style="display:flex;background:#ffd21e;color:#1a1a1a;font-size:48px;font-weight:900;padding:8px 28px;border-radius:10px;">${d.band}</div><div style="display:flex;border:3px solid #1a1a1a;color:#1a1a1a;font-size:40px;font-weight:900;padding:6px 22px;margin-left:18px;">${d.tag}</div></div>`
       +`</div>`;} },
 
@@ -2962,7 +2962,7 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:linear-gradient(160deg,#eef0ec,#dce0da);font-family:${t.head};">`
         +ic
         +`<div style="position:absolute;top:50px;left:120px;display:flex;background:#ffe24a;color:#1a1a1a;font-size:52px;font-weight:900;padding:8px 30px;transform:rotate(-4deg);">${d.badge}</div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:156px;font-weight:900;color:#6a6a6a;line-height:1.08;text-shadow:${outline('#fff')};">${nl(d.big)}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:156px;font-weight:900;color:#6a6a6a;line-height:1.08;${xstroke(9,'#fff')};">${nl(d.big)}</div>`
         +`<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;justify-content:center;align-items:center;background:#5a5a5a;padding:16px 0;"><div style="display:flex;align-items:center;font-size:44px;font-weight:900;color:#fff;">${mk(d.band)}</div></div>`
       +`</div>`;} },
 
@@ -2976,9 +2976,9 @@ const TEMPLATES = [
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#0a2a5a,#04122e);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;padding:70px 0 0 80px;${bg}">`
         +`<div style="display:flex;font-size:50px;font-weight:900;letter-spacing:4px;color:#fff;margin-bottom:10px;">${d.brand}</div>`
-        +`<div style="display:flex;font-size:140px;font-weight:900;color:#fff;line-height:1;text-shadow:${outline('#0a1a3a')};">${d.big}</div>`
+        +`<div style="display:flex;font-size:140px;font-weight:900;color:#fff;line-height:1;${xstroke(9,'#0a1a3a')};">${d.big}</div>`
         +`<div style="display:flex;font-size:38px;font-weight:700;letter-spacing:4px;color:#cfe0ff;margin-top:14px;">${d.en}</div>`
-        +`<div style="display:flex;font-size:80px;font-weight:900;color:#fff;margin-top:14px;text-shadow:${outline('#0a1a3a')};">${d.date}</div>`
+        +`<div style="display:flex;font-size:80px;font-weight:900;color:#fff;margin-top:14px;${xstroke(9,'#0a1a3a')};">${d.date}</div>`
       +`</div>`;} },
 
   { id:'note_s65', name:'note 図解教育型（中央2行＋下サブ）', cat:'サムネ', fmt:'note',
@@ -3019,7 +3019,7 @@ const TEMPLATES = [
         +right
         +`<div style="position:relative;display:flex;font-size:38px;font-weight:700;color:#cfe0ff;margin-bottom:14px;">${d.top}</div>`
         +`<div style="position:relative;display:flex;align-items:center;margin-bottom:18px;">${badges}</div>`
-        +`<div style="position:relative;display:flex;flex-direction:column;font-size:118px;font-weight:900;color:#fff;line-height:1.08;text-shadow:${outline('#0a1830')};">${lines}</div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;font-size:118px;font-weight:900;color:#fff;line-height:1.08;${xstroke(9,'#0a1830')};">${lines}</div>`
         +`<div style="position:relative;display:flex;background:rgba(255,255,255,0.15);color:#fff;font-size:40px;font-weight:900;padding:10px 28px;border-radius:10px;margin-top:20px;">${d.band}</div>`
         +`<div style="position:absolute;top:50px;right:60px;display:flex;background:#e23a2a;color:#fff;font-size:38px;font-weight:900;padding:10px 26px;transform:rotate(6deg);">${d.ribbon}</div>`
       +`</div>`;} },
@@ -3036,8 +3036,8 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:90px;background:linear-gradient(160deg,#eef2f6,#dbe4ec);">`
         +right
         +`<div style="position:relative;display:flex;background:#5a3a9a;color:#fff;font-size:46px;font-weight:900;padding:8px 26px;border-radius:8px;margin-bottom:18px;">${d.top}</div>`
-        +`<div style="position:relative;display:flex;flex-direction:column;font-size:140px;font-weight:900;color:#16243f;line-height:1.06;text-shadow:${outline('#fff')};">${lines}</div>`
-        +`<div style="position:relative;display:flex;background:#1763c4;color:#fff;font-size:54px;font-weight:900;padding:10px 30px;border-radius:10px;margin-top:20px;text-shadow:${outline('#0e3f86')};">${d.band}</div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;font-size:140px;font-weight:900;color:#16243f;line-height:1.06;${xstroke(9,'#fff')};">${lines}</div>`
+        +`<div style="position:relative;display:flex;background:#1763c4;color:#fff;font-size:54px;font-weight:900;padding:10px 30px;border-radius:10px;margin-top:20px;${xstroke(9,'#0e3f86')};">${d.band}</div>`
       +`</div>`;} },
 
   { id:'note_s76', name:'note 連載型（ブランド帯＋黄バブル＋下青帯）', cat:'サムネ', fmt:'note',
@@ -3050,7 +3050,7 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
         +`<div style="position:absolute;top:36px;left:60px;display:flex;align-items:center;"><div style="display:flex;font-size:44px;font-weight:900;letter-spacing:4px;color:#1a1a1a;margin-right:18px;">note</div><div style="display:flex;background:#e8852a;color:#fff;font-size:42px;font-weight:900;padding:8px 26px;border-radius:8px;">${d.brand}</div></div>`
         +`<div style="position:absolute;top:130px;left:50%;transform:translateX(-50%);display:flex;background:#ffe24a;color:#1a1a1a;font-size:50px;font-weight:900;padding:12px 38px;border-radius:40px;">${d.bubble}</div>`
-        +`<div style="position:absolute;left:0;bottom:50px;width:100%;display:flex;justify-content:center;"><div style="display:flex;flex-direction:column;align-items:center;background:#1763c4;padding:18px 50px;border-radius:14px;font-size:104px;font-weight:900;color:#fff;line-height:1.1;text-shadow:${outline('#0e3f86')};">${nl(d.big)}</div></div>`
+        +`<div style="position:absolute;left:0;bottom:50px;width:100%;display:flex;justify-content:center;"><div style="display:flex;flex-direction:column;align-items:center;background:#1763c4;padding:18px 50px;border-radius:14px;font-size:104px;font-weight:900;color:#fff;line-height:1.1;${xstroke(9,'#0e3f86')};">${nl(d.big)}</div></div>`
       +`</div>`;} },
 
   // ===== ▼ インフォ図解スタイル（早帰りラボ参考ギャラリー由来・YT/note両対応）▼ =====
