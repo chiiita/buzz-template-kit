@@ -31,6 +31,8 @@ const ROBOT_KING_URI='data:image/svg+xml;base64,'+b64('<svg xmlns="http://www.w3
 function nl(s){return String(s).split('\n').filter(x=>x.length).map(x=>'<div style="display:flex;">'+x+'</div>').join('');}
 // 袋文字(フチ文字)＝多方向textShadowで縁取り＋ドロップシャドウ。美容PR系の金フチ見出し用
 function outline(stroke,drop){const o=5;return [o+'px 0 '+stroke,'-'+o+'px 0 '+stroke,'0 '+o+'px '+stroke,'0 -'+o+'px '+stroke,o+'px '+o+'px '+stroke,'-'+o+'px '+o+'px '+stroke,o+'px -'+o+'px '+stroke,'-'+o+'px -'+o+'px '+stroke,'7px 9px 0 '+(drop||'rgba(0,0,0,0.15)')].join(',');}
+// 型ごとの色オーバーライド：d._c_<key> があればそれ、無ければ型のデフォルト色
+function col(d,k,def){var v=d&&d['_c_'+k];return (v===undefined||v===null||v==='')?def:v;}
 // ===== 質感アップグレード用ヘルパー（ブラウザ本番向け・satori QAでは一部無視）=====
 // 本物の太いフチ文字。-webkit-text-strokeで滑らかな縁取り＋ドロップ影。outline()より格段にキレイ（html-to-image書出で反映）
 function xstroke(px,color,drop){return `-webkit-text-stroke:${px}px ${color};paint-order:stroke fill;text-shadow:0 ${Math.round(px*1.4)}px 0 ${drop||'rgba(0,0,0,0.22)'},0 3px 14px rgba(0,0,0,0.32);`;}
@@ -2113,7 +2115,7 @@ const TEMPLATES = [
       {key:'n3',label:'注釈 左下 大（改行可）',def:'この時間、\nすきすぎる。\nリセットできる日'},
       {key:'n4',label:'注釈 右下（改行可）',def:'今日のごほうび\nしっとり甘い\nキャロットケーキ'}],
     render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(150deg,#caa978,#7c5a3a);';
-      const note=(s,css)=>`<div style="position:absolute;display:flex;flex-direction:column;font-family:Yomogi;font-size:40px;color:#fff;line-height:1.5;text-shadow:0 2px 9px rgba(0,0,0,0.6);${css}">${nl(s)}</div>`;
+      const note=(s,css)=>`<div style="position:absolute;display:flex;flex-direction:column;background:rgba(22,15,9,0.5);border-radius:20px;padding:18px 28px;font-family:Yomogi;font-size:44px;color:#fff;line-height:1.5;text-shadow:0 2px 8px rgba(0,0,0,0.5);${css}">${nl(s)}</div>`;
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
         +note(d.n1,'top:80px;left:100px;')
         +note(d.n2,'top:80px;right:100px;text-align:right;align-items:flex-end;')
@@ -2121,35 +2123,51 @@ const TEMPLATES = [
         +note(d.n4,'bottom:140px;right:100px;text-align:right;align-items:flex-end;')
       +`</div>`;} },
 
-  { id:'note_b03', name:'note 夕焼け＋黒袋文字＋下2行', cat:'サムネ', fmt:'note',
+  { id:'note_b03', name:'note 告知・メンバーシップ（モダン左寄せ）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'背景 写真(任意)',type:'file',def:''},
-      {key:'title',label:'特大タイトル',def:'メンバーシップ'},
-      {key:'sub',label:'下 サブ（改行可）',def:'ゼロから学ぶ\nトロロ流のSNS運用探究室'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(180deg,#3a2a6a,#c0512a 60%,#e88a3a);';
-      const star=(css)=>`<div style="position:absolute;display:flex;width:34px;height:34px;background:#fff;transform:rotate(45deg);box-shadow:0 0 20px #fff;${css}"></div>`;
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;font-family:'Dela Gothic One';font-size:184px;color:#141414;${xstroke(15,'#ffffff')}">${d.title}</div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:64px;font-weight:900;color:#fff;line-height:1.3;${xstroke(7,'#222')}margin-top:22px;">${nl(d.sub)}</div>`
-        +star('top:200px;left:380px;')+star('top:165px;right:440px;')+star('top:255px;right:320px;')
+      {key:'eyebrow',label:'上 小ラベル',def:'MEMBERSHIP'},
+      {key:'title',label:'タイトル（改行可・【】で差し色）',def:'ゼロから学ぶ\n【SNS運用】探究室'},
+      {key:'sub',label:'下 サブ',def:'トロロ流・メンバー限定コミュニティ始動'}],
+    colors:[{k:'accent',label:'アクセント',def:'#ffd24a'},{k:'text',label:'メイン文字',def:'#ffffff'}],
+    render:(d,t)=>{const ac=col(d,'accent','#ffd24a'),tx=col(d,'text','#ffffff');const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(125deg,#241640 0%,#5a2350 40%,#c0512a 74%,#eb9540 100%);';
+      const mk=function(s){return String(s).replace(/【([^】]*)】/g,'<span style="display:flex;color:'+ac+';">$1</span>');};
+      const lines=String(d.title).split('\n').map(function(l){return `<div style="display:flex;">${mk(l)}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 150px;${bg}">`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(90deg,rgba(0,0,0,0.52),rgba(0,0,0,0.10) 58%,rgba(0,0,0,0));"></div>`
+        +`<div style="position:relative;display:flex;align-items:center;margin-bottom:30px;"><div style="display:flex;width:70px;height:7px;background:${ac};margin-right:24px;"></div><div style="display:flex;font-size:44px;font-weight:900;letter-spacing:10px;color:${ac};">${d.eyebrow}</div></div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;font-family:'Zen Kaku Gothic New';font-size:148px;font-weight:900;color:${tx};line-height:1.16;text-shadow:0 6px 26px rgba(0,0,0,0.5);">${lines}</div>`
+        +`<div style="position:relative;display:flex;font-size:52px;font-weight:700;color:#f2e9e0;margin-top:34px;text-shadow:0 3px 14px rgba(0,0,0,0.45);">${d.sub}</div>`
       +`</div>`;} },
 
-  { id:'note_b04', name:'note イラスト背景＋下中央大見出し', cat:'サムネ', fmt:'note',
+  { id:'note_b04', name:'note テーマ見出し（中央・プレミアム）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'背景 イラスト/写真(任意)',type:'file',def:''},
-      {key:'title',label:'下 中央 大見出し',def:'学習・自己啓発'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#cfe0f0,#aac4e0);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;padding-bottom:240px;${bg}">`
-        +`<div style="display:flex;font-family:'Dela Gothic One';font-size:156px;color:#10243f;${xstroke(11,'#ffffff','rgba(0,0,0,0.22)')}">${d.title}</div>`
+      {key:'eyebrow',label:'上 小ラベル',def:'LEARNING'},
+      {key:'title',label:'中央 大見出し（【】で差し色）',def:'学習・【自己啓発】'},
+      {key:'sub',label:'下 サブ',def:'大人の学び直しを、現実の成果に。'}],
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(135deg,#16335f 0%,#2f6ea8 52%,#46a4c6 100%);';
+      const mk=function(s){return String(s).replace(/【([^】]*)】/g,'<span style="display:flex;color:#ffd24a;">$1</span>');};
+      const lines=String(d.title).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 140px;${bg}">`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(180deg,rgba(0,0,0,0.18),rgba(0,0,0,0.34));"></div>`
+        +`<div style="position:relative;display:flex;align-items:center;margin-bottom:34px;"><div style="display:flex;width:60px;height:4px;background:#ffd24a;margin-right:22px;"></div><div style="display:flex;font-size:42px;font-weight:900;letter-spacing:12px;color:#ffd24a;">${d.eyebrow}</div><div style="display:flex;width:60px;height:4px;background:#ffd24a;margin-left:22px;"></div></div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-family:'Zen Kaku Gothic New';font-size:158px;font-weight:900;color:#fff;line-height:1.14;text-shadow:0 6px 28px rgba(0,0,0,0.5);">${lines}</div>`
+        +`<div style="position:relative;display:flex;font-size:50px;font-weight:700;color:#eaf3fa;margin-top:36px;text-shadow:0 3px 14px rgba(0,0,0,0.45);">${d.sub}</div>`
       +`</div>`;} },
 
-  { id:'note_b05', name:'note 夕焼け＋白黒フチ3行テロップ', cat:'サムネ', fmt:'note',
+  { id:'note_b05', name:'note まとめテロップ（バッジ＋差し色・プレミアム）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'背景 写真(任意)',type:'file',def:''},
-      {key:'lines',label:'テロップ（改行で複数行）',def:'SNS運用\nロードマップ\n合計5つを一気見'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(180deg,#2a3a6a,#c0542a 55%,#f0a050);';
+      {key:'tag',label:'上 バッジ',def:'保存版'},
+      {key:'lines',label:'テロップ（改行・【】で金の差し色）',def:'SNS運用\nロードマップ\n【合計5つ】を一気見'}],
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#1e2a5a 0%,#7a3a64 36%,#d05a2a 72%,#f2a83a 100%);';
+      const mk=function(s){return String(s).replace(/【([^】]*)】/g,'<span style="display:flex;color:#ffe24a;">$1</span>');};
+      const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-family:'Dela Gothic One';font-size:138px;color:#fff;line-height:1.32;${xstroke(13,'#1a1a1a')}">${nl(d.lines)}</div>`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.32));"></div>`
+        +(d.tag?`<div style="position:relative;display:flex;align-items:center;justify-content:center;background:#ffe24a;color:#1a1a1a;font-size:42px;font-weight:900;letter-spacing:4px;padding:8px 34px;border-radius:40px;margin-bottom:30px;">${d.tag}</div>`:'')
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-family:'Dela Gothic One';font-size:134px;color:#fff;line-height:1.34;${xstroke(13,'#1a1a1a')}">${lines}</div>`
       +`</div>`;} },
 
   { id:'note_b07', name:'note 人物写真＋中央特大フチ＋下帯', cat:'サムネ', fmt:'note',
@@ -2176,7 +2194,7 @@ const TEMPLATES = [
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:linear-gradient(160deg,#1c2c52,#0e1730);font-family:${t.head};">`
         +`<div style="position:absolute;top:0;left:0;width:100%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border-bottom:3px solid #e8b84a;padding:18px 0;"><div style="display:flex;font-size:46px;font-weight:900;color:#fff;">${d.brand}</div><div style="display:flex;color:#e8b84a;margin:0 20px;font-size:40px;">｜</div><div style="display:flex;font-size:42px;font-weight:700;color:#e8b84a;">${d.tag}</div></div>`
         +`<div style="display:flex;font-size:130px;font-weight:900;color:#fff;text-shadow:0 4px 18px rgba(0,0,0,0.4);">${d.l1}</div>`
-        +`<div style="display:flex;width:60px;height:60px;background:#e8b84a;transform:rotate(45deg);margin:30px 0;"></div>`
+        +`<div style="display:flex;width:130px;height:5px;background:#e8b84a;border-radius:3px;margin:34px 0;"></div>`
         +`<div style="display:flex;align-items:center;font-size:104px;font-weight:900;color:#fff;">${gold(d.l2)}</div>`
         +`<div style="position:absolute;right:50px;bottom:40px;display:flex;font-size:42px;font-weight:700;color:#cdd6e6;">${d.date}</div>`
       +`</div>`;} },
@@ -2287,12 +2305,17 @@ const TEMPLATES = [
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#FFE24A;">$1</span>');};
       const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;">${mk(l)}</div>`;}).join('');
       const tags=String(d.tags).split(',').map(function(x){return `<div style="display:flex;background:#fff;color:#3a2466;font-size:34px;font-weight:900;padding:8px 24px;border-radius:30px;margin:0 10px;">${x}</div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-left:110px;${bg}">`
-        +`<div style="position:absolute;top:46px;left:110px;display:flex;background:rgba(255,255,255,0.85);color:#3a2466;font-size:36px;font-weight:900;padding:8px 26px;border-radius:8px;">${d.topband}</div>`
-        +`<div style="position:absolute;top:40px;right:60px;display:flex;background:#e23a2a;color:#fff;font-size:44px;font-weight:900;padding:10px 32px;border-radius:10px;">${d.ep}</div>`
-        +`<div style="display:flex;flex-direction:column;font-size:128px;font-weight:900;color:#fff;line-height:1.16;${xstroke(10,'#2a1a4a')}">${lines}</div>`
-        +`<div style="display:flex;align-items:center;justify-content:center;background:#2a7ad8;color:#fff;font-size:50px;font-weight:900;padding:14px 40px;border-radius:14px;margin-top:30px;width:fit-content;${xstroke(5,'#15467e')}">${d.band}</div>`
-        +`<div style="display:flex;margin-top:24px;">${tags}</div>`
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:58px 110px 64px;${bg}">`
+        +`<div style="position:absolute;right:-120px;top:50%;transform:translateY(-50%);width:720px;height:720px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;"></div>`
+        +`<div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;">`
+          +`<div style="display:flex;background:rgba(255,255,255,0.9);color:#3a2466;font-size:36px;font-weight:900;padding:9px 28px;border-radius:8px;">${d.topband}</div>`
+          +`<div style="display:flex;background:#e23a2a;color:#fff;font-size:46px;font-weight:900;padding:10px 34px;border-radius:10px;">${d.ep}</div>`
+        +`</div>`
+        +`<div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;width:1160px;">`
+          +`<div style="display:flex;flex-direction:column;font-size:112px;font-weight:900;color:#fff;line-height:1.2;${xstroke(10,'#2a1a4a')}">${lines}</div>`
+          +`<div style="display:flex;align-items:center;justify-content:center;background:#2a7ad8;color:#fff;font-size:48px;font-weight:900;padding:14px 40px;border-radius:14px;margin-top:38px;width:fit-content;${xstroke(5,'#15467e')}">${d.band}</div>`
+          +`<div style="display:flex;flex-wrap:wrap;margin-top:38px;">${tags}</div>`
+        +`</div>`
       +`</div>`;} },
 
   { id:'note_b25', name:'note ダーク人物＋上品見出し＋下5列メニュー', cat:'サムネ', fmt:'note',
@@ -2336,10 +2359,12 @@ const TEMPLATES = [
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#FFE24A;">$1</span>');};
       const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
       const boxes=String(d.boxes).split('/').map(function(x){const p=x.split('|');return `<div style="display:flex;flex-direction:column;align-items:center;background:rgba(15,20,30,0.55);padding:12px 44px;margin:0 16px;border-radius:10px;"><div style="display:flex;font-size:38px;color:#fff;">${p[0]||''}</div><div style="display:flex;font-size:74px;font-weight:900;color:#FFE24A;">${p[1]||''}</div></div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="position:absolute;top:60px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;background:rgba(0,0,0,0.45);color:#fff;font-size:42px;font-weight:700;padding:10px 30px;">${d.top}</div></div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-family:'Dela Gothic One';font-size:138px;color:#fff;line-height:1.18;${xstroke(12,'#1a1a1a')}">${lines}</div>`
-        +`<div style="display:flex;margin-top:34px;">${boxes}</div>`
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:66px 80px 72px;${bg}">`
+        +`<div style="display:flex;background:rgba(0,0,0,0.45);color:#fff;font-size:42px;font-weight:700;padding:10px 30px;">${d.top}</div>`
+        +`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;">`
+          +`<div style="display:flex;flex-direction:column;align-items:center;font-family:'Dela Gothic One';font-size:138px;color:#fff;line-height:1.18;${xstroke(12,'#1a1a1a')}">${lines}</div>`
+          +`<div style="display:flex;margin-top:40px;">${boxes}</div>`
+        +`</div>`
       +`</div>`;} },
 
   { id:'note_b37', name:'note AI成長ストーリー（吹き出し＋下ステップ）', cat:'サムネ', fmt:'note',
@@ -2364,46 +2389,60 @@ const TEMPLATES = [
       {key:'lines',label:'赤袋文字（改行可）',def:'金融崩壊の\n兆候が\n出揃いました！'}],
     render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:0;top:0;width:760px;height:1006px;background:url(${d.img}) center/cover;display:flex;"></div>`:'';
       const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;font-family:'Dela Gothic One';${metal('fire')}${xstroke(11,'#111')}">${l}</div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#ffffff;">`
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-left:120px;background:#ffffff;">`
         +right
-        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:152px;line-height:1.1;">${lines}</div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;width:1080px;font-size:150px;line-height:1.14;">${lines}</div>`
       +`</div>`;} },
 
-  { id:'note_b43', name:'note イラスト＋上薄タイトル＋下周年バッジ', cat:'サムネ', fmt:'note',
+  { id:'note_b43', name:'note 周年エンブレム（中央・自立）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'背景 イラスト(任意)',type:'file',def:''},
-      {key:'top',label:'上 薄タイトル',def:'Strawberry Prince 10th Anniversary'},
-      {key:'num',label:'バッジ 数字',def:'10th'},
-      {key:'label',label:'バッジ ラベル',def:'Anniversary'},
-      {key:'sub',label:'バッジ サブ',def:'Strawberry Prince'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#fbdceb,#f6c9dd);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
-        +`<div style="position:absolute;top:40px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-size:48px;font-weight:700;letter-spacing:8px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.35);">${d.top}</div></div>`
-        +`<div style="position:absolute;left:50%;bottom:40px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.92);border:6px solid #ec6fa0;border-radius:30px;padding:16px 60px;">`
-          +`<div style="display:flex;font-size:96px;font-weight:900;color:#e0457f;line-height:1;">${d.num}</div>`
-          +`<div style="display:flex;font-size:46px;font-weight:900;color:#e0457f;">${d.label}</div>`
-          +`<div style="display:flex;font-size:32px;font-weight:700;color:#b03a68;">${d.sub}</div>`
-        +`</div>`
+      {key:'brand',label:'上 ブランド名',def:'STRAWBERRY PRINCE'},
+      {key:'num',label:'数字',def:'10'},
+      {key:'suffix',label:'数字の後ろ',def:'th'},
+      {key:'label',label:'ラベル',def:'ANNIVERSARY'},
+      {key:'sub',label:'下 サブ',def:'いつも応援、ありがとう。'}],
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#fde2ee 0%,#f9c2dc 52%,#f0a0c8 100%);';
+      const num=`<div style="display:flex;align-items:flex-end;${metal(['#ffc9e0','#e0457f','#9c1e54'])}filter:drop-shadow(0 8px 12px rgba(150,30,84,0.25));"><div style="display:flex;font-family:'Dela Gothic One';font-size:300px;line-height:0.9;">${d.num}</div><div style="display:flex;font-family:'Dela Gothic One';font-size:120px;line-height:1;margin-bottom:36px;">${d.suffix}</div></div>`;
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
+        +`<div style="display:flex;font-size:48px;font-weight:900;letter-spacing:12px;color:#b8447a;margin-bottom:6px;">${d.brand}</div>`
+        +num
+        +`<div style="display:flex;align-items:center;margin-top:10px;"><div style="display:flex;width:90px;height:4px;background:#d97cab;margin-right:26px;"></div><div style="display:flex;font-size:60px;font-weight:900;letter-spacing:14px;color:#b8447a;">${d.label}</div><div style="display:flex;width:90px;height:4px;background:#d97cab;margin-left:26px;"></div></div>`
+        +`<div style="display:flex;font-size:42px;font-weight:700;color:#9a5575;margin-top:26px;">${d.sub}</div>`
       +`</div>`;} },
 
-  { id:'note_b45', name:'note 写真＋下 白文字テロップ', cat:'サムネ', fmt:'note',
+  { id:'note_b45', name:'note エッセイ・一言コラム（中央・プレミアム）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'背景 写真(任意)',type:'file',def:''},
-      {key:'lines',label:'下 白文字（改行可）',def:'スタンの国がぜんぶ危なそうって\nそりゃアンタ思い込みってやつよ'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#2a6a8a,#15405a);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:120px;${bg}">`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:70px;font-weight:700;color:#fff;line-height:1.4;text-shadow:0 3px 14px rgba(0,0,0,0.7);">${nl(d.lines)}</div>`
+      {key:'eyebrow',label:'上 小ラベル',def:'旅のひとり言'},
+      {key:'quote',label:'引用文（改行可・【】で差し色）',def:'スタンの国がぜんぶ危なそうって\nそりゃ【思い込み】ってやつよ'},
+      {key:'author',label:'下 サブ',def:'― 5年暮らして気づいたこと'}],
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(150deg,#0f3a4a 0%,#1d6e7e 54%,#2ba0aa 100%);';
+      const mk=function(s){return String(s).replace(/【([^】]*)】/g,'<span style="display:flex;color:#ffd24a;">$1</span>');};
+      const lines=String(d.quote).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 150px;${bg}">`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.4));"></div>`
+        +`<div style="position:relative;display:flex;align-items:center;margin-bottom:34px;"><div style="display:flex;width:64px;height:4px;background:#ffd24a;margin-right:22px;"></div><div style="display:flex;font-size:42px;font-weight:900;letter-spacing:10px;color:#ffd24a;">${d.eyebrow}</div><div style="display:flex;width:64px;height:4px;background:#ffd24a;margin-left:22px;"></div></div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:96px;font-weight:900;color:#fff;line-height:1.34;text-shadow:0 4px 18px rgba(0,0,0,0.45);">${lines}</div>`
+        +`<div style="position:relative;display:flex;font-size:42px;font-weight:700;color:#d8f0ee;margin-top:36px;text-shadow:0 2px 10px rgba(0,0,0,0.4);">${d.author}</div>`
       +`</div>`;} },
 
-  { id:'note_b46', name:'note 漫画背景＋毛筆大文字2つ', cat:'サムネ', fmt:'note',
+  { id:'note_b46', name:'note 2分割 対比（左右に画像＋大ラベル）', cat:'サムネ', fmt:'note',
     fields:[
-      {key:'img',label:'背景 画像(任意)',type:'file',def:''},
-      {key:'c1',label:'左下 大文字',def:'弟'},
-      {key:'c2',label:'右上 大文字',def:'兄'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#e8e8e8,#cfcfcf);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
-        +`<div style="position:absolute;left:34%;top:44%;display:flex;font-size:300px;font-weight:900;color:#1a1a1a;${xstroke(16,'#fff')}">${d.c1}</div>`
-        +`<div style="position:absolute;right:9%;top:8%;display:flex;font-size:260px;font-weight:900;color:#1a1a1a;${xstroke(15,'#fff')}">${d.c2}</div>`
+      {key:'i1',label:'左 画像(任意)',type:'file',def:''},
+      {key:'i2',label:'右 画像(任意)',type:'file',def:''},
+      {key:'l1',label:'左 ラベル',def:'兄'},
+      {key:'l2',label:'右 ラベル',def:'弟'},
+      {key:'title',label:'上 タイトル',def:'非オタの兄とオタク弟'}],
+    render:(d,t)=>{const li=d.i1?`url(${d.i1}) center/cover`:'linear-gradient(160deg,#6a7280,#363c44)';const ri=d.i2?`url(${d.i2}) center/cover`:'linear-gradient(160deg,#7a6670,#403640)';
+      const half=function(bg,lab){return `<div style="position:relative;display:flex;width:960px;height:1006px;background:${bg};">`
+        +`<div style="position:absolute;left:0;bottom:0;width:100%;height:420px;display:flex;background:linear-gradient(0deg,rgba(0,0,0,0.66),rgba(0,0,0,0));"></div>`
+        +`<div style="position:absolute;left:0;bottom:76px;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-family:'Dela Gothic One';font-size:200px;line-height:1;color:#fff;${xstroke(13,'#1a1a1a')}">${lab}</div></div>`
+      +`</div>`;};
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;">`
+        +half(li,d.l1)+half(ri,d.l2)
+        +`<div style="position:absolute;left:50%;top:0;width:6px;height:100%;background:#ffffff;transform:translateX(-50%);display:flex;"></div>`
+        +(d.title?`<div style="position:absolute;top:44px;left:50%;transform:translateX(-50%);display:flex;background:rgba(18,18,26,0.8);color:#fff;font-size:48px;font-weight:900;padding:13px 44px;border-radius:12px;">${d.title}</div>`:'')
       +`</div>`;} },
 
   { id:'note_b47', name:'note 白＋上 詩的細字＋中央水彩', cat:'サムネ', fmt:'note',
@@ -2411,7 +2450,7 @@ const TEMPLATES = [
       {key:'img',label:'中央 水彩画像(任意)',type:'file',def:''},
       {key:'lines',label:'上 詩的テキスト（改行可）',def:'わたしの大切な人を同じくらい大切に\nしてくれる人がいるって幸せなことね'}],
     render:(d,t)=>{const center=d.img?`<div style="display:flex;width:560px;height:320px;background:url(${d.img}) center/contain no-repeat;margin-top:40px;"></div>`
-        :`<div style="display:flex;margin-top:50px;"><div style="display:flex;width:120px;height:120px;border:18px solid #2a7ad8;border-radius:50%;margin:0 8px;"></div><div style="display:flex;width:120px;height:120px;border:18px solid #1a4a9a;border-radius:50%;margin:0 8px;"></div><div style="display:flex;width:120px;height:120px;border:18px solid #2aa890;border-radius:50%;margin:0 8px;"></div></div>`;
+        :`<div style="display:flex;align-items:center;margin-top:54px;filter:blur(3px);"><div style="display:flex;width:140px;height:140px;border-radius:50%;background:rgba(60,150,220,0.5);"></div><div style="display:flex;width:178px;height:178px;border-radius:50%;background:rgba(42,170,150,0.48);margin:0 -40px;"></div><div style="display:flex;width:130px;height:130px;border-radius:50%;background:rgba(140,205,235,0.5);"></div></div>`;
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#fbfaf6;font-family:Yomogi;">`
         +`<div style="display:flex;flex-direction:column;align-items:center;font-size:50px;color:#444;line-height:1.7;">${nl(d.lines)}</div>`
         +center
@@ -2421,10 +2460,10 @@ const TEMPLATES = [
     fields:[
       {key:'title',label:'上 タイトル',def:'本気で稼ぐ4つの圧倒的強み'},
       {key:'cells',label:'4セル（見出し|説明 を / 区切り）',def:'リアルな運営データの完全共有|会員数や売上、効果のある最新施策を数字で公開/生々しい「失敗」のプロセスを講義化|ボツ企画や大失敗した運用プランを共有/単発有料記事の完全無料化|数千円で販売する有料テンプレを会員は無料/高単価ビジネスに特化した戦略|月額制で長期的に稼ぐ仕組みを構築'}],
-    render:(d,t)=>{const cells=String(d.cells).split('/').map(function(x){const p=x.split('|');return `<div style="display:flex;flex-direction:column;width:780px;height:228px;background:rgba(255,255,255,0.08);border:2px solid rgba(120,170,230,0.5);border-radius:18px;padding:24px 30px;margin-bottom:22px;"><div style="display:flex;font-size:44px;font-weight:900;color:#7fd0ff;margin-bottom:10px;">${p[0]||''}</div><div style="display:flex;font-size:32px;font-weight:500;color:#dde6f0;line-height:1.35;">${p[1]||''}</div></div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:50px 100px;background:linear-gradient(160deg,#16335c,#0c2038);font-family:${t.head};">`
-        +`<div style="display:flex;font-size:78px;font-weight:900;color:#fff;margin-bottom:34px;${xstroke(7,'#0a1830')}">${d.title}</div>`
-        +`<div style="display:flex;flex-wrap:wrap;width:1620px;justify-content:space-between;">${cells}</div>`
+    render:(d,t)=>{const cells=String(d.cells).split('/').map(function(x){const p=x.split('|');return `<div style="display:flex;flex-direction:column;justify-content:center;width:782px;height:264px;background:rgba(255,255,255,0.08);border:2px solid rgba(120,170,230,0.5);border-radius:20px;padding:0 38px;margin-bottom:34px;"><div style="display:flex;font-size:46px;font-weight:900;color:#7fd0ff;margin-bottom:14px;">${p[0]||''}</div><div style="display:flex;font-size:33px;font-weight:500;color:#dde6f0;line-height:1.4;">${p[1]||''}</div></div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:60px 100px 26px;background:linear-gradient(160deg,#16335c,#0c2038);font-family:${t.head};">`
+        +`<div style="display:flex;font-size:78px;font-weight:900;color:#fff;${xstroke(7,'#0a1830')}">${d.title}</div>`
+        +`<div style="flex:1;display:flex;align-items:center;"><div style="display:flex;flex-wrap:wrap;width:1640px;justify-content:space-between;">${cells}</div></div>`
       +`</div>`;} },
 
   { id:'note_b50', name:'note テクスチャ背景＋中央 手書き白', cat:'サムネ', fmt:'note',
@@ -3223,6 +3262,22 @@ const page=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>�
  #delbtn{display:none;position:fixed;z-index:40;width:30px;height:30px;border-radius:50%;background:var(--ac);color:#fff;border:2px solid #fff;align-items:center;justify-content:center;cursor:pointer;font-size:15px;line-height:1;box-shadow:0 3px 12px rgba(0,0,0,.5);padding:0} #delbtn:hover{filter:brightness(1.1)}
  #szbtn{display:none;position:fixed;z-index:40;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;border:2px solid #fff;align-items:center;justify-content:center;cursor:nwse-resize;font-size:14px;line-height:1;box-shadow:0 3px 12px rgba(0,0,0,.5);padding:0;touch-action:none} #szbtn:hover{filter:brightness(1.1)}
  @media print{ body *{visibility:hidden} #printarea,#printarea *{visibility:visible} #printarea{position:absolute;left:0;top:0} .pslide{page-break-after:always;break-after:page} @page{size:1080px 1350px;margin:0} }
+#cpick{position:fixed;display:none;z-index:60;width:300px;background:#fff;border:1px solid #d0d6de;border-radius:12px;box-shadow:0 16px 54px rgba(0,0,0,.3);font-size:13px;color:#2c3e50;overflow:hidden}
+#cpick .cphd{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#eef1f5;cursor:move;font-weight:700;user-select:none}
+#cpick .cphd button{border:none;background:none;font-size:17px;cursor:pointer;color:#889;line-height:1}
+#cpick .cpbd{padding:12px 14px}
+#cpick .cppv{height:42px;border-radius:8px;border:1px solid #ddd;margin-bottom:6px}
+#cpick .cplab{font-size:11px;color:#7a828c;margin:9px 0 3px}
+#cpick input[type=range]{width:100%;height:16px;-webkit-appearance:none;appearance:none;border-radius:8px;outline:none}
+#cpick input.hue{background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+#cpick .cphex{width:120px;border:1px solid #ccd2da;border-radius:6px;padding:5px 9px;font-size:13px}
+#cpick .cpsw{display:flex;flex-wrap:wrap;gap:6px;margin:11px 0 2px}
+#cpick .cpsw button{width:26px;height:26px;border-radius:6px;border:1px solid rgba(0,0,0,.15);cursor:pointer;padding:0}
+#cpick .cpok{display:flex;gap:8px;margin-top:13px}
+#cpick .cpok button{flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px}
+#cpick .cpok .ok{background:#2D6CDF;color:#fff}
+#cpick .cpok .cc{background:#eceff3;color:#555}
+.cptrig{width:48px;height:26px;border-radius:6px;border:1px solid #b8bec8;cursor:pointer;padding:0;vertical-align:middle}
 </style></head><body>
 <div id="side"><h3>フォーマット</h3><select id="fmtsel" onchange="setFmt(this.value)"></select><h3>アカウントテーマ</h3><select id="theme"></select><h3>型を選ぶ</h3><button id="gbtn" onclick="toggleGallery()">▦ 型ギャラリーで探す</button><div id="list"></div></div>
 <div id="mid"><div id="topbar"><button id="movebtn" onclick="toggleMove()"><span id="movestate">🔒 編集モード：オフ</span><span id="movesub">押すと文字・画像を動かせます</span></button></div><div id="preview"><div id="stage"><div id="card"></div></div><div id="ovwarn">⚠ 文字がはみ出している可能性</div></div><div id="deckbar"></div></div>
@@ -3231,6 +3286,7 @@ const page=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>�
 <div id="printarea"></div>
 <button id="delbtn" onclick="deleteSelected()" title="削除 (Delete)">✕</button>
 <button id="szbtn" onmousedown="startResize(event)" title="ドラッグでサイズ変更">⤡</button>
+<div id="cpick"><div class="cphd" onmousedown="cpDragStart(event)"><span id="cptitle">色を選ぶ</span><button onclick="cpCancel()" title="閉じる">✕</button></div><div class="cpbd"><div class="cppv" id="cppv"></div><div class="cplab">色あい <b id="cpv1"></b></div><input type="range" class="hue" id="cph" min="0" max="360" oninput="cpFromSlider()"><div class="cplab">あざやかさ <b id="cpv2"></b></div><input type="range" id="cps" min="0" max="100" oninput="cpFromSlider()"><div class="cplab">明るさ <b id="cpv3"></b></div><input type="range" id="cpl" min="0" max="100" oninput="cpFromSlider()"><div class="cplab">カラーコード</div><input class="cphex" id="cphex" maxlength="7" oninput="cpFromHex()"><div class="cpsw" id="cpsw"></div><div class="cpok"><button class="cc" onclick="cpCancel()">キャンセル</button><button class="ok" onclick="cpConfirm()">確定</button></div></div></div>
 <div id="icongallery" onclick="if(event.target.id==='icongallery')toggleIcons()"><div id="icobox"><h3 style="margin-top:0">アイコン一覧（名前を入力欄へ）</h3><div id="icogrid"></div></div></div>
 <div id="tplgallery" onclick="if(event.target.id==='tplgallery')toggleGallery()"><div id="galbox"><input id="galsearch" placeholder="型を検索（例: 診断 / カレンダー / 比較 / 締め）" oninput="filterTpl(this.value)"><div id="galgrid"></div></div></div>
 <div id="presetbox" onclick="if(event.target.id==='presetbox')togglePresets()"><div id="presbox"><h3 style="margin-top:0">構成プリセット（読み込んで中身を差し替え）</h3><div id="preslist"></div></div></div>
@@ -3250,6 +3306,7 @@ const icon=${icon.toString()};
 const markerBg=${markerBg.toString()};
 const nl=${nl.toString()};
 const outline=${outline.toString()};
+const col=${col.toString()};
 const xstroke=${xstroke.toString()};
 const metal=${metal.toString()};
 const glowf=${glowf.toString()};
@@ -3274,7 +3331,7 @@ function tplsOf(f){return TEMPLATES.filter(function(t){return (t.fmt||'ig')===f;
 function freshDeck(f){if(f==='ig')return JSON.parse(JSON.stringify(INITIAL_DECK));const list=tplsOf(f);const id=(list[0]||TEMPLATES[0]).id;const th=f==='youtube'?'business':'mono';return [{tplId:id,theme:th,data:defaults(getTpl(id))}];}
 try{const sv=localStorage.getItem('buzzdeck_'+fmt);deck=sv?JSON.parse(sv):null;}catch(e){deck=null;}
 if(!deck||!deck.length)deck=freshDeck(fmt);
-const FONTS={'標準':'','角ゴシック':KAKU,'丸ゴシック':MARU,'明朝':MIN,'インパクト':DELA,'手書き':HAND};
+const FONTS={'標準':'','角ゴシック':KAKU,'丸ゴシック':MARU,'明朝':MIN,'インパクト':DELA,'手書き':HAND,'ポップ丸':"'Mochiy Pop One'",'レトロ太':"'Reggae One'",'カジュアル手書':"'Yusei Magic'"};
 function eff(s){const b=THEMES[s.theme];const t=Object.assign({},b);const o=s.over||{};
  if(o.head&&FONTS[o.head]){t.head=FONTS[o.head];t.display=FONTS[o.head];}
  if(o.body&&FONTS[o.body]){t.body=FONTS[o.body];}
@@ -3283,7 +3340,9 @@ function eff(s){const b=THEMES[s.theme];const t=Object.assign({},b);const o=s.ov
  if(o.accent){t.accent=o.accent;t.accentDeep=shade(o.accent,-0.18);}
  return t;}
 const slide=()=>deck[cur];
-const slideHtml=s=>getTpl(s.tplId).render(s.data,eff(s));
+const slideHtml=s=>{var html=getTpl(s.tplId).render(s.data,eff(s));var m=s.data&&s.data._cm;if(m)html=html.replace(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g,function(c){var lc=c.toLowerCase();return (m[lc]&&m[lc]!==lc)?m[lc]:c;});return html;};
+function tplColors(s){var html=getTpl(s.tplId).render(s.data,eff(s));var seen={},out=[],re=/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g,mm;while((mm=re.exec(html))){var c=mm[0].toLowerCase();if(!seen[c]){seen[c]=1;out.push(c);}}return out.slice(0,18);}
+function tplColResetAll(){var s=slide();if(s.data)delete s.data._cm;renderCard();renderDeck();buildSlideOpt();save();}
 let undoStack=[],redoStack=[],histTimer=null,lastHist=null;
 function scheduleHist(){clearTimeout(histTimer);histTimer=setTimeout(function(){const j=JSON.stringify(deck);if(j!==lastHist){if(lastHist!=null){undoStack.push(lastHist);if(undoStack.length>60)undoStack.shift();}redoStack=[];lastHist=j;updateHistBtns();}},450);}
 function updateHistBtns(){const u=document.getElementById('undobtn'),r=document.getElementById('redobtn');if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;}
@@ -3305,6 +3364,9 @@ function applyEl(root,s,live){if(!root)return;const ch=root.children,ps=s.pos||{
  if(e.bold)el.style.setProperty('font-weight','900','important');
  if(e.al){el.style.alignSelf=e.al;el.style.textAlign=(e.al==='center'?'center':e.al==='flex-end'?'right':'left');}
  if(e.box){el.style.background=t.panel;el.style.border='3px solid '+t.accent;el.style.borderRadius='18px';el.style.padding='22px 28px';el.style.boxShadow='0 8px 24px rgba(0,0,0,.16)';}
+ if(e.ff)el.style.setProperty('font-family',(FONTS[e.ff]||e.ff),'important');
+ if(e.fc)el.style.setProperty('color',e.fc,'important');
+ if(e.bg||e.bgop!=null){var _o=(e.bgop==null?100:e.bgop)/100,_c=(e.bg||'#000000'),_r=parseInt(_c.slice(1,3),16),_g=parseInt(_c.slice(3,5),16),_b=parseInt(_c.slice(5,7),16);el.style.background='rgba('+_r+','+_g+','+_b+','+_o+')';if(!el.style.padding)el.style.padding='16px 24px';if(!el.style.borderRadius)el.style.borderRadius='16px';}
  if(e.hide){if(live){el.style.opacity='.18';el.style.outline='1px dashed #999';}else{el.style.display='none';}}}}
 function paint(el,s,live){el.innerHTML=slideHtml(s);const r=el.firstElementChild;applyBg(r,s);applyEl(r,s,live);applyOverlay(r,s,live);return r;}
 let moveMode=false,selBlock=-1,selFree=-1,iconForFree=false,curScale=1,brand=[];
@@ -3411,6 +3473,34 @@ function elBump(d){if(selBlock<0)return;const e=elObj();e.sc=Math.round(Math.max
 function elToggle(p){if(selBlock<0)return;const e=elObj();e[p]=!e[p];renderCard();renderDeck();buildSlideOpt();save();}
 function elAlign(v){if(selBlock<0)return;const e=elObj();e.al=(e.al===v?'':v);renderCard();renderDeck();buildSlideOpt();save();}
 function elReset(){const s=slide();if(selBlock<0)return;if(s.el)delete s.el[selBlock];if(s.pos)delete s.pos[selBlock];renderCard();renderDeck();buildSlideOpt();save();}
+function elSet(k,v){if(selBlock<0)return;const e=elObj();if(v===''||v==null)delete e[k];else e[k]=v;renderCard();renderDeck();buildSlideOpt();save();}
+function elClrBg(){if(selBlock<0)return;const e=elObj();delete e.bg;delete e.bgop;renderCard();renderDeck();buildSlideOpt();save();}
+function elSwatches(prop){var P=['#ffffff','#1a1a1a','#e0241c','#ff7a1a','#ffd24a','#2aa84a','#15b3c9','#2a7ad8','#16335c','#7a3a8a','#e8497f','#8a8a8a'];return '<div class="swrow" style="margin:4px 0 2px">'+P.map(function(c){return '<button class="sw" style="background:'+c+'" title="'+c+'" onclick="elSet(\\''+prop+'\\',\\''+c+'\\')"></button>';}).join('')+'</div>';}
+var cpKind=null,cpKey=null,cpOrig=null;
+function cpApply(c){var s=slide();
+ if(cpKind==='el'){if(selBlock<0)return;if(!s.el)s.el={};if(!s.el[selBlock])s.el[selBlock]={};if(c)s.el[selBlock][cpKey]=c;else delete s.el[selBlock][cpKey];}
+ else if(cpKind==='over'){if(!s.over)s.over={};if(c&&c!=='標準')s.over[cpKey]=c;else delete s.over[cpKey];}
+ else if(cpKind==='bgfill'){if(!s.bg)s.bg={};s.bg.fill=c;}
+ else if(cpKind==='grad'){if(!s.bg)s.bg={};s.bg[cpKey]=c;}
+ else if(cpKind==='free'){if(s.free&&selFree>=0&&s.free[selFree])s.free[selFree].color=c;}
+ else if(cpKind==='logo'){if(logo)logo.color=c;}
+ else if(cpKind==='tplcol'){if(!s.data)s.data={};if(c)s.data['_c_'+cpKey]=c;else delete s.data['_c_'+cpKey];}
+ else if(cpKind==='remap'){if(!s.data)s.data={};if(!s.data._cm)s.data._cm={};if(c)s.data._cm[cpKey.toLowerCase()]=c;else delete s.data._cm[cpKey.toLowerCase()];}
+ renderCard();renderDeck();}
+function tplColReset(k){var s=slide();if(s.data)delete s.data['_c_'+k];renderCard();renderDeck();buildSlideOpt();save();}
+function cpVals(){document.getElementById('cpv1').textContent=document.getElementById('cph').value+'°';document.getElementById('cpv2').textContent=document.getElementById('cps').value+'%';document.getElementById('cpv3').textContent=document.getElementById('cpl').value+'%';}
+function hsl2hex(h,s,l){s/=100;l/=100;var c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),mm=l-c/2,r,g,b;if(h<60){r=c;g=x;b=0;}else if(h<120){r=x;g=c;b=0;}else if(h<180){r=0;g=c;b=x;}else if(h<240){r=0;g=x;b=c;}else if(h<300){r=x;g=0;b=c;}else{r=c;g=0;b=x;}var f=function(v){return ('0'+Math.round((v+mm)*255).toString(16)).slice(-2);};return '#'+f(r)+f(g)+f(b);}
+function hex2hsl(hex){hex=String(hex||'').replace('#','');if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];if(!/^[0-9a-fA-F]{6}$/.test(hex))return [0,0,100];var r=parseInt(hex.slice(0,2),16)/255,g=parseInt(hex.slice(2,4),16)/255,b=parseInt(hex.slice(4,6),16)/255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),h,s,l=(mx+mn)/2;if(mx===mn){h=0;s=0;}else{var d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);if(mx===r)h=(g-b)/d+(g<b?6:0);else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;}return [Math.round(h),Math.round(s*100),Math.round(l*100)];}
+function openCP(kind,key,orig,title){cpKind=kind;cpKey=key;cpOrig=(orig==null?'':orig);var hsl=hex2hsl(cpOrig||'#ffffff');document.getElementById('cph').value=hsl[0];document.getElementById('cps').value=hsl[1];document.getElementById('cpl').value=hsl[2];document.getElementById('cphex').value=(cpOrig||'#ffffff');document.getElementById('cptitle').textContent=(title||'色')+'を選ぶ';buildCpSw();cpPv();cpVals();var p=document.getElementById('cpick');p.style.display='block';p.style.left='auto';p.style.right='360px';p.style.top='110px';}
+function cpPv(){document.getElementById('cppv').style.background=document.getElementById('cphex').value;}
+function cpFromSlider(){var hex=hsl2hex(+document.getElementById('cph').value,+document.getElementById('cps').value,+document.getElementById('cpl').value);document.getElementById('cphex').value=hex;cpPv();cpVals();cpApply(hex);}
+function cpFromHex(){var v=document.getElementById('cphex').value;if(/^#?[0-9a-fA-F]{6}$/.test(v)){if(v[0]!=='#')v='#'+v;var hsl=hex2hsl(v);document.getElementById('cph').value=hsl[0];document.getElementById('cps').value=hsl[1];document.getElementById('cpl').value=hsl[2];cpPv();cpVals();cpApply(v);}}
+function cpPick(c){document.getElementById('cphex').value=c;cpFromHex();}
+function buildCpSw(){var P=['#ffffff','#1a1a1a','#e0241c','#ff7a1a','#ffd24a','#2aa84a','#15b3c9','#2a7ad8','#16335c','#7a3a8a','#e8497f','#8a8a8a'];document.getElementById('cpsw').innerHTML=P.map(function(c){return '<button style="background:'+c+'" title="'+c+'" onclick="cpPick(\\''+c+'\\')"></button>';}).join('');}
+function cpFinish(){if(cpKind==='logo'){try{localStorage.setItem('buzzlogo',JSON.stringify(logo));}catch(e){}}save();buildSlideOpt();document.getElementById('cpick').style.display='none';cpKind=null;}
+function cpConfirm(){cpFinish();}
+function cpCancel(){if(cpKind)cpApply(cpOrig||'');cpFinish();}
+function cpDragStart(e){e.preventDefault();var p=document.getElementById('cpick'),r=p.getBoundingClientRect(),ox=e.clientX-r.left,oy=e.clientY-r.top;p.style.right='auto';function mv(ev){p.style.left=Math.max(0,ev.clientX-ox)+'px';p.style.top=Math.max(0,ev.clientY-oy)+'px';}function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);}
 function buildSlideOpt(){const s=slide();const bg=s.bg||{};const o=s.over||{};const et=eff(s);
  const fontOpts=function(sel){return Object.keys(FONTS).map(function(k){return '<option value="'+k+'"'+(sel===k?' selected':'')+'>'+k+'</option>';}).join('');};
  const sw=['bg','panelSoft','accent','accentDeep','ink','sub'].map(function(k){return '<button class="sw" title="'+et[k]+'" style="background:'+et[k]+'" onclick="setBgFill(\\''+et[k]+'\\')"></button>';}).join('');
@@ -3419,8 +3509,8 @@ function buildSlideOpt(){const s=slide();const bg=s.bg||{};const o=s.over||{};co
    +'<button class="'+(bg.mode==='fill'?'on':'')+'" onclick="setBgMode(\\'fill\\')">塗り</button>'
    +'<button class="'+(bg.mode==='grad'?'on':'')+'" onclick="setBgMode(\\'grad\\')">グラデ</button>'
    +'<button class="'+(bg.mode==='image'?'on':'')+'" onclick="setBgMode(\\'image\\')">画像</button></div>';
- if(bg.mode==='fill'){h+='<div class="optrow"><input type="color" value="'+(bg.fill||et.bg)+'" oninput="setBgFill(this.value)"><span class="swrow">'+sw+'</span></div>'+brandRow('bgfill',bg.fill||et.bg);}
- if(bg.mode==='grad'){h+='<div class="optrow2"><span class="optlab2">色1</span><input type="color" value="'+(bg.fill||et.accent)+'" oninput="setGrad(\\'fill\\',this.value)"><span class="optlab2">色2</span><input type="color" value="'+(bg.fill2||et.accentDeep)+'" oninput="setGrad(\\'fill2\\',this.value)"></div>'+brandRow('gradfill',bg.fill||et.accent)
+ if(bg.mode==='fill'){h+='<div class="optrow"><button class="cptrig" style="background:'+(bg.fill||et.bg)+'" onclick="openCP(\\'bgfill\\',\\'\\',\\''+(bg.fill||et.bg)+'\\',\\'背景の色\\')"></button><span class="swrow">'+sw+'</span></div>'+brandRow('bgfill',bg.fill||et.bg);}
+ if(bg.mode==='grad'){h+='<div class="optrow2"><span class="optlab2">色1</span><button class="cptrig" style="background:'+(bg.fill||et.accent)+'" onclick="openCP(\\'grad\\',\\'fill\\',\\''+(bg.fill||et.accent)+'\\',\\'グラデ 色1\\')"></button><span class="optlab2">色2</span><button class="cptrig" style="background:'+(bg.fill2||et.accentDeep)+'" onclick="openCP(\\'grad\\',\\'fill2\\',\\''+(bg.fill2||et.accentDeep)+'\\',\\'グラデ 色2\\')"></button></div>'+brandRow('gradfill',bg.fill||et.accent)
    +'<div class="optlab">角度 '+(bg.angle==null?135:bg.angle)+'°</div><input type="range" class="optrange" min="0" max="360" value="'+(bg.angle==null?135:bg.angle)+'" oninput="setGrad(\\'angle\\',this.value);this.previousElementSibling.textContent=\\'角度 \\'+this.value+\\'°\\'">';}
  if(bg.mode==='image'){h+='<input type="file" accept="image/*" class="optfile" onchange="setBgImage(event)">'+(bg.image?'<div class="optlab" style="color:#7a7">画像セット済（再アップで差し替え）</div>':'<div class="optlab" style="color:#977">画像をアップしてください</div>')
    +'<div class="optlab">表示方法</div><div class="seg"><button class="'+(!bg.fit||bg.fit==='cover'?'on':'')+'" onclick="setFit(\\'cover\\')">全体に敷く</button><button class="'+(bg.fit==='contain'?'on':'')+'" onclick="setFit(\\'contain\\')">全部見せる</button></div>'
@@ -3429,18 +3519,30 @@ function buildSlideOpt(){const s=slide();const bg=s.bg||{};const o=s.over||{};co
    +'<div class="optlab">レイヤーの濃さ '+(bg.opacity==null?35:bg.opacity)+'%</div><input type="range" class="optrange" min="0" max="90" value="'+(bg.opacity==null?35:bg.opacity)+'" oninput="setOpacity(this.value);this.previousElementSibling.textContent=\\'レイヤーの濃さ \\'+this.value+\\'%\\'">';}
  if(bg.mode&&bg.mode!=='theme')h+='<button class="rs" style="margin-top:9px" onclick="applyBgAll()">この背景を全スライドへ</button>';
  h+='</div>';
- h+='<div class="optsec"><div class="opth">フォント</div><div class="optlab" style="margin-top:0">見出し</div><select class="optsel" onchange="setOver(\\'head\\',this.value)">'+fontOpts(o.head||'標準')+'</select><div class="optlab">本文</div><select class="optsel" onchange="setOver(\\'body\\',this.value)">'+fontOpts(o.body||'標準')+'</select></div>';
- h+='<div class="optsec"><div class="opth">文字カラー</div>';
- [['ink','文字色'],['accent','アクセント'],['sub','サブ文字']].forEach(function(kv){const k=kv[0],lab=kv[1];h+='<div class="optrow2"><span class="optlab2">'+lab+'</span><input type="color" value="'+(o[k]||et[k])+'" oninput="setOver(\\''+k+'\\',this.value)">'+(o[k]?'<button class="rs" onclick="setOver(\\''+k+'\\',\\'\\')">標準</button>':'')+'</div>'+brandRow(k,o[k]||et[k]);});
+ var _cols=tplColors(s),_cm=(s.data&&s.data._cm)||{};
+ if(_cols.length){h+='<div class="optsec"><div class="opth">🎨 この型の色</div><div class="optlab" style="margin-top:0">使われている色をクリックすると、その色を別の色に変えられます（型全体に反映）。</div><div class="cpsw" style="margin-top:8px">';
+   _cols.forEach(function(oc){var cur=_cm[oc]||oc;h+='<button style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(0,0,0,.18);cursor:pointer;padding:0;background:'+cur+'" title="'+oc+'" onclick="openCP(\\'remap\\',\\''+oc+'\\',\\''+cur+'\\',\\'色\\')"></button>';});
+   h+='</div>';
+   if(Object.keys(_cm).length)h+='<button class="rs" style="margin-top:9px" onclick="tplColResetAll()">色を全部もとに戻す</button>';
+   h+='</div>';}
+ if(fmt==='ig'){
+ h+='<div class="optsec"><div class="opth">フォント（型全体）</div><div class="optlab" style="margin-top:0">見出し</div><select class="optsel" onchange="setOver(\\'head\\',this.value)">'+fontOpts(o.head||'標準')+'</select><div class="optlab">本文</div><select class="optsel" onchange="setOver(\\'body\\',this.value)">'+fontOpts(o.body||'標準')+'</select></div>';
+ h+='<div class="optsec"><div class="opth">文字カラー（型全体）</div>';
+ [['ink','文字色'],['accent','アクセント'],['sub','サブ文字']].forEach(function(kv){const k=kv[0],lab=kv[1];h+='<div class="optrow2"><span class="optlab2">'+lab+'</span><button class="cptrig" style="background:'+(o[k]||et[k])+'" onclick="openCP(\\'over\\',\\''+k+'\\',\\''+(o[k]||et[k])+'\\',\\''+lab+'\\')"></button>'+(o[k]?'<button class="rs" onclick="setOver(\\''+k+'\\',\\'\\')">標準</button>':'')+'</div>'+brandRow(k,o[k]||et[k]);});
  h+='<button class="rs" style="margin-top:9px" onclick="applyStyleAll()">フォント・色を全スライドへ</button>';
  if(brand.length)h+='<div class="optlab">保存色（＋で追加）<button class="rs" style="margin-left:6px" onclick="clearBrand()">全消去</button></div>';
  h+='</div>';
- h+='<div class="optsec"><div class="opth">配置・要素編集</div>';
- if(!moveMode){h+='<div class="optlab" style="margin-top:0">上の「✋移動」をONにすると、文字・表をドラッグ移動＆選択して個別編集できます。</div>';}
- else if(selBlock<0){h+='<div class="optlab" style="margin-top:0">プレビュー上の文字・表を<b>クリックで選択</b>→ここに編集メニューが出ます。ドラッグで移動／矢印キーで微調整。</div>';}
+ }
+ h+='<div class="optsec"><div class="opth">✏️ 選択した文字を編集</div>';
+ if(!moveMode){h+='<div class="optlab" style="margin-top:0">上の「✋移動」をONにして、<b>変えたい文字をクリック</b>すると、ここでフォント・色・サイズを変えられます。</div>';}
+ else if(selBlock<0){h+='<div class="optlab" style="margin-top:0">プレビュー上の<b>文字をクリックで選択</b>→ここにその文字専用のメニューが出ます。</div>';}
  else{const e=(s.el&&s.el[selBlock])||{};
-   h+='<div class="optlab" style="margin-top:0">選択中の要素 #'+(selBlock+1)+'</div>';
+   h+='<div class="optlab" style="margin-top:0;font-weight:800;color:#2D6CDF">いま選択中の文字だけに効きます</div>';
+   h+='<div class="optlab">フォント</div><select class="optsel" onchange="elSet(\\'ff\\',this.value)">'+Object.keys(FONTS).map(function(k){return '<option value="'+k+'"'+((e.ff||'標準')===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>';
+   h+='<div class="optrow2"><span class="optlab2">文字色</span><button class="cptrig" style="background:'+(e.fc||'#ffffff')+'" onclick="openCP(\\'el\\',\\'fc\\',\\''+(e.fc||'')+'\\',\\'文字色\\')" title="クリックで色を選ぶ"></button>'+(e.fc?'<button class="rs" onclick="elSet(\\'fc\\',\\'\\')">標準</button>':'')+'</div>'+elSwatches('fc');
    h+='<div class="optlab">文字サイズ '+Math.round((e.sc||1)*100)+'%</div><div class="elrow"><button onclick="elBump(-0.1)">－</button><button onclick="elBump(0.1)">＋</button><button class="'+(e.bold?'on':'')+'" onclick="elToggle(\\'bold\\')">太字</button></div>';
+   h+='<div class="optrow2"><span class="optlab2">裏の色</span><button class="cptrig" style="background:'+(e.bg||'#161616')+'" onclick="openCP(\\'el\\',\\'bg\\',\\''+(e.bg||'')+'\\',\\'裏の色\\')" title="クリックで色を選ぶ"></button>'+((e.bg||e.bgop!=null)?'<button class="rs" onclick="elClrBg()">裏なし</button>':'')+'</div>'+elSwatches('bg');
+   h+='<div class="optlab">裏の不透明度 '+(e.bgop==null?100:e.bgop)+'%</div><input type="range" class="optrange" min="0" max="100" value="'+(e.bgop==null?100:e.bgop)+'" oninput="elSet(\\'bgop\\',+this.value);this.previousElementSibling.textContent=\\'裏の不透明度 \\'+this.value+\\'%\\'">';
    h+='<div class="optlab">整列</div><div class="elrow"><button class="'+(e.al==='flex-start'?'on':'')+'" onclick="elAlign(\\'flex-start\\')">左</button><button class="'+(e.al==='center'?'on':'')+'" onclick="elAlign(\\'center\\')">中央</button><button class="'+(e.al==='flex-end'?'on':'')+'" onclick="elAlign(\\'flex-end\\')">右</button></div>';
    h+='<div class="elrow" style="margin-top:8px"><button class="'+(e.box?'on':'')+'" onclick="elToggle(\\'box\\')">枠・影</button><button class="'+(e.hide?'on':'')+'" onclick="elToggle(\\'hide\\')">'+(e.hide?'再表示':'非表示')+'</button><button onclick="elReset()">要素リセット</button></div>';}
  if(s.pos&&Object.keys(s.pos).length||s.el&&Object.keys(s.el).length){h+='<button class="rs" style="margin-top:10px" onclick="resetPos()">スライド全体の配置をリセット</button>';}
@@ -3451,15 +3553,15 @@ function buildSlideOpt(){const s=slide();const bg=s.bg||{};const o=s.over||{};co
    if(fe.type==='text'){h+='<textarea class="optsel" style="resize:vertical" oninput="setFree(\\'text\\',this.value)">'+(fe.text||'').replace(/</g,'&lt;')+'</textarea>'
      +'<div class="optlab">文字サイズ '+(fe.size||60)+'</div><div class="elrow"><button onclick="freeBump(\\'size\\',-6,12,400)">－</button><button onclick="freeBump(\\'size\\',6,12,400)">＋</button><button onclick="toggleFreeBold()">太字</button></div>'
      +'<div class="optlab">フォント</div><select class="optsel" onchange="setFree(\\'font\\',this.value)">'+Object.keys(FONTS).map(function(k){return '<option'+((fe.font||'標準')===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
-     +'<div class="optrow2"><span class="optlab2">文字色</span><input type="color" value="'+(fe.color||et.ink)+'" oninput="setFree(\\'color\\',this.value)"></div>'+brandRow2('color',fe.color||et.ink);}
+     +'<div class="optrow2"><span class="optlab2">文字色</span><button class="cptrig" style="background:'+(fe.color||et.ink)+'" onclick="openCP(\\'free\\',\\'color\\',\\''+(fe.color||et.ink)+'\\',\\'文字色\\')"></button></div>'+brandRow2('color',fe.color||et.ink);}
    else if(fe.type==='image'){h+='<div class="optlab">大きさ '+(fe.w||440)+'</div><div class="elrow"><button onclick="freeBump(\\'w\\',-30,80,1080);freeBump(\\'h\\',-30,80,1350)">－</button><button onclick="freeBump(\\'w\\',30,80,1080);freeBump(\\'h\\',30,80,1350)">＋</button></div><div class="optlab">角丸 '+(fe.radius||0)+'</div><div class="elrow"><button onclick="freeBump(\\'radius\\',-10,0,400)">－</button><button onclick="freeBump(\\'radius\\',10,0,400)">＋</button></div>';}
-   else if(fe.type==='shape'){h+='<div class="optlab">形</div><div class="seg"><button class="'+(fe.shape==='rect'?'on':'')+'" onclick="setFreeUI(\\'shape\\',\\'rect\\')">四角</button><button class="'+(fe.shape==='circle'?'on':'')+'" onclick="setFreeUI(\\'shape\\',\\'circle\\')">丸</button><button class="'+(fe.shape==='line'?'on':'')+'" onclick="setFreeUI(\\'shape\\',\\'line\\')">線</button></div><div class="optlab">大きさ</div><div class="elrow"><button onclick="freeBump(\\'w\\',-30,20,1080)">幅－</button><button onclick="freeBump(\\'w\\',30,20,1080)">幅＋</button><button onclick="freeBump(\\'h\\',-20,6,1350)">高－</button><button onclick="freeBump(\\'h\\',20,6,1350)">高＋</button></div><div class="optrow2"><span class="optlab2">色</span><input type="color" value="'+(fe.color||et.accent)+'" oninput="setFree(\\'color\\',this.value)"></div>'+brandRow2('color',fe.color||et.accent);}
-   else if(fe.type==='icon'){h+='<div class="elrow"><button onclick="iconForFree=true;toggleIcons()">アイコンを選ぶ（現在: '+(fe.name||'star')+'）</button></div><div class="optlab">大きさ '+(fe.size||130)+'</div><div class="elrow"><button onclick="freeBump(\\'size\\',-14,24,600)">－</button><button onclick="freeBump(\\'size\\',14,24,600)">＋</button></div><div class="optrow2"><span class="optlab2">色</span><input type="color" value="'+(fe.color||et.accent)+'" oninput="setFree(\\'color\\',this.value)"></div>'+brandRow2('color',fe.color||et.accent);}
+   else if(fe.type==='shape'){h+='<div class="optlab">形</div><div class="seg"><button class="'+(fe.shape==='rect'?'on':'')+'" onclick="setFreeUI(\\'shape\\',\\'rect\\')">四角</button><button class="'+(fe.shape==='circle'?'on':'')+'" onclick="setFreeUI(\\'shape\\',\\'circle\\')">丸</button><button class="'+(fe.shape==='line'?'on':'')+'" onclick="setFreeUI(\\'shape\\',\\'line\\')">線</button></div><div class="optlab">大きさ</div><div class="elrow"><button onclick="freeBump(\\'w\\',-30,20,1080)">幅－</button><button onclick="freeBump(\\'w\\',30,20,1080)">幅＋</button><button onclick="freeBump(\\'h\\',-20,6,1350)">高－</button><button onclick="freeBump(\\'h\\',20,6,1350)">高＋</button></div><div class="optrow2"><span class="optlab2">色</span><button class="cptrig" style="background:'+(fe.color||et.accent)+'" onclick="openCP(\\'free\\',\\'color\\',\\''+(fe.color||et.accent)+'\\',\\'色\\')"></button></div>'+brandRow2('color',fe.color||et.accent);}
+   else if(fe.type==='icon'){h+='<div class="elrow"><button onclick="iconForFree=true;toggleIcons()">アイコンを選ぶ（現在: '+(fe.name||'star')+'）</button></div><div class="optlab">大きさ '+(fe.size||130)+'</div><div class="elrow"><button onclick="freeBump(\\'size\\',-14,24,600)">－</button><button onclick="freeBump(\\'size\\',14,24,600)">＋</button></div><div class="optrow2"><span class="optlab2">色</span><button class="cptrig" style="background:'+(fe.color||et.accent)+'" onclick="openCP(\\'free\\',\\'color\\',\\''+(fe.color||et.accent)+'\\',\\'色\\')"></button></div>'+brandRow2('color',fe.color||et.accent);}
    h+='<button class="rs" style="margin-top:9px" onclick="delFree()">この要素を削除</button>';}
  else{h+='<div class="optlab">＋で文字/画像/図形/アイコンを追加→プレビュー上をドラッグで移動。クリックで選択。絵文字は＋文字に直接入力。</div>';}
  h+='</div>';
  const lg=logo||{};h+='<div class="optsec"><div class="opth">ロゴ・透かし（全スライド共通）</div><div class="optrow2"><span class="optlab2">テキスト</span><input class="optsel" style="flex:2" value="'+(lg.text||'').replace(/"/g,'&quot;')+'" oninput="setLogo(\\'text\\',this.value)"></div><div class="elrow"><button onclick="document.getElementById(\\'logoin\\').click()">画像ロゴ'+(lg.image?'（変更）':'')+'</button>'+(lg.image||lg.text?'<button onclick="clearLogo()">消す</button>':'')+'</div><input id="logoin" type="file" accept="image/*" style="display:none" onchange="setLogoImage(event)">';
- if(lg.text||lg.image){h+='<div class="optlab">位置</div><select class="optsel" onchange="setLogo(\\'pos\\',this.value)">'+['right bottom','left bottom','center bottom','right top','left top','center top'].map(function(p){return '<option value="'+p+'"'+((lg.pos||'right bottom')===p?' selected':'')+'>'+({'right bottom':'右下','left bottom':'左下','center bottom':'中央下','right top':'右上','left top':'左上','center top':'中央上'}[p])+'</option>';}).join('')+'</select><div class="optrow2"><span class="optlab2">文字色</span><input type="color" value="'+(lg.color||et.ink)+'" oninput="setLogo(\\'color\\',this.value)"></div><div class="optlab">大きさ '+(lg.size||40)+'</div><input type="range" class="optrange" min="24" max="90" value="'+(lg.size||40)+'" oninput="setLogo(\\'size\\',+this.value)"><div class="optlab">濃さ '+(lg.opacity==null?90:lg.opacity)+'%</div><input type="range" class="optrange" min="15" max="100" value="'+(lg.opacity==null?90:lg.opacity)+'" oninput="setLogo(\\'opacity\\',+this.value)">';}
+ if(lg.text||lg.image){h+='<div class="optlab">位置</div><select class="optsel" onchange="setLogo(\\'pos\\',this.value)">'+['right bottom','left bottom','center bottom','right top','left top','center top'].map(function(p){return '<option value="'+p+'"'+((lg.pos||'right bottom')===p?' selected':'')+'>'+({'right bottom':'右下','left bottom':'左下','center bottom':'中央下','right top':'右上','left top':'左上','center top':'中央上'}[p])+'</option>';}).join('')+'</select><div class="optrow2"><span class="optlab2">文字色</span><button class="cptrig" style="background:'+(lg.color||et.ink)+'" onclick="openCP(\\'logo\\',\\'color\\',\\''+(lg.color||et.ink)+'\\',\\'文字色\\')"></button></div><div class="optlab">大きさ '+(lg.size||40)+'</div><input type="range" class="optrange" min="24" max="90" value="'+(lg.size||40)+'" oninput="setLogo(\\'size\\',+this.value)"><div class="optlab">濃さ '+(lg.opacity==null?90:lg.opacity)+'%</div><input type="range" class="optrange" min="15" max="100" value="'+(lg.opacity==null?90:lg.opacity)+'" oninput="setLogo(\\'opacity\\',+this.value)">';}
  h+='</div>';
  h+='<div class="optsec"><div class="opth">画像で書き出し（PNG）</div><div class="elrow"><button onclick="exportPng(false)">このスライド</button><button onclick="exportPng(true)">全スライド</button></div><div class="optlab">PDFと別に1枚ずつPNG保存（1080×1350）。オンライン環境で動作。</div></div>';
  document.getElementById('slideopt').innerHTML=h;}
