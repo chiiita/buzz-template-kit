@@ -2507,13 +2507,19 @@ const TEMPLATES = [
         +`<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;justify-content:center;align-items:center;background:rgba(210,90,140,0.9);padding:18px 0;"><div style="display:flex;font-size:50px;font-weight:900;color:#fff;">${d.band}</div></div>`
       +`</div>`;} },
 
-  { id:'note_b55', name:'note 暗写真＋左上 白テロップ', cat:'サムネ', fmt:'note',
+  { id:'note_b55', name:'note 暗背景＋左キャプション（記事まとめ）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'背景 写真(任意・暗め)',type:'file',def:''},
-      {key:'lines',label:'左上 白文字（改行可）',def:'人間関係に疲れた人へ\n―読んでほしい記事まとめ'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#3a2e1e,#140e08);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;padding:110px 0 0 100px;${bg}">`
-        +`<div style="display:flex;flex-direction:column;font-size:74px;font-weight:700;color:#fff;line-height:1.45;text-shadow:0 3px 14px rgba(0,0,0,0.8);">${nl(d.lines)}</div>`
+      {key:'title',label:'見出し（改行可・【】で差し色）',def:'人間関係に【疲れた】人へ'},
+      {key:'sub',label:'下 サブ',def:'― 読んでほしい記事まとめ'}],
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(130deg,#2a2333 0%,#1a2230 58%,#101620 100%);';
+      const mk=function(s){return String(s).replace(/【([^】]*)】/g,'<span style="display:flex;color:#f0b86a;">$1</span>');};
+      const lines=String(d.title).split('\n').map(function(l){return `<div style="display:flex;">${mk(l)}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:120px;${bg}">`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(90deg,rgba(0,0,0,0.5),rgba(0,0,0,0.12) 55%,rgba(0,0,0,0));"></div>`
+        +`<div style="position:relative;display:flex;width:90px;height:8px;background:#f0b86a;margin-bottom:32px;"></div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;font-size:104px;font-weight:900;color:#fff;line-height:1.32;text-shadow:0 4px 18px rgba(0,0,0,0.55);">${lines}</div>`
+        +`<div style="position:relative;display:flex;font-size:48px;font-weight:700;color:#d8dde4;margin-top:30px;text-shadow:0 2px 12px rgba(0,0,0,0.5);">${d.sub}</div>`
       +`</div>`;} },
 
   { id:'note_b59', name:'note 水色＋イラスト＋はじめてのnote(袋文字)', cat:'サムネ', fmt:'note',
@@ -2528,26 +2534,38 @@ const TEMPLATES = [
         +ill
       +`</div>`;} },
 
-  { id:'note_b61', name:'note イラスト＋左右 縦書きラベル', cat:'サムネ', fmt:'note',
+  { id:'note_b61', name:'note 比較カード（2択・明るい・実用）', cat:'サムネ', fmt:'note',
     fields:[
-      {key:'img',label:'背景 イラスト(任意)',type:'file',def:''},
-      {key:'left',label:'左 縦ラベル',def:'氷砂糖'},
-      {key:'right',label:'右 縦ラベル',def:'きび砂糖'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#fbd3df,#f3b9cd);';
-      const vs=(s,css)=>`<div style="position:absolute;display:flex;flex-direction:column;align-items:center;font-size:96px;font-weight:900;color:#3a2218;line-height:1.05;${xstroke(8,'#fff')}${css}">`+String(s).split('').map(c=>`<div style="display:flex;">${c}</div>`).join('')+`</div>`;
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
-        +vs(d.left,'left:70px;top:50%;transform:translateY(-50%);')+vs(d.right,'right:70px;top:50%;transform:translateY(-50%);')
+      {key:'title',label:'上 タイトル',def:'梅シロップ、どっちで作る？'},
+      {key:'i1',label:'左 画像(任意)',type:'file',def:''},
+      {key:'l1',label:'左 名前',def:'氷砂糖'},
+      {key:'d1',label:'左 ひとこと',def:'すっきり上品な甘さ'},
+      {key:'i2',label:'右 画像(任意)',type:'file',def:''},
+      {key:'l2',label:'右 名前',def:'きび砂糖'},
+      {key:'d2',label:'右 ひとこと',def:'コクのある深い甘さ'}],
+    render:(d,t)=>{const card=function(im,name,desc){return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:720px;height:600px;background:#ffffff;border-radius:32px;box-shadow:0 14px 36px rgba(180,80,120,0.22);padding:44px 40px;">`
+        +(im?`<div style="display:flex;width:548px;height:300px;background:url(${im}) center/cover;border-radius:22px;margin-bottom:30px;"></div>`:'')
+        +`<div style="display:flex;font-size:76px;font-weight:900;color:#d6357f;">${name}</div>`
+        +`<div style="display:flex;font-size:36px;font-weight:700;color:#7a6068;margin-top:16px;text-align:center;">${desc}</div>`
+      +`</div>`;};
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:54px 90px 64px;background:linear-gradient(160deg,#fcdbe8,#f5b8ce);">`
+        +`<div style="display:flex;font-size:72px;font-weight:900;color:#b03060;text-shadow:0 2px 0 rgba(255,255,255,0.6);">${d.title}</div>`
+        +`<div style="flex:1;display:flex;align-items:center;justify-content:center;">`
+          +card(d.i1,d.l1,d.d1)
+          +`<div style="display:flex;align-items:center;justify-content:center;width:130px;height:130px;border-radius:50%;background:#e0457f;margin:0 -20px;z-index:2;border:7px solid #fff;box-shadow:0 8px 20px rgba(180,30,90,0.3);"><div style="display:flex;font-family:'Dela Gothic One';font-size:50px;font-style:italic;color:#fff;">VS</div></div>`
+          +card(d.i2,d.l2,d.d2)
+        +`</div>`
       +`</div>`;} },
 
   { id:'note_b62', name:'note 暗背景＋赤袋文字3行＋右人物', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'右 人物(任意)',type:'file',def:''},
       {key:'lines',label:'赤袋文字（改行可）',def:'流されないで！\n最終段階に突入\n●●を備えよ！'}],
-    render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:0;top:0;width:620px;height:1006px;background:url(${d.img}) center/cover;display:flex;"></div>`:'';
-      const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;font-family:'Dela Gothic One';${metal('fire')}${xstroke(9,'#240202')}">${l}</div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(circle at 40% 40%,#1a2150,#06081e);">`
+    render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:0;top:0;width:640px;height:1006px;background:url(${d.img}) center/cover;display:flex;"></div>`:'';
+      const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;font-family:'Dela Gothic One';${metal(['#ffd0c6','#ff3322','#d11410'])}${xstroke(11,'#2a0202')}">${l}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:115px;background:radial-gradient(circle at 38% 42%,#2c2c33,#0a0a0c);">`
         +right
-        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:142px;line-height:1.16;">${lines}</div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;width:1120px;font-size:142px;line-height:1.2;filter:drop-shadow(0 0 24px rgba(255,70,50,0.55));">${lines}</div>`
       +`</div>`;} },
 
   { id:'note_b64', name:'note 映画ポスター型（上キャッチ＋下特大タイトル）', cat:'サムネ', fmt:'note',
@@ -2556,10 +2574,11 @@ const TEMPLATES = [
       {key:'catch',label:'上 キャッチ',def:'すべての“もしも”は、愛と奇跡につながる'},
       {key:'title',label:'中央下 特大タイトル',def:'サンキュー、チャック'},
       {key:'date',label:'公開日',def:'5.1 fri'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#cfe2ee,#9bb6c8);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:80px;${bg}">`
-        +`<div style="position:absolute;top:50px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-size:42px;font-weight:700;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${d.catch}</div></div>`
-        +`<div style="display:flex;font-size:130px;font-weight:900;color:#fff;${xstroke(10,'#1a3a6a')}">${d.title}</div>`
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(180deg,#1c2740 0%,#101a2c 55%,#060a14 100%);';
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:84px;${bg}">`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(180deg,rgba(0,0,0,0.5),rgba(0,0,0,0.05) 32%,rgba(0,0,0,0.08) 62%,rgba(0,0,0,0.62));"></div>`
+        +`<div style="position:absolute;top:54px;left:0;width:100%;display:flex;justify-content:center;"><div style="display:flex;font-size:42px;font-weight:700;letter-spacing:4px;color:#f0eee8;text-shadow:0 2px 10px rgba(0,0,0,0.7);">${d.catch}</div></div>`
+        +`<div style="position:relative;display:flex;font-size:132px;font-weight:900;color:#fff;${xstroke(9,'#0a1422')}">${d.title}</div>`
         +`<div style="display:flex;font-size:56px;font-weight:900;color:#ffd84a;margin-top:10px;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${d.date}</div>`
       +`</div>`;} },
 
@@ -2596,26 +2615,37 @@ const TEMPLATES = [
         +`<div style="display:flex;align-self:flex-end;margin-right:120px;font-size:90px;font-weight:700;color:#ff5a1a;text-shadow:0 0 24px #ff8a2a;">${d.bottom}</div>`
       +`</div>` },
 
-  { id:'note_b69', name:'note 黄色＋上手書き＋中央イラスト', cat:'サムネ', fmt:'note',
+  { id:'note_b69', name:'note 黄色＋手書き「はじめてのnote」（ポップ）', cat:'サムネ', fmt:'note',
     fields:[
-      {key:'img',label:'中央 イラスト(任意)',type:'file',def:''},
-      {key:'title',label:'上 手書きタイトル',def:'#1はじめてのnote'}],
-    render:(d,t)=>{const ill=d.img?`<div style="display:flex;width:520px;height:520px;background:url(${d.img}) center/contain no-repeat;margin-top:20px;"></div>`:'';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#ffd21e;">`
-        +`<div style="display:flex;font-family:Yomogi;font-size:96px;font-weight:700;color:#6a4a20;">${d.title}</div>`
+      {key:'img',label:'右下 イラスト(任意)',type:'file',def:''},
+      {key:'num',label:'シリーズ番号',def:'#1'},
+      {key:'small',label:'上 手書き',def:'はじめての'},
+      {key:'big',label:'特大ロゴ',def:'note'},
+      {key:'sub',label:'下 手書きサブ',def:'自己紹介、はじめます。'}],
+    render:(d,t)=>{const ink='#5a4018';
+      const ill=d.img?`<div style="position:absolute;right:90px;bottom:80px;width:460px;height:460px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-left:150px;background:#ffd21e;">`
+        +`<div style="position:relative;display:flex;align-items:center;margin-bottom:18px;"><div style="display:flex;align-items:center;justify-content:center;background:${ink};color:#ffd21e;font-family:Yomogi;font-size:44px;font-weight:700;padding:4px 26px;border-radius:40px;margin-right:24px;">${d.num}</div><div style="display:flex;font-family:Yomogi;font-size:78px;color:${ink};">${d.small}</div></div>`
+        +`<div style="position:relative;display:flex;font-family:'Mochiy Pop One';font-size:240px;line-height:0.96;color:${ink};">${d.big}</div>`
+        +`<div style="position:relative;display:flex;font-family:Yomogi;font-size:54px;color:${ink};margin-top:34px;">${d.sub}</div>`
         +ill
       +`</div>`;} },
 
-  { id:'note_b70', name:'note 白＋中央特大＋左右 小ラベル', cat:'サムネ', fmt:'note',
+  { id:'note_b70', name:'note プロフィールカード（アバター＋名前＋タグ）', cat:'サムネ', fmt:'note',
     fields:[
-      {key:'big',label:'中央 特大（改行可）',def:'自己\n紹介'},
-      {key:'left',label:'左 小',def:'22歳'},
-      {key:'right',label:'右 小',def:'大学生'}],
-    render:(d,t)=>`<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:center;align-items:center;background:#fbfbf9;font-family:'Zen Maru Gothic';">`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:188px;font-weight:900;color:#141414;line-height:1.12;">${nl(d.big)}</div>`
-        +`<div style="position:absolute;left:24%;top:50%;transform:translate(-50%,-50%);display:flex;font-size:60px;font-weight:700;color:#222;">${d.left}</div>`
-        +`<div style="position:absolute;right:24%;top:50%;transform:translate(50%,-50%);display:flex;font-size:60px;font-weight:700;color:#222;">${d.right}</div>`
-      +`</div>` },
+      {key:'img',label:'アバター写真(任意)',type:'file',def:''},
+      {key:'label',label:'上 ラベル',def:'自己紹介'},
+      {key:'name',label:'名前',def:'たろう'},
+      {key:'tags',label:'タグ（カンマ区切り）',def:'22歳,大学生,スーパー飽き性'}],
+    render:(d,t)=>{const ac='#2f6fe0';
+      const av=d.img?`background:url(${d.img}) center/cover;`:'background:#e3ecfb;';
+      const tags=String(d.tags).split(',').map(function(x){return `<div style="display:flex;align-items:center;justify-content:center;background:#e8f0ff;color:${ac};font-size:42px;font-weight:900;padding:12px 32px;border-radius:50px;margin:0 9px;">${x}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#fbfbf9;font-family:'Zen Maru Gothic';">`
+        +`<div style="display:flex;font-size:42px;font-weight:900;letter-spacing:10px;color:${ac};margin-bottom:30px;">${d.label}</div>`
+        +`<div style="display:flex;width:330px;height:330px;border-radius:50%;${av}border:10px solid #ffffff;box-shadow:0 12px 34px rgba(40,70,140,0.18);"></div>`
+        +`<div style="display:flex;font-size:104px;font-weight:900;color:#1a1a1a;margin-top:34px;">${d.name}</div>`
+        +`<div style="display:flex;flex-wrap:wrap;justify-content:center;margin-top:26px;">${tags}</div>`
+      +`</div>`;} },
 
   { id:'note_b71', name:'note 明朝・淡写真＋上ラベル＋中央2行', cat:'サムネ', fmt:'note',
     fields:[
@@ -2628,13 +2658,18 @@ const TEMPLATES = [
         +`<div style="display:flex;flex-direction:column;font-size:74px;font-weight:700;line-height:1.5;">${nl(d.lines)}</div>`
       +`</div>`;} },
 
-  { id:'note_b73', name:'note イラスト＋中央特大白フチ', cat:'サムネ', fmt:'note',
+  { id:'note_b73', name:'note 共感フレーズ（感情トーン・中央）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'背景 イラスト/写真(任意)',type:'file',def:''},
-      {key:'big',label:'中央 特大',def:'普通がしんどい'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#dfe4e8,#bcc6cc);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;font-family:'Dela Gothic One';font-size:176px;color:#fff;${xstroke(13,'#2a2a2a')}">${d.big}</div>`
+      {key:'big',label:'中央 特大（改行可・【】差し色）',def:'普通が【しんどい】'},
+      {key:'sub',label:'下 サブ',def:'― そう感じる日も、ある。'}],
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(155deg,#3d4a5e 0%,#2c3543 55%,#22272f 100%);';
+      const mk=function(s){return String(s).replace(/【([^】]*)】/g,'<span style="display:flex;color:#f0a85e;">$1</span>');};
+      const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 140px;${bg}">`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(180deg,rgba(0,0,0,0.22),rgba(0,0,0,0.0) 40%,rgba(0,0,0,0.32));"></div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-family:'Dela Gothic One';font-size:158px;color:#fff;line-height:1.26;${xstroke(11,'#1a1a1a')}">${lines}</div>`
+        +`<div style="position:relative;display:flex;font-size:48px;font-weight:700;color:#cfd6df;margin-top:40px;text-shadow:0 2px 10px rgba(0,0,0,0.4);">${d.sub}</div>`
       +`</div>`;} },
 
   { id:'note_b74', name:'note キラ背景＋角括弧ラベル＋中央3行（マラソン型）', cat:'サムネ', fmt:'note',
@@ -2648,14 +2683,18 @@ const TEMPLATES = [
         +`<div style="display:flex;flex-direction:column;align-items:center;font-size:72px;font-weight:700;color:#3a3530;line-height:1.55;text-shadow:0 2px 10px rgba(255,255,255,0.7);">${nl(d.lines)}</div>`
       +`</div>`;} },
 
-  { id:'note_b78', name:'note 単色＋左イラスト＋右 手書き3行', cat:'サムネ', fmt:'note',
+  { id:'note_b78', name:'note 文章術・特徴（ティール＋黄下線＋手書きサブ）', cat:'サムネ', fmt:'note',
     fields:[
-      {key:'img',label:'左 イラスト(任意)',type:'file',def:''},
-      {key:'lines',label:'右 手書き（改行可）',def:'最後まで\n読まれない\n文章の特徴'}],
-    render:(d,t)=>{const ill=d.img?`<div style="position:absolute;left:130px;top:50%;transform:translateY(-50%);width:520px;height:520px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:flex-end;align-items:center;padding-right:180px;background:#69c2d6;">`
-        +ill
-        +`<div style="display:flex;flex-direction:column;align-items:flex-start;font-family:Yomogi;font-size:118px;font-weight:700;color:#fff;line-height:1.3;">${nl(d.lines)}</div>`
+      {key:'img',label:'背景 画像(任意)',type:'file',def:''},
+      {key:'title',label:'見出し（改行可・《》黄下線）',def:'最後まで《読まれない》\n文章の特徴'},
+      {key:'sub',label:'下 手書きサブ',def:'あなたの文章、大丈夫？'}],
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(150deg,#62c4d8 0%,#3a9fb4 60%,#2b8497 100%);';
+      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;background:linear-gradient(to top,#ffe24a 14px,transparent 14px);">$1</span>');};
+      const lines=String(d.title).split('\n').map(function(l){return `<div style="display:flex;align-items:baseline;justify-content:center;">${mk(l)}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 140px;${bg}">`
+        +(d.img?`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.34));"></div>`:'')
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-size:122px;font-weight:900;color:#fff;line-height:1.4;text-shadow:0 4px 16px rgba(0,0,0,0.28);">${lines}</div>`
+        +`<div style="position:relative;display:flex;font-family:Yomogi;font-size:58px;color:#fff;margin-top:40px;text-shadow:0 2px 10px rgba(0,0,0,0.3);">${d.sub}</div>`
       +`</div>`;} },
 
   { id:'note_s04', name:'note ネオンLP型（キャラ＋上帯＋3行＋下5チップ）', cat:'サムネ', fmt:'note',
