@@ -125,7 +125,7 @@ const infoHero=function infoHero(w,h,d){const cy='#1aa3d8';
     +`<div style="display:flex;flex-direction:column;margin-left:${Math.round(w*0.05)}px;">`
       +`<div style="display:flex;font-size:${Math.round(h*0.07)}px;font-weight:900;color:#23506a;">${d.label||''}</div>`
       +`<div style="display:flex;align-items:flex-end;"><div style="display:flex;font-size:${Math.round(h*0.34)}px;font-weight:900;color:#14384e;line-height:0.95;">${mark(d.num||'')}</div><div style="display:flex;font-size:${Math.round(h*0.12)}px;font-weight:900;color:#14384e;margin-left:10px;margin-bottom:${Math.round(h*0.03)}px;">${d.unit||''}</div></div>`
-      +`<div style="display:flex;font-size:${Math.round(h*0.045)}px;color:#5a7686;line-height:1.5;margin-top:${Math.round(h*0.03)}px;max-width:${Math.round(w*0.6)}px;">${d.desc||''}</div>`
+      +`<div style="display:flex;font-size:${Math.round(h*0.045)}px;color:#5a7686;line-height:1.5;margin-top:${Math.round(h*0.03)}px;max-width:${Math.round(w*0.46)}px;">${d.desc||''}</div>`
     +`</div>`
   +`</div>`;};
 const infoStat3=function infoStat3(w,h,d){const cy='#1aa3d8';const pad=Math.round(w*0.04);const gap=Math.round(w*0.025);const cw=Math.round((w-pad*2-gap*2)/3);
@@ -145,7 +145,7 @@ const infoIndex=function infoIndex(w,h,d){const items=String(d.items||'').split(
     return `<div style="display:flex;align-items:flex-end;margin:${Math.round(h*0.017)}px 0;font-size:${Math.round(h*0.034)}px;${major}"><div style="display:flex;flex-shrink:0;">${lead}</div><div style="display:flex;flex:1;border-bottom:2px dashed #cccccc;margin:0 12px ${Math.round(h*0.012)}px;"></div><div style="display:flex;flex-shrink:0;color:#666;">${pg}</div></div>`;};
   const cwid=Math.round((w-w*0.16-w*0.06)/2);
   const colDiv=function(arr){return `<div style="display:flex;flex-direction:column;width:${cwid}px;">${arr.map(row).join('')}</div>`;};
-  return `<div style="${infoCard(w,h,'#ffffff')}flex-direction:column;padding:${Math.round(h*0.08)}px ${Math.round(w*0.08)}px;">`
+  return `<div style="${infoCard(w,h,'#ffffff')}flex-direction:column;justify-content:center;padding:${Math.round(h*0.08)}px ${Math.round(w*0.08)}px;">`
     +`<div style="display:flex;font-size:${Math.round(h*0.075)}px;font-weight:900;letter-spacing:4px;color:#1a1a1a;margin-bottom:${Math.round(h*0.05)}px;">${d.title||'INDEX'}</div>`
     +`<div style="display:flex;justify-content:space-between;">${colDiv(cols[0])}${colDiv(cols[1])}</div>`
   +`</div>`;};
@@ -153,9 +153,9 @@ const infoBannerNo1=function infoBannerNo1(w,h,d){const teal='#15b3c9';const rig
   return `<div style="${infoCard(w,h,teal)}flex-direction:column;justify-content:center;padding:0 ${Math.round(w*0.06)}px;color:#fff;">`
     +`<div style="display:flex;font-size:${Math.round(h*0.1)}px;font-weight:900;text-shadow:0 3px 0 rgba(0,0,0,0.12);">${d.head||'数字でアピール'}</div>`
     +`<div style="display:flex;align-items:center;margin-top:${Math.round(h*0.01)}px;">`
-      +`<div style="display:flex;transform:scaleX(-1);">${icon('sprout','#eaffff',Math.round(h*0.2),1.6)}</div>`
-      +`<div style="display:flex;font-size:${Math.round(h*0.32)}px;font-weight:900;line-height:1;margin:0 ${Math.round(w*0.01)}px;color:#fff;">${d.num||'No.1'}</div>`
-      +`<div style="display:flex;">${icon('sprout','#eaffff',Math.round(h*0.2),1.6)}</div>`
+      +`<div style="display:flex;">${icon('star','#eaffff',Math.round(h*0.2),1.6)}</div>`
+      +`<div style="display:flex;font-size:${Math.round(h*0.32)}px;font-weight:900;line-height:1;margin:0 ${Math.round(w*0.02)}px;color:#fff;">${d.num||'No.1'}</div>`
+      +`<div style="display:flex;">${icon('star','#eaffff',Math.round(h*0.2),1.6)}</div>`
     +`</div>`
     +`<div style="display:flex;align-items:center;justify-content:center;background:#fff;color:${teal};font-size:${Math.round(h*0.05)}px;font-weight:900;padding:${Math.round(h*0.012)}px ${Math.round(w*0.025)}px;border-radius:40px;margin-top:${Math.round(h*0.03)}px;align-self:flex-start;">${d.chip||'登録者数 00,000以上！'}</div>`
     +`<div style="position:absolute;left:${Math.round(w*0.06)}px;bottom:${Math.round(h*0.07)}px;display:flex;align-items:center;border:3px solid #fff;border-radius:8px;padding:6px 18px;font-size:${Math.round(h*0.05)}px;font-weight:900;">${d.logo||'Logo'}</div>`
@@ -1632,11 +1632,13 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +`<div style="display:flex;align-items:center;font-size:110px;font-weight:900;color:#fff;${xstroke(9,'#10204a')};margin:6px 0;">${mk(d.mid,'#5ad0ff')}</div>`
         +`<div style="display:flex;align-items:center;font-size:170px;font-weight:900;color:#fff;${xstroke(9,'#3a2a00')};">${mk(d.big,'#ffd21e')}</div>`
       +`</div>`;}},
-{id:"note_s13",name:"note 暖色イラスト＋上 赤フチ2行",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 イラスト(任意)","type":"file","def":""},{"key":"lines","label":"上 2行（《》赤・改行可）","def":"「《親バカ》」は最高の\n子育て戦略である"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#fbe6cf,#f6d2b0);';
-      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#e0241c;">$1</span>');};
-      const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding-top:90px;${bg}">`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:118px;font-weight:900;color:#fff;line-height:1.18;${xstroke(9,'#b81810')};">${lines}</div>`
+{id:"note_s13",name:"note 暖色＋上 赤袋文字＋下 褒め言葉ふきだし",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 イラスト(任意)","type":"file","def":""},{"key":"lines","label":"上 2行（赤袋文字・改行可）","def":"「親バカ」は最高の\n子育て戦略である"},{"key":"bubbles","label":"下 褒め言葉（カンマ区切り）","def":"すごいね,だいすき,よくできたね,さいこう！"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#fde7d2,#f6cca8);';
+      const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${l}</div>`;}).join('');
+      const cols=['#ff8a3a','#ff6f7a','#5ab0e0','#7ec46a'];
+      const bb=String(d.bubbles).split(',').map(function(x,i){return `<div style="display:flex;align-items:center;justify-content:center;background:#fff;color:${cols[i%cols.length]};font-family:Yomogi;font-size:48px;font-weight:700;padding:16px 38px;border-radius:50px;margin:0 14px;box-shadow:0 8px 20px rgba(180,110,70,0.2);">${x}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:120px 90px 130px;${bg}">`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:124px;font-weight:900;color:#e8341e;line-height:1.2;${xstroke(11,'#ffffff')}">${lines}</div>`
+        +`<div style="display:flex;flex-wrap:wrap;justify-content:center;">${bb}</div>`
       +`</div>`;}},
 {id:"note_s14",name:"note 金炎LP＋特大英字＋下チップ",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 画像(任意・金炎)","type":"file","def":""},{"key":"top","label":"上 帯","def":"Xで爆発的に伸ばすための教科書"},{"key":"big","label":"特大タイトル","def":"Xplosion"},{"key":"sub","label":"下 サブ","def":"X運用82日で結果を出した、すべてを公開"},{"key":"chips","label":"下チップ（カンマ区切り）","def":"フォロワー1万人,2ヶ月で収益化,完全有料,44日で60万円"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:radial-gradient(circle at 50% 45%,#5a3400,#0a0600 75%);';
       const chips=String(d.chips).split(',').map(function(x){return `<div style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);border:2px solid #ffb02a;color:#ffd24a;font-size:30px;font-weight:900;padding:10px 20px;margin:0 8px;border-radius:10px;">${x}</div>`;}).join('');
@@ -1647,13 +1649,15 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +`<div style="display:flex;">${chips}</div>`
       +`</div>`;}},
 {id:"note_s15",name:"note 黒金神秘＋上小＋金2行＋下赤帯",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 画像(任意・黒金)","type":"file","def":""},{"key":"top","label":"上 小","def":"7年間の研究で辿り着いた"},{"key":"big","label":"金 特大（改行可）","def":"引き寄せの法則\n最短発動ワーク"},{"key":"band","label":"下 赤帯","def":"※いきなり叶い始めます　覚悟して実践してください"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:radial-gradient(circle at 50% 42%,#4a3a10,#080604 72%);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;font-size:48px;font-weight:700;color:#f0e0b0;margin-bottom:14px;">${d.top}</div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:126px;font-weight:900;color:#e8c860;line-height:1.18;text-shadow:0 0 24px rgba(220,180,80,0.6);">${nl(d.big)}</div>`
-        +`<div style="position:absolute;left:0;bottom:60px;width:100%;display:flex;justify-content:center;"><div style="display:flex;background:#b81818;color:#fff;font-size:40px;font-weight:900;padding:10px 34px;">${d.band}</div></div>`
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;${bg}">`
+        +`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;">`
+          +`<div style="display:flex;font-size:48px;font-weight:700;letter-spacing:4px;color:#f0e0b0;margin-bottom:20px;">${d.top}</div>`
+          +`<div style="display:flex;flex-direction:column;align-items:center;font-size:128px;font-weight:900;color:#e8c860;line-height:1.2;text-shadow:0 0 26px rgba(220,180,80,0.6);">${nl(d.big)}</div>`
+        +`</div>`
+        +`<div style="width:100%;display:flex;justify-content:center;align-items:center;background:#b81818;padding:24px 0;"><div style="display:flex;font-size:42px;font-weight:900;color:#fff;">${d.band}</div></div>`
       +`</div>`;}},
-{id:"note_s16",name:"note 水色＋左イラスト＋右白パネル＋丸数字",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"左 イラスト(任意)","type":"file","def":""},{"key":"badge","label":"黄バッジ","def":"保存版"},{"key":"big","label":"白パネル内（改行可）","def":"冷蔵庫に貼るだけ\nレシピ帳"},{"key":"num","label":"丸 数字","def":"108"},{"key":"unit","label":"丸 単位","def":"レシピ"}],render:(d,t)=>{const ill=d.img?`<div style="position:absolute;left:70px;top:50%;transform:translateY(-50%);width:520px;height:680px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:flex-end;align-items:center;padding-right:90px;background:#28c0dc;">`
+{id:"note_s16",name:"note 保存版まとめパネル（数字＋画像は任意）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"左 イラスト(任意)","type":"file","def":""},{"key":"badge","label":"黄バッジ","def":"保存版"},{"key":"big","label":"白パネル内（改行可）","def":"冷蔵庫に貼るだけ\nレシピ帳"},{"key":"num","label":"丸 数字","def":"108"},{"key":"unit","label":"丸 単位","def":"レシピ"}],render:(d,t)=>{const ill=d.img?`<div style="position:absolute;left:70px;top:50%;transform:translateY(-50%);width:520px;height:680px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:${d.img?'flex-end':'center'};align-items:center;padding:0 90px;background:#28c0dc;">`
         +ill
         +`<div style="display:flex;flex-direction:column;align-items:center;background:#fff;border-radius:34px;padding:44px 90px;">`
           +`<div style="display:flex;background:#ffe24a;color:#2a2a2a;font-size:50px;font-weight:900;padding:8px 44px;border-radius:30px;margin-bottom:26px;">${d.badge}</div>`
@@ -1693,14 +1697,14 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +`<div style="position:relative;display:flex;align-items:center;font-size:74px;font-weight:900;color:#fff;margin-top:18px;">${mk(d.sub)}</div>`
         +`<div style="position:relative;display:flex;font-size:38px;font-weight:500;color:#aeb8c8;margin-top:14px;">${d.sub2}</div>`
       +`</div>`;}},
-{id:"note_s30",name:"note 黒金＋左アイコン＋角括弧帯＋金2行",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"左 アイコン(任意)","type":"file","def":""},{"key":"badge","label":"上 帯ラベル","def":"SNS不要"},{"key":"big","label":"2行（《》金・改行可）","def":"顔出しなしで\n《稼ぐ副業》"},{"key":"tail","label":"小","def":"まとめ"}],render:(d,t)=>{const ic=d.img?`<div style="position:absolute;left:120px;top:50%;transform:translateY(-50%);width:300px;height:300px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
-      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#e8c860;">$1</span>');};
+{id:"note_s30",name:"note 黒金＋左アイコン＋角括弧帯＋金2行",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"左 アイコン(任意)","type":"file","def":""},{"key":"badge","label":"上 帯ラベル","def":"SNS不要"},{"key":"big","label":"2行（《》金・改行可）","def":"顔出しなしで\n《稼ぐ副業》"},{"key":"tail","label":"小","def":"まとめ"},{"key":"items","label":"下チップ（カンマ区切り）","def":"ブログ,コンテンツ販売,物販,AI活用,動画編集"}],render:(d,t)=>{const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#e8c860;">$1</span>');};
       const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;justify-content:center;">${mk(l)}</div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(circle at 55% 45%,#2a2410,#080604 72%);font-family:${t.head};">`
-        +ic
-        +`<div style="display:flex;align-items:center;border-top:2px solid #c8a850;border-bottom:2px solid #c8a850;padding:8px 40px;color:#e8d8a0;font-size:46px;font-weight:900;margin-bottom:22px;">${d.badge}</div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:134px;font-weight:900;color:#fff;line-height:1.12;text-shadow:0 3px 14px rgba(0,0,0,0.5);">${lines}</div>`
-        +`<div style="display:flex;font-size:48px;font-weight:900;color:#e8d8a0;margin-top:10px;">${d.tail}</div>`
+      const chips=String(d.items).split(',').filter(function(x){return x.length;}).map(function(x){return `<div style="display:flex;align-items:center;justify-content:center;border:2px solid #b89a4a;color:#e8d8a0;font-size:38px;font-weight:900;padding:9px 28px;border-radius:50px;margin:8px;">${x}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(circle at 55% 42%,#2a2410,#080604 72%);font-family:${t.head};">`
+        +`<div style="display:flex;align-items:center;border-top:2px solid #c8a850;border-bottom:2px solid #c8a850;padding:8px 40px;color:#e8d8a0;font-size:44px;font-weight:900;margin-bottom:22px;">${d.badge}</div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;font-size:120px;font-weight:900;color:#fff;line-height:1.14;text-shadow:0 3px 14px rgba(0,0,0,0.5);">${lines}</div>`
+        +`<div style="display:flex;font-size:46px;font-weight:900;color:#e8d8a0;margin-top:8px;">${d.tail}</div>`
+        +`<div style="display:flex;flex-wrap:wrap;justify-content:center;max-width:1500px;margin-top:40px;">${chips}</div>`
       +`</div>`;}},
 {id:"note_s31",name:"note 金LP＋特大3行＋下帯",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 画像(任意・金)","type":"file","def":""},{"key":"big","label":"特大3行（《》金・改行可）","def":"ChatGPT\n《画像生成》\n《オールインパック》"},{"key":"sub","label":"下 帯","def":"SNS・広告・バナー・図解・漫画・表紙までプロ品質でワンストップで実現！"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:radial-gradient(circle at 50% 45%,#5a3e08,#0c0804 78%);';
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#ffd24a;">$1</span>');};
@@ -1709,10 +1713,14 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +`<div style="display:flex;flex-direction:column;align-items:center;font-size:142px;font-weight:900;color:#fff;line-height:1.04;${xstroke(9,'#3a2600')};">${lines}</div>`
         +`<div style="display:flex;background:rgba(0,0,0,0.55);color:#ffe6b0;font-size:38px;font-weight:900;padding:12px 30px;border-radius:10px;margin-top:26px;">${d.sub}</div>`
       +`</div>`;}},
-{id:"note_s33",name:"note 写真＋下 毛筆2部",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 写真(任意)","type":"file","def":""},{"key":"big","label":"下 毛筆（《》赤）","def":"《有料記事、》だからなんだ?"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#3a4a5a,#1a2230);';
-      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#e0241c;">$1</span>');};
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;justify-content:center;align-items:flex-end;padding-bottom:60px;${bg}">`
-        +`<div style="display:flex;align-items:center;font-family:Yomogi;font-size:160px;font-weight:700;color:#fff;${xstroke(9,'#1a1a1a')};">${mk(d.big)}</div>`
+{id:"note_s33",name:"note ダーク＋毛筆フレーズ（《》赤・自由改行）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 写真(任意)","type":"file","def":""},{"key":"lines","label":"フレーズ（改行可・《》で赤）","def":"情報を並べただけの\n《有料記事》、だからなんだ?"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(150deg,#3a4658 0%,#232b37 58%,#171c26 100%);';
+      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#ff3a26;">$1</span>');};
+      const lines=String(d.lines).split('\n').map(function(l){return `<div style="display:flex;align-items:center;justify-content:center;">${mk(l)}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 120px;${bg}">`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(180deg,rgba(0,0,0,0.35),rgba(0,0,0,0.05) 38%,rgba(0,0,0,0.1) 66%,rgba(0,0,0,0.45));"></div>`
+        +`<div style="position:absolute;left:120px;top:130px;display:flex;font-family:'Shippori Mincho';font-size:300px;line-height:0.7;color:rgba(255,255,255,0.12);">「</div>`
+        +`<div style="position:absolute;right:120px;bottom:120px;display:flex;font-family:'Shippori Mincho';font-size:300px;line-height:0.7;color:rgba(255,255,255,0.12);">」</div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;font-family:Yomogi;font-size:122px;font-weight:700;color:#fff;line-height:1.42;${xstroke(10,'#10141c')}">${lines}</div>`
       +`</div>`;}},
 {id:"note_s34",name:"note ミニマル紫＋中央2行＋下 日付/ブランド",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 画像(任意)","type":"file","def":""},{"key":"big","label":"中央2行（《》水色・改行可）","def":"Claude CodeとClaude Designで\n完結する新しい《スライド制作術》"},{"key":"date","label":"左下 日付","def":"Apr 24, 2026"},{"key":"brand","label":"右下 ブランド","def":"POSTS"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#3a3a8a,#5a3a9a,#2a2a5a);';
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#9ab8ff;">$1</span>');};
@@ -1739,44 +1747,24 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
       +`</div>`;}},
 {id:"note_s39",name:"note 暗ロマン写真＋中央4段",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 写真(任意・暗め)","type":"file","def":""},{"key":"label","label":"上 枠ラベル","def":"【片思い両思い】を"},{"key":"big","label":"特大","def":"実らせる"},{"key":"s1","label":"小","def":"簡単な"},{"key":"s2","label":"下","def":"恋愛上級者テクニック"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(150deg,#3a2e26,#140e0a);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;${bg}">`
-        +`<div style="display:flex;border:2px solid rgba(255,255,255,0.7);padding:8px 30px;color:#fff;font-size:46px;font-weight:700;margin-bottom:14px;text-shadow:0 2px 8px rgba(0,0,0,0.6);">${d.label}</div>`
-        +`<div style="display:flex;font-size:160px;font-weight:900;color:#fff;line-height:1;${xstroke(9,'#1a1a1a','rgba(0,0,0,0)')};">${d.big}</div>`
-        +`<div style="display:flex;font-size:48px;font-weight:700;color:#fff;margin-top:10px;text-shadow:0 2px 8px rgba(0,0,0,0.6);">${d.s1}</div>`
-        +`<div style="display:flex;font-size:72px;font-weight:900;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${d.s2}</div>`
+        +`<div style="display:flex;border:2px solid rgba(255,255,255,0.7);padding:8px 30px;color:#fff;font-size:46px;font-weight:700;margin-bottom:30px;text-shadow:0 2px 8px rgba(0,0,0,0.6);">${d.label}</div>`
+        +`<div style="display:flex;font-size:168px;font-weight:900;color:#fff;line-height:1;${xstroke(9,'#1a1a1a','rgba(0,0,0,0)')};">${d.big}</div>`
+        +`<div style="display:flex;font-size:48px;font-weight:700;color:#fff;margin-top:30px;text-shadow:0 2px 8px rgba(0,0,0,0.6);">${d.s1}</div>`
+        +`<div style="display:flex;font-size:76px;font-weight:900;color:#fff;margin-top:14px;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${d.s2}</div>`
       +`</div>`;}},
-{id:"note_s42",name:"note クリーム＋金枠＋イラスト＋左下特大",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 イラスト(任意)","type":"file","def":""},{"key":"big","label":"左下 特大","def":"訴状着弾"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:#f6edd6;';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;align-items:flex-end;border:18px solid #c9a94e;${bg}">`
-        +`<div style="display:flex;margin:0 0 70px 70px;font-size:200px;font-weight:900;color:#1a1a1a;line-height:1;${xstroke(9,'#f6edd6','rgba(0,0,0,0)')};">${d.big}</div>`
+{id:"note_s42",name:"note 金枠＋実録ラベル＋黒特大＋サブ（事件・暴露）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 画像(任意)","type":"file","def":""},{"key":"label","label":"上 ラベル","def":"実録"},{"key":"big","label":"特大タイトル（改行可）","def":"消えた2000万と\n一通の訴状"},{"key":"sub","label":"下 サブ","def":"その顛末を、すべて書きます"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:#f6edd6;';
+      const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;">${l}</div>`;}).join('');
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 110px;border:18px solid #c9a94e;${bg}">`
+        +`<div style="display:flex;align-items:center;margin-bottom:30px;"><div style="display:flex;width:64px;height:6px;background:#c9a94e;margin-right:22px;"></div><div style="display:flex;font-size:48px;font-weight:900;letter-spacing:10px;color:#9a7a2e;">${d.label}</div></div>`
+        +`<div style="display:flex;flex-direction:column;font-size:152px;font-weight:900;color:#1a1a1a;line-height:1.16;${xstroke(8,'#f6edd6','rgba(0,0,0,0)')}">${lines}</div>`
+        +`<div style="display:flex;font-size:50px;font-weight:700;color:#6a583a;margin-top:30px;">${d.sub}</div>`
       +`</div>`;}},
-{id:"note_s43",name:"note 2×2マトリクス図解（スライド型）",cat:"サムネ",fmt:"note",fields:[{"key":"title","label":"タイトル","def":"イノベーションの類型化"},{"key":"cells","label":"4象限 ラベル|項目,項目 を / 区切り（左上→右上→左下→右下）","def":"B|ウォークマン,ウォシュレット,CVS/A|電話,検索エンジン,iPhone/|/C|電報,新幹線,TESLA"},{"key":"xa","label":"横軸ラベル","def":"解決のアプローチ"},{"key":"ya","label":"縦軸ラベル","def":"問題の種類"}],render:(d,t)=>{const cs=String(d.cells).split('/');const cell=function(x){const p=x.split('|');const items=(p[1]||'').split(',').filter(Boolean).map(function(it){return `<div style="display:flex;align-items:center;font-size:38px;color:#1a2a3a;margin-top:6px;"><div style="display:flex;width:18px;height:18px;border-radius:50%;background:#1a2a3a;margin-right:14px;"></div>${it}</div>`;}).join('');
-        return `<div style="display:flex;flex-direction:column;width:600px;height:280px;border:3px solid #16324a;padding:18px 26px;"><div style="display:flex;justify-content:center;font-size:46px;font-weight:900;color:#16324a;">${p[0]||''}</div>${items}</div>`;};
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#ffffff;font-family:${t.head};color:#16324a;">`
-        +`<div style="position:absolute;top:60px;left:90px;display:flex;font-size:60px;font-weight:900;">${d.title}</div>`
-        +`<div style="display:flex;flex-direction:column;border:3px solid #16324a;">`
-          +`<div style="display:flex;">${cell(cs[0]||'')}${cell(cs[1]||'')}</div>`
-          +`<div style="display:flex;">${cell(cs[2]||'')}${cell(cs[3]||'')}</div>`
-        +`</div>`
-        +`<div style="display:flex;font-size:42px;font-weight:700;margin-top:24px;">${d.xa}　→</div>`
-        +`<div style="position:absolute;left:60px;top:50%;display:flex;font-size:42px;font-weight:700;">${d.ya}</div>`
-      +`</div>`;}},
-{id:"note_s46",name:"note ゲームリザルト型（左情報＋中央順位＋右チーム）",cat:"サムネ",fmt:"note",fields:[{"key":"badge","label":"中央 バッジ","def":"チャンピオン級"},{"key":"rank","label":"順位","def":"3位"},{"key":"rate","label":"最終レート","def":"2677.551"},{"key":"season","label":"シーズン","def":"シーズンM-1"},{"key":"rule","label":"ルール","def":"ダブルバトル"},{"key":"period","label":"期間","def":"2026/04/08〜05/13"},{"key":"team","label":"チーム6体（カンマ）","def":"ガブリアス,カイリュー,リザードン,ドドゲザン,エルフーン,ニンフィア"}],render:(d,t)=>{const box=function(lb,vl){return `<div style="display:flex;flex-direction:column;background:rgba(255,255,255,0.1);border-radius:14px;padding:16px 24px;margin-bottom:18px;"><div style="display:flex;font-size:30px;color:#c8c0f0;">${lb}</div><div style="display:flex;font-size:42px;font-weight:900;color:#fff;">${vl}</div></div>`;};
-      const team=String(d.team).split(',').map(function(x){return `<div style="display:flex;align-items:center;background:rgba(255,255,255,0.1);border-radius:12px;padding:8px 18px;margin-bottom:10px;"><div style="display:flex;width:48px;height:48px;border-radius:50%;background:#6a5aaa;margin-right:16px;"></div><div style="display:flex;font-size:34px;font-weight:700;color:#fff;">${x}</div></div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:50px 60px;background:linear-gradient(160deg,#4a3a8a,#241a52);font-family:${t.head};">`
-        +`<div style="display:flex;flex-direction:column;width:460px;">${box('ランクバトル',d.season)}${box('バトルルール',d.rule)}${box('開催期間',d.period)}</div>`
-        +`<div style="display:flex;flex-direction:column;align-items:center;width:560px;">`
-          +`<div style="display:flex;background:linear-gradient(90deg,#1a2a6a,#3a4a9a);border:3px solid #e8c860;border-radius:16px;padding:18px 50px;font-size:72px;font-weight:900;color:#8ad0ff;${xstroke(9,'#16204a')};">${d.badge}</div>`
-          +`<div style="display:flex;font-size:40px;color:#c8c0f0;margin-top:26px;">順位</div>`
-          +`<div style="display:flex;font-size:120px;font-weight:900;color:#8ad0ff;line-height:1;">${d.rank}</div>`
-          +`<div style="display:flex;font-size:34px;color:#c8c0f0;margin-top:14px;">最終レート</div>`
-          +`<div style="display:flex;font-size:64px;font-weight:900;color:#fff;">${d.rate}</div>`
-        +`</div>`
-        +`<div style="display:flex;flex-direction:column;width:460px;"><div style="display:flex;justify-content:flex-end;font-size:40px;font-weight:900;color:#fff;margin-bottom:16px;">チーム1</div>${team}</div>`
-      +`</div>`;}},
-{id:"note_s55",name:"note YouTube副業型（ロゴ＋数字袋文字＋帯）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"右 キャラ(任意)","type":"file","def":""},{"key":"corner","label":"右上 小","def":"顔出しなし・声出しなし"},{"key":"l1","label":"1行（《》桃）","def":"再生数《0》から"},{"key":"l2","label":"特大","def":"150万円"},{"key":"band","label":"帯","def":"ジャンル公開！"},{"key":"tag","label":"タグ","def":"未経験主婦"}],render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:60px;top:50%;transform:translateY(-50%);width:360px;height:360px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
+{id:"note_s55",name:"note YouTube副業型（ロゴ＋数字袋文字＋帯）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"右 キャラ(任意)","type":"file","def":""},{"key":"badge","label":"バッジ（カテゴリ）","def":"YouTube"},{"key":"corner","label":"右上 小（任意・空欄で非表示）","def":"顔出しなし・声出しなし"},{"key":"l1","label":"1行（《》桃）","def":"再生数《0》から"},{"key":"l2","label":"特大","def":"150万円"},{"key":"band","label":"帯","def":"ジャンル公開！"},{"key":"tag","label":"タグ","def":"未経験主婦"}],render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:60px;top:50%;transform:translateY(-50%);width:360px;height:360px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
+      const corner=String(d.corner||'').trim()?`<div style="position:absolute;right:64px;top:56px;display:flex;background:rgba(26,26,26,0.85);color:#fff;font-size:34px;font-weight:700;padding:8px 24px;border-radius:10px;">${d.corner}</div>`:'';
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#ff3a8a;">$1</span>');};
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:100px;background:linear-gradient(150deg,#ffd0e0,#ffe8c0);">`
-        +right
-        +`<div style="position:relative;display:flex;align-items:center;margin-bottom:8px;"><div style="display:flex;background:#ff0000;color:#fff;font-size:54px;font-weight:900;padding:6px 26px;border-radius:14px;">YouTube</div></div>`
+        +right+corner
+        +`<div style="position:relative;display:flex;align-items:center;margin-bottom:8px;"><div style="display:flex;background:#ff0000;color:#fff;font-size:54px;font-weight:900;padding:6px 26px;border-radius:14px;">${d.badge}</div></div>`
         +`<div style="position:relative;display:flex;align-items:center;font-size:110px;font-weight:900;color:#1a1a1a;${xstroke(9,'#fff')};">${mk(d.l1)}</div>`
         +`<div style="position:relative;display:flex;font-size:200px;font-weight:900;color:#ff2a82;line-height:1;${xstroke(9,'#fff')};">${d.l2}</div>`
         +`<div style="position:relative;display:flex;align-items:center;margin-top:10px;"><div style="display:flex;background:#ffd21e;color:#1a1a1a;font-size:48px;font-weight:900;padding:8px 28px;border-radius:10px;">${d.band}</div><div style="display:flex;border:3px solid #1a1a1a;color:#1a1a1a;font-size:40px;font-weight:900;padding:6px 22px;margin-left:18px;">${d.tag}</div></div>`
@@ -1790,11 +1778,11 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +`<div style="position:absolute;left:0;bottom:0;width:100%;display:flex;justify-content:center;align-items:center;background:#5a5a5a;padding:16px 0;"><div style="display:flex;align-items:center;font-size:44px;font-weight:900;color:#fff;">${mk(d.band)}</div></div>`
       +`</div>`;}},
 {id:"note_s60",name:"note イベントポスター型",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 写真(任意)","type":"file","def":""},{"key":"brand","label":"左上 ブランド","def":"ABEMA"},{"key":"big","label":"特大タイトル","def":"エイオキクラッチ01"},{"key":"en","label":"英字サブ","def":"PROWRESLING MATCH | SHINJUKU FACE"},{"key":"date","label":"日付","def":"4.20 2026"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#0a2a5a,#04122e);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;padding:70px 0 0 80px;${bg}">`
-        +`<div style="display:flex;font-size:50px;font-weight:900;letter-spacing:4px;color:#fff;margin-bottom:10px;">${d.brand}</div>`
-        +`<div style="display:flex;font-size:140px;font-weight:900;color:#fff;line-height:1;${xstroke(9,'#0a1a3a')};">${d.big}</div>`
-        +`<div style="display:flex;font-size:38px;font-weight:700;letter-spacing:4px;color:#cfe0ff;margin-top:14px;">${d.en}</div>`
-        +`<div style="display:flex;font-size:80px;font-weight:900;color:#fff;margin-top:14px;${xstroke(9,'#0a1a3a')};">${d.date}</div>`
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;padding:90px 80px 80px 80px;${bg}">`
+        +`<div style="display:flex;font-size:50px;font-weight:900;letter-spacing:4px;color:#fff;margin-bottom:14px;">${d.brand}</div>`
+        +`<div style="display:flex;font-size:150px;font-weight:900;color:#fff;line-height:1.02;${xstroke(9,'#0a1a3a')};">${d.big}</div>`
+        +`<div style="display:flex;font-size:40px;font-weight:700;letter-spacing:4px;color:#cfe0ff;margin-top:18px;">${d.en}</div>`
+        +`<div style="display:flex;align-items:center;margin-top:auto;"><div style="display:flex;width:14px;height:80px;background:#ffd24a;margin-right:24px;"></div><div style="display:flex;font-size:88px;font-weight:900;color:#fff;${xstroke(9,'#0a1a3a')};">${d.date}</div></div>`
       +`</div>`;}},
 {id:"note_s65",name:"note 図解教育型（中央2行＋下サブ）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 イラスト(任意)","type":"file","def":""},{"key":"big","label":"中央2行（《》強調・改行可）","def":"人間関係のモヤモヤを消す\n「《中和の法則》」"},{"key":"sub","label":"下 サブ","def":"〜ネガティブな人への3つの対処法"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#eef4fa,#dce8f2);';
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#1763c4;">$1</span>');};
@@ -1803,8 +1791,16 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +`<div style="display:flex;flex-direction:column;align-items:center;font-size:96px;font-weight:900;color:#1a2a3a;line-height:1.2;text-shadow:0 2px 8px rgba(255,255,255,0.6);">${lines}</div>`
         +`<div style="display:flex;font-size:50px;font-weight:900;color:#3a4a5a;margin-top:18px;">${d.sub}</div>`
       +`</div>`;}},
-{id:"note_s66",name:"note 写真＋右下 コーナーテロップ",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 写真(任意)","type":"file","def":""},{"key":"corner","label":"右下 テロップ","def":"観た後に自分を読む"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#caa050,#5a3a20);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
+{id:"note_s66",name:"note 大見出し＋右下コーナーテロップ（写真任意）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 写真(任意)","type":"file","def":""},{"key":"eyebrow","label":"左上 ラベル(任意・空欄で非表示)","def":"映画レビュー"},{"key":"big","label":"大見出し（《》金・改行可）","def":"観て終わりに\nしない《読み解き方》"},{"key":"corner","label":"右下 テロップ","def":"観た後に自分を読む"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(120deg,#caa050,#5a3a20);';
+      const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#ffd24a;">$1</span>');};
+      const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;align-items:center;">${mk(l)}</div>`;}).join('');
+      const eb=String(d.eyebrow||'').trim()?`<div style="display:flex;align-self:flex-start;background:rgba(30,90,180,0.92);color:#fff;font-size:42px;font-weight:900;padding:8px 28px;margin-bottom:26px;">${d.eyebrow}</div>`:'';
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 120px 0 90px;${bg}font-family:${t.head};">`
+        +`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:linear-gradient(90deg,rgba(0,0,0,0.6),rgba(0,0,0,0.2) 55%,rgba(0,0,0,0));"></div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;align-items:flex-start;">`
+          +eb
+          +`<div style="display:flex;flex-direction:column;align-items:flex-start;font-size:130px;font-weight:900;color:#fff;line-height:1.1;${xstroke(9,'#1a1208')};">${lines}</div>`
+        +`</div>`
         +`<div style="position:absolute;right:0;bottom:0;display:flex;align-items:center;background:rgba(30,90,180,0.88);padding:24px 70px 24px 110px;transform:skewX(-12deg);transform-origin:bottom right;margin-right:-30px;"><div style="display:flex;transform:skewX(12deg);font-size:54px;font-weight:900;color:#fff;">${d.corner}</div></div>`
       +`</div>`;}},
 {id:"note_s68",name:"note 起業ママLP（バッジ×3＋特大＋下帯＋リボン）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"右 女性(任意)","type":"file","def":""},{"key":"top","label":"上 小","def":"頑張るほど、理想から離れる感覚にモヤモヤしている起業ママへ"},{"key":"badges","label":"バッジ3（カンマ）","def":"起業,子育て,夫婦関係"},{"key":"big","label":"特大2行（《》金・改行可）","def":"望む未来を《全部叶える》\n超実践ハンドブック"},{"key":"band","label":"下帯","def":"全部あきらめない！と決めた起業ママ専用"},{"key":"ribbon","label":"右上 リボン","def":"実践ガイド"}],render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:0;bottom:0;width:480px;height:1006px;background:url(${d.img}) center/cover;display:flex;"></div>`:'';
@@ -1829,13 +1825,15 @@ const TEMPLATES=[{id:"cover_target",name:"A2 ターゲット名指し（表紙�
         +`<div style="position:relative;display:flex;background:#1763c4;color:#fff;font-size:54px;font-weight:900;padding:10px 30px;border-radius:10px;margin-top:20px;${xstroke(9,'#0e3f86')};">${d.band}</div>`
       +`</div>`;}},
 {id:"note_s76",name:"note 連載型（ブランド帯＋黄バブル＋下青帯）",cat:"サムネ",fmt:"note",fields:[{"key":"img","label":"背景 写真(任意)","type":"file","def":""},{"key":"brand","label":"左上 ブランド","def":"小林よしのり ライジング"},{"key":"bubble","label":"上 黄バブル","def":"沖縄の男尊女卑はどこから来た?"},{"key":"big","label":"下 青帯（改行可）","def":"沖縄と本土、\nどちらが辺境か?"}],render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#8ac0e0,#3a7a4a);';
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;${bg}">`
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;${bg}font-family:${t.head};">`
         +`<div style="position:absolute;top:36px;left:60px;display:flex;align-items:center;"><div style="display:flex;font-size:44px;font-weight:900;letter-spacing:4px;color:#1a1a1a;margin-right:18px;">note</div><div style="display:flex;background:#e8852a;color:#fff;font-size:42px;font-weight:900;padding:8px 26px;border-radius:8px;">${d.brand}</div></div>`
-        +`<div style="position:absolute;top:130px;left:50%;transform:translateX(-50%);display:flex;background:#ffe24a;color:#1a1a1a;font-size:50px;font-weight:900;padding:12px 38px;border-radius:40px;">${d.bubble}</div>`
-        +`<div style="position:absolute;left:0;bottom:50px;width:100%;display:flex;justify-content:center;"><div style="display:flex;flex-direction:column;align-items:center;background:#1763c4;padding:18px 50px;border-radius:14px;font-size:104px;font-weight:900;color:#fff;line-height:1.1;${xstroke(9,'#0e3f86')};">${nl(d.big)}</div></div>`
+        +`<div style="display:flex;flex-direction:column;align-items:center;">`
+          +`<div style="display:flex;background:#ffe24a;color:#1a1a1a;font-size:50px;font-weight:900;padding:12px 38px;border-radius:40px;margin-bottom:44px;">${d.bubble}</div>`
+          +`<div style="display:flex;flex-direction:column;align-items:center;background:#1763c4;padding:18px 50px;border-radius:14px;font-size:104px;font-weight:900;color:#fff;line-height:1.1;${xstroke(9,'#0e3f86')};">${nl(d.big)}</div>`
+        +`</div>`
       +`</div>`;}},
-{id:"yt_info_hero",name:"インフォ ヒーロー数字（線画＋黄マーカー）",cat:"サムネ",fmt:"youtube",fields:[{"key":"icon","label":"アイコン名(lucide)","def":"plane"},{"key":"label","label":"上 ラベル","def":"年間休日"},{"key":"num","label":"大数字","def":"123日"},{"key":"unit","label":"単位(任意)","def":"相当"},{"key":"desc","label":"説明","def":"しっかり休んで生活を充実。趣味や家族との時間が、良い仕事につながる。"}],render:(d,t)=>infoHero(1280,720,d)},
-{id:"note_info_hero",name:"インフォ ヒーロー数字（線画＋黄マーカー）",cat:"サムネ",fmt:"note",fields:[{"key":"icon","label":"アイコン名(lucide)","def":"plane"},{"key":"label","label":"上 ラベル","def":"年間休日"},{"key":"num","label":"大数字","def":"123日"},{"key":"unit","label":"単位(任意)","def":"相当"},{"key":"desc","label":"説明","def":"しっかり休んで生活を充実。趣味や家族との時間が、良い仕事につながる。"}],render:(d,t)=>infoHero(1920,1006,d)},
+{id:"yt_info_hero",name:"インフォ ヒーロー数字（線画＋黄マーカー）",cat:"サムネ",fmt:"youtube",fields:[{"key":"icon","label":"アイコン名(lucide)","def":"plane"},{"key":"label","label":"上 ラベル","def":"年間休日"},{"key":"num","label":"大数字","def":"123日"},{"key":"unit","label":"単位(任意)","def":"相当"},{"key":"desc","label":"説明","def":"しっかり休めて、生活が充実する。"}],render:(d,t)=>infoHero(1280,720,d)},
+{id:"note_info_hero",name:"インフォ ヒーロー数字（線画＋黄マーカー）",cat:"サムネ",fmt:"note",fields:[{"key":"icon","label":"アイコン名(lucide)","def":"plane"},{"key":"label","label":"上 ラベル","def":"年間休日"},{"key":"num","label":"大数字","def":"123日"},{"key":"unit","label":"単位(任意)","def":"相当"},{"key":"desc","label":"説明","def":"しっかり休めて、生活が充実する。"}],render:(d,t)=>infoHero(1920,1006,d)},
 {id:"yt_info_stat3",name:"インフォ 数字スタッツ 横3枚",cat:"サムネ",fmt:"youtube",fields:[{"key":"title","label":"上 タイトル","def":"数字で見るはたらき方"},{"key":"c1","label":"カード1（icon|ラベル|数字|説明）","def":"plane|年間休日|123日|しっかり休める"},{"key":"c2","label":"カード2","def":"sprout|定着率|90.6%|長く働ける"},{"key":"c3","label":"カード3","def":"baby|育休復職|98.7%|安心して戻れる"}],render:(d,t)=>infoStat3(1280,720,d)},
 {id:"note_info_stat3",name:"インフォ 数字スタッツ 横3枚",cat:"サムネ",fmt:"note",fields:[{"key":"title","label":"上 タイトル","def":"数字で見るはたらき方"},{"key":"c1","label":"カード1（icon|ラベル|数字|説明）","def":"plane|年間休日|123日|しっかり休める"},{"key":"c2","label":"カード2","def":"sprout|定着率|90.6%|長く働ける"},{"key":"c3","label":"カード3","def":"baby|育休復職|98.7%|安心して戻れる"}],render:(d,t)=>infoStat3(1920,1006,d)},
 {id:"yt_info_index",name:"目次 INDEX（点線リーダー2カラム）",cat:"サムネ",fmt:"youtube",fields:[{"key":"title","label":"タイトル","def":"INDEX"},{"key":"items","label":"項目（1行=ラベル|頁・改行区切り）","def":"1 きほんのシャツ|04\n1-A シャツワンピース|05\n1-B ギャザーシャツ|06\n2 きほんのワンピース|09\n2-A ギャザーワンピース|10\n3 きほんのパンツ|13\n3-A サルエル風パンツ|14\n4 きほんのブルゾン|18\n4-A ギャザーブルゾン|19\n5 きほんのエプロン|24"}],render:(d,t)=>infoIndex(1280,720,d)},
