@@ -44,11 +44,11 @@ function glowf(color,blur){return `filter:drop-shadow(0 0 ${blur||18}px ${color}
 function infoCard(w,h,bg){return `width:${w}px;height:${h}px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;background:${bg||'#eaf6fb'};font-family:'Zen Kaku Gothic New';`;}
 function mark(txt,color){return `<span style="display:flex;background:linear-gradient(transparent 58%, ${color||'#FFE24A'} 58%);">${txt}</span>`;}
 function infoHero(w,h,d){const cy='#1aa3d8';
-  return `<div style="${infoCard(w,h,'#eaf6fb')}align-items:center;padding:0 ${Math.round(w*0.07)}px;">`
-    +`<div style="display:flex;align-items:center;justify-content:center;width:${Math.round(h*0.62)}px;height:${Math.round(h*0.62)}px;flex-shrink:0;">${icon(d.icon||'plane',cy,Math.round(h*0.6),1.5)}</div>`
-    +`<div style="display:flex;flex-direction:column;margin-left:${Math.round(w*0.05)}px;">`
+  return `<div style="${infoCard(w,h,'#eaf6fb')}align-items:center;padding:0 ${Math.round(w*0.055)}px;">`
+    +`<div style="display:flex;align-items:center;justify-content:center;width:${Math.round(h*0.46)}px;height:${Math.round(h*0.46)}px;flex-shrink:0;">${icon(d.icon||'plane',cy,Math.round(h*0.44),1.5)}</div>`
+    +`<div style="display:flex;flex-direction:column;margin-left:${Math.round(w*0.045)}px;">`
       +`<div style="display:flex;font-size:${Math.round(h*0.07)}px;font-weight:900;color:#23506a;">${d.label||''}</div>`
-      +`<div style="display:flex;align-items:flex-end;"><div style="display:flex;font-size:${Math.round(h*0.34)}px;font-weight:900;color:#14384e;line-height:0.95;">${mark(d.num||'')}</div><div style="display:flex;font-size:${Math.round(h*0.12)}px;font-weight:900;color:#14384e;margin-left:10px;margin-bottom:${Math.round(h*0.03)}px;">${d.unit||''}</div></div>`
+      +`<div style="display:flex;align-items:flex-end;flex-shrink:0;white-space:nowrap;"><div style="display:flex;white-space:nowrap;font-size:${Math.round(h*0.3)}px;font-weight:900;color:#14384e;line-height:0.95;"><span style="white-space:nowrap;background:linear-gradient(transparent 58%, #FFE24A 58%);">${d.num||''}</span></div><div style="display:flex;flex-shrink:0;white-space:nowrap;font-size:${Math.round(h*0.11)}px;font-weight:900;color:#14384e;margin-left:12px;margin-bottom:${Math.round(h*0.025)}px;">${d.unit||''}</div></div>`
       +`<div style="display:flex;font-size:${Math.round(h*0.045)}px;color:#5a7686;line-height:1.5;margin-top:${Math.round(h*0.03)}px;max-width:${Math.round(w*0.46)}px;">${d.desc||''}</div>`
     +`</div>`
   +`</div>`;}
@@ -56,34 +56,43 @@ function infoStat3(w,h,d){const cy='#1aa3d8';const pad=Math.round(w*0.04);const 
   const card=function(spec){const p=String(spec||'').split('|');return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:${cw}px;height:${Math.round(h*0.66)}px;background:#fff;border-radius:${Math.round(h*0.03)}px;box-shadow:0 6px 20px rgba(20,80,110,0.08);padding:0 ${Math.round(cw*0.06)}px;">`
     +`<div style="display:flex;">${icon(p[0]||'star',cy,Math.round(h*0.18),1.5)}</div>`
     +`<div style="display:flex;font-size:${Math.round(h*0.05)}px;font-weight:900;color:#23506a;margin-top:${Math.round(h*0.02)}px;">${p[1]||''}</div>`
-    +`<div style="display:flex;font-size:${Math.round(h*0.16)}px;font-weight:900;color:#14384e;line-height:1;margin-top:${Math.round(h*0.01)}px;">${mark(p[2]||'')}</div>`
+    +`<div style="display:flex;flex-shrink:0;white-space:nowrap;font-size:${Math.round(h*0.16)}px;font-weight:900;color:#14384e;line-height:1;margin-top:${Math.round(h*0.01)}px;"><span style="white-space:nowrap;background:linear-gradient(transparent 58%, #FFE24A 58%);">${p[2]||''}</span></div>`
     +`<div style="display:flex;font-size:${Math.round(h*0.035)}px;color:#5a7686;text-align:center;line-height:1.4;margin-top:${Math.round(h*0.02)}px;">${p[3]||''}</div>`
   +`</div>`;};
   return `<div style="${infoCard(w,h,'#eaf6fb')}flex-direction:column;align-items:center;justify-content:center;padding:${pad}px;">`
     +`<div style="display:flex;font-size:${Math.round(h*0.085)}px;font-weight:900;color:#14384e;margin-bottom:${Math.round(h*0.045)}px;">${d.title||''}</div>`
     +`<div style="display:flex;gap:${gap}px;">${card(d.c1)}${card(d.c2)}${card(d.c3)}</div>`
   +`</div>`;}
-function infoIndex(w,h,d){const items=String(d.items||'').split('\n').filter(function(x){return x.length;});
-  const half=Math.ceil(items.length/2);const cols=[items.slice(0,half),items.slice(half)];
-  const row=function(line){const p=String(line).split('|');const lead=p[0]||'';const pg=p[1]||'';const major=(/^\d+\s/.test(lead)&&!/^\d+-/.test(lead))?'font-weight:900;color:#1a1a1a;':'font-weight:500;color:#3a3a3a;';
-    return `<div style="display:flex;align-items:flex-end;margin:${Math.round(h*0.017)}px 0;font-size:${Math.round(h*0.034)}px;${major}"><div style="display:flex;flex-shrink:0;">${lead}</div><div style="display:flex;flex:1;border-bottom:2px dashed #cccccc;margin:0 12px ${Math.round(h*0.012)}px;"></div><div style="display:flex;flex-shrink:0;color:#666;">${pg}</div></div>`;};
-  const cwid=Math.round((w-w*0.16-w*0.06)/2);
+function infoIndex(w,h,d){const items=String(d.items||'').split('\n').map(function(s){return s.split('|')[0].trim();}).filter(Boolean);const ac='#1763c4';
+  const two=items.length>6;const half=Math.ceil(items.length/2);const cols=two?[items.slice(0,half),items.slice(half)]:[items];
+  const numFont=two?Math.round(h*0.05):Math.round(h*0.058);const dot=two?Math.round(h*0.075):Math.round(h*0.088);
+  let n=0;const row=function(label){n++;return `<div style="display:flex;align-items:center;margin:${Math.round(h*0.016)}px 0;">`
+    +`<div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;width:${dot}px;height:${dot}px;border-radius:50%;background:${ac};color:#fff;font-size:${Math.round(dot*0.5)}px;font-weight:900;">${n}</div>`
+    +`<div style="display:flex;font-size:${numFont}px;font-weight:700;color:#1a2a3a;margin-left:${Math.round(w*0.02)}px;">${label}</div>`
+  +`</div>`;};
+  const cwid=Math.round((w-w*0.16-w*0.05)/(two?2:1));
   const colDiv=function(arr){return `<div style="display:flex;flex-direction:column;width:${cwid}px;">${arr.map(row).join('')}</div>`;};
-  return `<div style="${infoCard(w,h,'#ffffff')}flex-direction:column;justify-content:center;padding:${Math.round(h*0.08)}px ${Math.round(w*0.08)}px;">`
-    +`<div style="display:flex;font-size:${Math.round(h*0.075)}px;font-weight:900;letter-spacing:4px;color:#1a1a1a;margin-bottom:${Math.round(h*0.05)}px;">${d.title||'INDEX'}</div>`
-    +`<div style="display:flex;justify-content:space-between;">${colDiv(cols[0])}${colDiv(cols[1])}</div>`
+  return `<div style="${infoCard(w,h,'#ffffff')}flex-direction:column;justify-content:center;padding:${Math.round(h*0.09)}px ${Math.round(w*0.08)}px;">`
+    +`<div style="display:flex;align-items:center;margin-bottom:${Math.round(h*0.045)}px;"><div style="display:flex;flex-shrink:0;width:${Math.round(w*0.011)}px;height:${Math.round(h*0.09)}px;background:${ac};margin-right:${Math.round(w*0.018)}px;"></div><div style="display:flex;font-size:${Math.round(h*0.082)}px;font-weight:900;color:#16243f;">${d.title||'この記事でわかること'}</div></div>`
+    +`<div style="display:flex;justify-content:space-between;">${cols.map(colDiv).join('')}</div>`
   +`</div>`;}
-function infoBannerNo1(w,h,d){const teal='#15b3c9';const right=d.img?`<div style="position:absolute;right:${Math.round(w*0.04)}px;top:50%;transform:translateY(-50%);width:${Math.round(w*0.34)}px;height:${Math.round(h*0.6)}px;background:url(${d.img}) center/contain no-repeat;display:flex;"></div>`:'';
-  return `<div style="${infoCard(w,h,teal)}flex-direction:column;justify-content:center;padding:0 ${Math.round(w*0.06)}px;color:#fff;">`
-    +`<div style="display:flex;font-size:${Math.round(h*0.1)}px;font-weight:900;text-shadow:0 3px 0 rgba(0,0,0,0.12);">${d.head||'数字でアピール'}</div>`
-    +`<div style="display:flex;align-items:center;margin-top:${Math.round(h*0.01)}px;">`
-      +`<div style="display:flex;">${icon('star','#eaffff',Math.round(h*0.2),1.6)}</div>`
-      +`<div style="display:flex;font-size:${Math.round(h*0.32)}px;font-weight:900;line-height:1;margin:0 ${Math.round(w*0.02)}px;color:#fff;">${d.num||'No.1'}</div>`
-      +`<div style="display:flex;">${icon('star','#eaffff',Math.round(h*0.2),1.6)}</div>`
+function infoBannerNo1(w,h,d){
+  const bg=d.img?`background:url(${d.img}) center/cover;`:`background:linear-gradient(155deg,#26304e 0%,#141a2e 55%,#080b15 100%);`;
+  const scrim=d.img?`<div style="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;background:rgba(7,11,21,0.66);"></div>`:'';
+  const goldBar=function(){return `<div style="display:flex;width:${Math.round(w*0.16)}px;height:${Math.round(h*0.012)}px;border-radius:${Math.round(h*0.006)}px;background:linear-gradient(90deg,rgba(169,113,29,0),#a9711d,#fff6cf,#f1c75a,#a9711d,rgba(169,113,29,0));"></div>`;};
+  const kicker=String(d.kicker||'').trim()?`<div style="position:relative;display:flex;font-size:${Math.round(h*0.052)}px;font-weight:900;letter-spacing:8px;${metal('gold')}margin-bottom:${Math.round(h*0.03)}px;">${d.kicker}</div>`:'';
+  const pre=String(d.pre||'').trim()?`<div style="position:relative;display:flex;font-size:${Math.round(h*0.092)}px;font-weight:900;color:#ffffff;text-shadow:0 2px 12px rgba(0,0,0,0.5);">${d.pre}</div>`:'';
+  const sub=String(d.sub||'').trim()?`<div style="position:relative;display:flex;font-size:${Math.round(h*0.06)}px;font-weight:700;color:#c8cfe0;margin-top:${Math.round(h*0.03)}px;letter-spacing:2px;">${d.sub}</div>`:'';
+  return `<div style="${infoCard(w,h,'#080b15')}flex-direction:column;justify-content:center;align-items:center;padding:0 ${Math.round(w*0.06)}px;${bg}">`
+    +scrim
+    +kicker
+    +pre
+    +`<div style="position:relative;display:flex;flex-direction:column;align-items:center;margin:${Math.round(h*0.015)}px 0;">`
+      +goldBar()
+      +`<div style="display:flex;flex-shrink:0;white-space:nowrap;font-size:${Math.round(h*0.36)}px;font-weight:900;line-height:1.04;${metal('gold')}${glowf('rgba(241,199,90,0.45)',22)}">${d.num||'No.1'}</div>`
+      +goldBar()
     +`</div>`
-    +`<div style="display:flex;align-items:center;justify-content:center;background:#fff;color:${teal};font-size:${Math.round(h*0.05)}px;font-weight:900;padding:${Math.round(h*0.012)}px ${Math.round(w*0.025)}px;border-radius:40px;margin-top:${Math.round(h*0.03)}px;align-self:flex-start;">${d.chip||'登録者数 00,000以上！'}</div>`
-    +`<div style="position:absolute;left:${Math.round(w*0.06)}px;bottom:${Math.round(h*0.07)}px;display:flex;align-items:center;border:3px solid #fff;border-radius:8px;padding:6px 18px;font-size:${Math.round(h*0.05)}px;font-weight:900;">${d.logo||'Logo'}</div>`
-    +right
+    +sub
   +`</div>`;}
 // 顔の図解（resvgはSVG内textを描画しないので顔は図形のみ・%はHTML側でゾーン色対応リストにする）
 function faceSVG(cf,cc,cj,v){const H='#7C6A56';
@@ -3065,28 +3074,31 @@ const TEMPLATES = [
           +eb
           +`<div style="display:flex;flex-direction:column;align-items:flex-start;font-size:130px;font-weight:900;color:#fff;line-height:1.1;${xstroke(9,'#1a1208')};">${lines}</div>`
         +`</div>`
-        +`<div style="position:absolute;right:0;bottom:0;display:flex;align-items:center;background:rgba(30,90,180,0.88);padding:24px 70px 24px 110px;transform:skewX(-12deg);transform-origin:bottom right;margin-right:-30px;"><div style="display:flex;transform:skewX(12deg);font-size:54px;font-weight:900;color:#fff;">${d.corner}</div></div>`
+        +`<div style="position:absolute;right:0;bottom:0;display:flex;align-items:center;background:rgba(30,90,180,0.9);padding:24px 64px;"><div style="display:flex;font-size:54px;font-weight:900;color:#fff;">${d.corner}</div></div>`
       +`</div>`;} },
 
   { id:'note_s68', name:'note 起業ママLP（バッジ×3＋特大＋下帯＋リボン）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'右 女性(任意)',type:'file',def:''},
-      {key:'top',label:'上 小',def:'頑張るほど、理想から離れる感覚にモヤモヤしている起業ママへ'},
+      {key:'top',label:'上 小(任意・空欄で非表示)',def:''},
       {key:'badges',label:'バッジ3（カンマ）',def:'起業,子育て,夫婦関係'},
       {key:'big',label:'特大2行（《》金・改行可）',def:'望む未来を《全部叶える》\n超実践ハンドブック'},
-      {key:'band',label:'下帯',def:'全部あきらめない！と決めた起業ママ専用'},
-      {key:'ribbon',label:'右上 リボン',def:'実践ガイド'}],
+      {key:'band',label:'下帯(任意・空欄で非表示)',def:'全部あきらめないママ専用'},
+      {key:'ribbon',label:'右上 リボン(任意・空欄で非表示)',def:''}],
     render:(d,t)=>{const right=d.img?`<div style="position:absolute;right:0;bottom:0;width:480px;height:1006px;background:url(${d.img}) center/cover;display:flex;"></div>`:'';
       const mk=function(s){return String(s).replace(/《([^》]*)》/g,'<span style="display:flex;color:#ffd24a;">$1</span>');};
       const lines=String(d.big).split('\n').map(function(l){return `<div style="display:flex;">${mk(l)}</div>`;}).join('');
-      const badges=String(d.badges).split(',').map(function(x,i){return (i>0?'<div style="display:flex;align-items:center;font-size:46px;font-weight:900;color:#fff;margin:0 12px;">×</div>':'')+`<div style="display:flex;background:#fff;color:#16335c;font-size:46px;font-weight:900;padding:6px 30px;border-radius:10px;">${x}</div>`;}).join('');
-      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:90px;background:linear-gradient(150deg,#1a3a6a,#0c2044);">`
+      const badges=String(d.badges).split(',').filter(Boolean).map(function(x,i){return (i>0?'<div style="display:flex;align-items:center;font-size:46px;font-weight:900;color:#fff;margin:0 12px;">×</div>':'')+`<div style="display:flex;background:#fff;color:#16335c;font-size:46px;font-weight:900;padding:6px 30px;border-radius:10px;">${x}</div>`;}).join('');
+      const top=String(d.top||'').trim()?`<div style="position:relative;display:flex;font-size:38px;font-weight:700;color:#cfe0ff;margin-bottom:28px;">${d.top}</div>`:'';
+      const band=String(d.band||'').trim()?`<div style="position:relative;display:flex;background:rgba(255,255,255,0.15);color:#fff;font-size:40px;font-weight:900;padding:10px 28px;border-radius:10px;margin-top:46px;">${d.band}</div>`:'';
+      const ribbon=String(d.ribbon||'').trim()?`<div style="position:absolute;top:50px;right:60px;display:flex;background:#e23a2a;color:#fff;font-size:38px;font-weight:900;padding:10px 26px;transform:rotate(6deg);">${d.ribbon}</div>`:'';
+      return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:120px;background:linear-gradient(150deg,#1a3a6a,#0c2044);">`
         +right
-        +`<div style="position:relative;display:flex;font-size:38px;font-weight:700;color:#cfe0ff;margin-bottom:14px;">${d.top}</div>`
-        +`<div style="position:relative;display:flex;align-items:center;margin-bottom:18px;">${badges}</div>`
-        +`<div style="position:relative;display:flex;flex-direction:column;font-size:118px;font-weight:900;color:#fff;line-height:1.08;${xstroke(9,'#0a1830')};">${lines}</div>`
-        +`<div style="position:relative;display:flex;background:rgba(255,255,255,0.15);color:#fff;font-size:40px;font-weight:900;padding:10px 28px;border-radius:10px;margin-top:20px;">${d.band}</div>`
-        +`<div style="position:absolute;top:50px;right:60px;display:flex;background:#e23a2a;color:#fff;font-size:38px;font-weight:900;padding:10px 26px;transform:rotate(6deg);">${d.ribbon}</div>`
+        +top
+        +`<div style="position:relative;display:flex;align-items:center;margin-bottom:40px;">${badges}</div>`
+        +`<div style="position:relative;display:flex;flex-direction:column;font-size:116px;font-weight:900;color:#fff;line-height:1.16;${xstroke(9,'#0a1830')};">${lines}</div>`
+        +band
+        +ribbon
       +`</div>`;} },
 
   { id:'note_s70', name:'note 学習LP（上帯＋2行＋下帯＋右学生）', cat:'サムネ', fmt:'note',
@@ -3108,12 +3120,12 @@ const TEMPLATES = [
   { id:'note_s76', name:'note 連載型（ブランド帯＋黄バブル＋下青帯）', cat:'サムネ', fmt:'note',
     fields:[
       {key:'img',label:'背景 写真(任意)',type:'file',def:''},
-      {key:'brand',label:'左上 ブランド',def:'小林よしのり ライジング'},
-      {key:'bubble',label:'上 黄バブル',def:'沖縄の男尊女卑はどこから来た?'},
-      {key:'big',label:'下 青帯（改行可）',def:'沖縄と本土、\nどちらが辺境か?'}],
-    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#8ac0e0,#3a7a4a);';
+      {key:'brand',label:'左上 ブランド',def:'連載コラム'},
+      {key:'bubble',label:'上 黄バブル',def:'なぜ、お金が貯まらないのか?'},
+      {key:'big',label:'下 青帯（改行可）',def:'貯まる人だけが\nやっていること'}],
+    render:(d,t)=>{const bg=d.img?`background:url(${d.img}) center/cover;`:'background:linear-gradient(160deg,#eef3f8,#d4e2ee);';
       return `<div style="width:1920px;height:1006px;box-sizing:border-box;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;${bg}font-family:${t.head};">`
-        +`<div style="position:absolute;top:36px;left:60px;display:flex;align-items:center;"><div style="display:flex;font-size:44px;font-weight:900;letter-spacing:4px;color:#1a1a1a;margin-right:18px;">note</div><div style="display:flex;background:#e8852a;color:#fff;font-size:42px;font-weight:900;padding:8px 26px;border-radius:8px;">${d.brand}</div></div>`
+        +`<div style="position:absolute;top:36px;left:60px;display:flex;align-items:center;"><div style="display:flex;font-size:44px;font-weight:900;letter-spacing:4px;color:#16335c;margin-right:18px;">note</div><div style="display:flex;background:#1763c4;color:#fff;font-size:42px;font-weight:900;padding:8px 26px;border-radius:8px;">${d.brand}</div></div>`
         +`<div style="display:flex;flex-direction:column;align-items:center;">`
           +`<div style="display:flex;background:#ffe24a;color:#1a1a1a;font-size:50px;font-weight:900;padding:12px 38px;border-radius:40px;margin-bottom:44px;">${d.bubble}</div>`
           +`<div style="display:flex;flex-direction:column;align-items:center;background:#1763c4;padding:18px 50px;border-radius:14px;font-size:104px;font-weight:900;color:#fff;line-height:1.1;${xstroke(9,'#0e3f86')};">${nl(d.big)}</div>`
@@ -3136,17 +3148,17 @@ const TEMPLATES = [
     render:(d,t)=>infoStat3(1920,1006,d) },
 
   { id:'yt_info_index', name:'目次 INDEX（点線リーダー2カラム）', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'title',label:'タイトル',def:'INDEX'},{key:'items',label:'項目（1行=ラベル|頁・改行区切り）',def:'1 きほんのシャツ|04\n1-A シャツワンピース|05\n1-B ギャザーシャツ|06\n2 きほんのワンピース|09\n2-A ギャザーワンピース|10\n3 きほんのパンツ|13\n3-A サルエル風パンツ|14\n4 きほんのブルゾン|18\n4-A ギャザーブルゾン|19\n5 きほんのエプロン|24'}],
+    fields:[{key:'title',label:'タイトル',def:'この記事でわかること'},{key:'items',label:'項目（1行1項目）',def:'最短で成果を出す全体像\nゼロから始める準備リスト\n毎日つづく仕組みのつくり方\n伸び悩んだ時の改善法\nありがちな失敗と回避策\n今日からやる最初の一歩'}],
     render:(d,t)=>infoIndex(1280,720,d) },
   { id:'note_info_index', name:'目次 INDEX（点線リーダー2カラム）', cat:'サムネ', fmt:'note',
-    fields:[{key:'title',label:'タイトル',def:'INDEX'},{key:'items',label:'項目（1行=ラベル|頁・改行区切り）',def:'1 きほんのシャツ|04\n1-A シャツワンピース|05\n1-B ギャザーシャツ|06\n2 きほんのワンピース|09\n2-A ギャザーワンピース|10\n3 きほんのパンツ|13\n3-A サルエル風パンツ|14\n4 きほんのブルゾン|18\n4-A ギャザーブルゾン|19\n5 きほんのエプロン|24'}],
+    fields:[{key:'title',label:'タイトル',def:'この記事でわかること'},{key:'items',label:'項目（1行1項目）',def:'最短で成果を出す全体像\nゼロから始める準備リスト\n毎日つづく仕組みのつくり方\n伸び悩んだ時の改善法\nありがちな失敗と回避策\n今日からやる最初の一歩'}],
     render:(d,t)=>infoIndex(1920,1006,d) },
 
-  { id:'yt_info_no1', name:'広告バナー No.1訴求（月桂冠＋デバイス）', cat:'サムネ', fmt:'youtube',
-    fields:[{key:'head',label:'上 見出し',def:'数字でアピール'},{key:'num',label:'中央 大文字',def:'No.1'},{key:'chip',label:'実績チップ',def:'登録者数 00,000以上！'},{key:'img',label:'右 デバイス画像(任意)',type:'file',def:''},{key:'logo',label:'左下 ロゴ',def:'Logo'}],
+  { id:'yt_info_no1', name:'No.1発表サムネ（☆＋特大No.1）', cat:'サムネ', fmt:'youtube',
+    fields:[{key:'img',label:'背景 写真(任意)',type:'file',def:''},{key:'kicker',label:'上 小ラベル(任意)',def:'2026年 満足度調査'},{key:'pre',label:'No.1の前 ひとこと',def:'選ばれ続けて'},{key:'num',label:'中央 大文字',def:'No.1'},{key:'sub',label:'下 ひとこと',def:'その理由を解説します'}],
     render:(d,t)=>infoBannerNo1(1280,720,d) },
-  { id:'note_info_no1', name:'広告バナー No.1訴求（月桂冠＋デバイス）', cat:'サムネ', fmt:'note',
-    fields:[{key:'head',label:'上 見出し',def:'数字でアピール'},{key:'num',label:'中央 大文字',def:'No.1'},{key:'chip',label:'実績チップ',def:'登録者数 00,000以上！'},{key:'img',label:'右 デバイス画像(任意)',type:'file',def:''},{key:'logo',label:'左下 ロゴ',def:'Logo'}],
+  { id:'note_info_no1', name:'No.1発表サムネ（☆＋特大No.1）', cat:'サムネ', fmt:'note',
+    fields:[{key:'img',label:'背景 写真(任意)',type:'file',def:''},{key:'kicker',label:'上 小ラベル(任意)',def:'2026年 満足度調査'},{key:'pre',label:'No.1の前 ひとこと',def:'選ばれ続けて'},{key:'num',label:'中央 大文字',def:'No.1'},{key:'sub',label:'下 ひとこと',def:'その理由を解説します'}],
     render:(d,t)=>infoBannerNo1(1920,1006,d) },
 
   { id:'note_basic', name:'N1 ベーシック', cat:'サムネ', fmt:'note',
